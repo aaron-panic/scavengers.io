@@ -23,3 +23,31 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- Admin approve new user request
+DELIMITER //
+
+CREATE PROCEDURE sp_admin_approve_requested(
+    IN p_id INT
+)
+BEGIN
+    UPDATE Users
+    SET status = 'active'
+        WHERE id = p_id
+        AND status = 'requested';
+END //
+
+DELIMITER ;
+
+-- Admin deny new user request
+DELIMITER //
+CREATE PROCEDURE sp_admin_deny_requested(
+    IN p_ID INT
+)
+BEGIN
+    DELETE FROM Users
+        WHERE id = p_ID
+        AND status = 'requested';
+END //
+
+DELIMITER ;

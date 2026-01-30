@@ -131,3 +131,29 @@ def fetch_all_users():
             conn.close()
 
     return users
+
+# Approve newly requested user
+def approve_user(user_id):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_query(conn, "CALL sp_admin_approve_requested(%s)", (user_id,), commit=True)
+    except Error as e:
+        print(f"Approve error: {e}")
+        raise
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+
+# Deny newly requested user
+def deny_user(user_id):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_query(conn, "CALL sp_admin_deny_requested(%s)", (user_id,), commit=True)
+    except Error as e:
+        print(f"Deny error: {e}")
+        raise
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
