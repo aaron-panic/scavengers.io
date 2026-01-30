@@ -1,7 +1,7 @@
 services:
   db:
     image: mariadb:10.11
-    container_name: scav_db
+    container_name: scavengers_db
     restart: unless-stopped
     env_file:
       - .env
@@ -16,7 +16,7 @@ services:
 
   web:
     build: ./site
-    container_name: scav_web
+    container_name: scavengers.io
     restart: unless-stopped
     volumes:
       - ./site:/app
