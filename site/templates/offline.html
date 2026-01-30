@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="announce">
+    <h1>//User -> {{ session['username'] }}</h1>
+    <p>System Status: Online</p>
+    <p>Role: {{ session['role'] }}</p>
+</div>
+
+{% endblock %}

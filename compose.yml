@@ -1,0 +1,39 @@
+services:
+  db:
+    image: mariadb:10.11
+    container_name: scav_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASS_ROOT}
+      MARIADB_DATABASE: scavengers
+    volumes:
+      - db_scav_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
+    networks:
+      - scavenger_net
+
+  web:
+    build: ./site
+    container_name: scav_web
+    restart: unless-stopped
+    volumes:
+      - ./site:/app
+    ports:
+      - "127.0.0.1:5000:5000"
+    env_file:
+      - .env
+    environment:
+      PYTHONDONTWRITEBYTECODE: 1
+    depends_on:
+      - db
+    networks:
+      - scavenger_net
+
+volumes:
+  db_scav_data:
+
+networks:
+  scavenger_net:
+    driver: bridge

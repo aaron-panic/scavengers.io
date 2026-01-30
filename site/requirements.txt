@@ -1,0 +1,6 @@
+flask
+flask-limiter
+flask-wtf
+mysql-connector-python
+argon2-cffi
+gunicorn

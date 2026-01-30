@@ -1,0 +1,41 @@
+{% extends 'admin.html' %}
+
+{% block subcontent %}
+    <h2 class="content-subcontent">user management</h2>
+    <div id="user-list">
+        <div id="user-record-header">
+            <span>ID</span>
+            <span>Username</span>
+            <span>Email</span>
+            <span>Role</span>
+            <span>Joined</span>
+            <span>Status</span>
+        </div>
+
+        {% for user in users %}
+        <div class="user-record">
+            <span class="user-id">{{ user.id }}</span>
+            <span class="user-username">{{ user.username }}</span>
+            <span class="user-email">{{ user.email }}</span>
+            <span class="user-role">{{ user.role }}</span>
+            <span class="user-joined">{{ user.created_at }}</span>
+            <span class="user-status-{{ user.status }}">
+                {{ user.status }}
+                {% if user.suspended_until %}
+                - Suspended Until: {{ user.suspended_until }}
+                {% endif %}
+            </span>
+            <span class="user-actions">
+                {% if user.status == 'requested' %}
+                <a href="#">[approve]</a>
+                <a href="#">[deny]</a>
+                {% else %}
+                <a href="#">[edit]</a>
+                <a href="#">[suspend]</a>
+                <a href="#">[ban]</a>
+                {% endif %}
+            </span>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

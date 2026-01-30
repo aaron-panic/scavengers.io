@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="content-header">{{ title }}</h1>
+    <div id="content-navigation">
+        <span><a href="{{ url_for('admin.users') }}">users</a></span>
+        {% block subcontent %}
+        {% endblock %}
+    </div>
+{% endblock %}
