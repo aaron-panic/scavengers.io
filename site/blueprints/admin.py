@@ -14,9 +14,18 @@ def dashboard():
     return render_template('admin.html', title='admin')
 
 @admin_bp.route('/users')
-def users():
+@admin_bp.route('/users/<int:selected_user_id>')
+def users(selected_user_id=None):
     user_list = db.fetch_all_users()
-    return render_template('admin_users.html', title='users', users=user_list)
+    
+    selected_user = None
+    if selected_user_id:
+        slected_user = db.fetch_user_details(selected_user_id)
+        if not selected_user:
+            flash(f"No Details: UID: {selected_user_id}")
+            return redirect(url_for('admin.users'))
+        
+        return render_template('admin_users.html', title='users', users=user_list, selected_user=selected_user)
 
 @admin_bp.route('/users/approve/<int:user_id>', methods=['POST'])
 def approve(user_id):
@@ -37,3 +46,58 @@ def deny(user_id):
         flash(f"Denial error: UID {user_id}: {e}")
     
     return redirect(url_for('admin.users'))
+
+@admin_bp.route('/users/suspend/<int:user_id>/<int:duration>', methods=['POST'])
+def suspend_user(user_id, duration):
+    try:
+        db.suspend_user(user_id, duration)
+        flash(f"User {user_id} suspended for {duration} hours.")
+    except Exception as e:
+        flash(f"Error suspending user: {e}")
+    # Return to the detail view of the same user
+    return redirect(url_for('admin.users', selected_user_id=user_id))
+
+@admin_bp.route('/users/ban/<int:user_id>', methods=['POST'])
+def ban_user(user_id):
+    try:
+        db.ban_user(user_id)
+        flash(f"User {user_id} BANNED.")
+    except Exception as e:
+        flash(f"Error banning user: {e}")
+    return redirect(url_for('admin.users', selected_user_id=user_id))
+
+@admin_bp.route('/users/reinstate/<int:user_id>', methods=['POST'])
+def reinstate_user(user_id):
+    try:
+        db.reinstate_user(user_id)
+        flash(f"User {user_id} reinstated.")
+    except Exception as e:
+        flash(f"Error reinstating user: {e}")
+    return redirect(url_for('admin.users', selected_user_id=user_id))
+
+@admin_bp.route('/users/delete/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    try:
+        db.delete_user(user_id)
+        flash(f"User {user_id} DELETED.")
+        # Return to main list since user is gone
+        return redirect(url_for('admin.users')) 
+    except Exception as e:
+        flash(f"Error deleting user: {e}")
+        return redirect(url_for('admin.users', selected_user_id=user_id))
+
+@admin_bp.route('/users/reset_pass/<int:user_id>', methods=['POST'])
+def reset_pass(user_id):
+    # Generate a secure random 16-char password
+    alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+    new_pass = ''.join(secrets.choice(alphabet) for i in range(16))
+    
+    try:
+        hashed_pw = ph.hash(new_pass)
+        db.reset_password(user_id, hashed_pw)
+        # Must manually copy the password here
+        flash(f"Password reset for User {user_id}. New Password: {new_pass}")
+    except Exception as e:
+        flash(f"Error resetting password: {e}")
+        
+    return redirect(url_for('admin.users', selected_user_id=user_id))
