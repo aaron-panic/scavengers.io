@@ -1,33 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="content-area">
-    <h1 class="content-header">{{ title }}</h1>
+<div class="layout-content-centered">
+    <h1 class="page-header">{{ title }}</h1>
 
     <form action="" method="post" id="register-form" class="card glass">
         {{ form.hidden_tag() }}
-        <div class="input-group">
-            <span class="input-label">{{ form.username.label }}</span>
-            <span class="input-field">{{ form.username(size=32) }}</span>
+        <div class="form-group">
+            <span class="form-label">{{ form.username.label }}</span>
+            <span class="form-control">{{ form.username(size=32) }}</span>
         </div>
-        <div class="input-group">
-            <span class="input-label">{{ form.email.label }}</span>
-            <span class="input-field">{{ form.email(size=32) }}</span>
+        <div class="form-group">
+            <span class="form-label">{{ form.email.label }}</span>
+            <span class="form-control">{{ form.email(size=32) }}</span>
         </div>
-        <div class="input-group">
-            <span class="input-label">{{ form.password.label }}</span>
-            <span class="input-field">{{ form.password(size=32, id="register-input-password") }}</span>
-            <span id="register-password-status" class="input-status-indicator"></span>
+        <div class="form-group">
+            <span class="form-label">{{ form.password.label }}</span>
+            <span class="form-control">{{ form.password(size=32, id="register-input-password") }}</span>
+            <span id="register-password-status" class="form-status-indicator"></span>
         </div>
-        <div class="input-group">
-            <span class="input-label">{{ form.confirm.label }}</span>
-            <span class="input-field">{{ form.confirm(size=32, id="register-input-confirm") }}</span>
-            <span id="register-confirm-status" class="input-status-indicator"></span>
-            <div class="input-hint">
+        <div class="form-group">
+            <span class="form-label">{{ form.confirm.label }}</span>
+            <span class="form-control">{{ form.confirm(size=32, id="register-input-confirm") }}</span>
+            <span id="register-confirm-status" class="form-status-indicator"></span>
+            <div class="form-hint">
                 min. 12 chars (Upper, Lower, Number, Symbol) -OR- >24 chars (any)
             </div>
         </div>
-        <div class="input-submit">
+        <div class="form-actions">
             {{ form.submit() }}
         </div>
     </form>

@@ -5,113 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - .scavengers</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/effects.css') }}">
 </head>
 <body>
-    <div class="content-pollen">
-        <aside class="navigation glass">
-            <div id="navigation-head">
-                <div id="navigation-title">
+    <div id="layout-wrapper">
+        <aside id="nav-container" class="glass">
+            <div id="nav-header">
+                <div id="nav-title">
                     <h3>.scavengers</h3>
                     {% if session.get('username') %}
-                        <span id="navigation-user">// {{ session['username'] }}</span>
+                    <span id="nav-user-indicator">// {{ session['username'] }}</span>
                     {% endif %}
                 </div>
-                <!--
-                <button id="navigation-menu-button">☰</button>
-                -->
             </div>
-            <div id="navigation-content">
+            <div id="nav-body">
                 <nav>
                     {% if session.get('username') %}
                         {% if session['role'] in ['admin'] %}
-                            <div class="navigation-item admin-item">
-                                <a href="{{ url_for('admin.dashboard') }}">admin</a>
-                            </div>
-                            <div class="navigation-item navigation-break admin-item"></div>
+                        <div class="nav-item nav-item-admin">
+                            <a href="{{ url_for('admin.dashboard') }}">admin</a>
+                        </div>
+                        <div class="nav-break"></div>
                         {% endif %}
 
                         {% if session['role'] in ['admin', 'user'] %}
-                            <div class="navigation-item navigation-break user-item"></div>
-                            <div class="navigation-item user-item">
-                                <a href="{{ url_for('user.media') }}">media</a>
-                            </div>
-                            <div class="navigation-item user-item">
-                                <a href="{{ url_for('user.req') }}">req</a>
-                            </div>
-                            <div class="navigation-item user-item">
-                                <a href="{{ url_for('user.report') }}">report</a>
-                            </div>
+                        <div class="nav-break"></div>
+                        <div class="nav-item nav-item-user">
+                            <a href="{{ url_for('user.media') }}">media</a>
+                        </div>
+                        <div class="nav-item nav-item-user">
+                            <a href="{{ url_for('user.req') }}">req</a>
+                        </div>
+                        <div class="nav-item nav-item-user">
+                            <a href="{{ url_for('user.report') }}">report</a>
+                        </div>
                         {% endif %}
 
                         {% if session['role'] in ['admin', 'user', 'social'] %}
-                            <div class="navigation-item social-item">
-                                <a href="{{ url_for('social.announce') }}">announce</a>
-                            </div>
-                            <div class="navigation-item social-item">
-                                <a href="{{ url_for('social.post') }}">post</a>
-                            </div>
-                            <div class="navigation-item social-item">
-                                <a href="{{ url_for('social.bulletin') }}">bulletin</a>
-                            </div>
-                            <div class="navigation-item social-item">
-                                <a href="{{ url_for('social.chat') }}">chat</a>
-                            </div>
-                            <div class="navigation-item social-item">
-                                <a href="{{ url_for('social.app') }}">app</a>
-                            </div>
+                        <div class="nav-item nav-item-social">
+                            <a href="{{ url_for('social.announce') }}">announce</a>
+                        </div>
+                        <div class="nav-item nav-item-social">
+                            <a href="{{ url_for('social.post') }}">post</a>
+                        </div>
+                        <div class="nav-item nav-item-social">
+                            <a href="{{ url_for('social.bulletin') }}">bulletin</a>
+                        </div>
+                        <div class="nav-item nav-item-social">
+                            <a href="{{ url_for('social.chat') }}">chat</a>
+                        </div>
+                        <div class="nav-item nav-item-social">
+                            <a href="{{ url_for('social.app') }}">app</a>
+                        </div>
                         {% endif %}
 
-                        <div class="navigation-item navigation-break"></div>
-                        <div class="navigation-item">
+                        <div class="nav-break"></div>
+                        <div class="nav-item">
                             <a href="{{ url_for('home.profile') }}">profile</a>
                         </div>
 
-                        <div class="navigation-item navigation-break"></div>
-                        <div class="navigation-item" id="logout-button">
+                        <div class="nav-break"></div>
+                        <div class="nav-item" id="nav-logout">
                             <a href="{{ url_for('auth.logout') }}">logout</a>
                         </div>
-
                     {% endif %}
 
                     {% if not session.get('username') %}
-                        <div class="navigation-item">
-                            <a href="{{ url_for('auth.login') }}">login</a>
-                        </div>
-                        <div class="navigation-item">
-                            <a href="{{ url_for('auth.register') }}">register</a>
-                        </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('auth.login') }}">login</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('auth.register') }}">register</a>
+                    </div>
                     {% endif %}
                 </nav>
-
-                <div id="sidebar-nodestatus">
-                    </div>
+                <div id="nav-status"></div>
             </div>
-
         </aside>
 
-        <main id="content">
-            <div id="flash-message-container">
+        <main id="layout-main">
+            <div id="layout-flash-container">
                 {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        <ul class="flash-message-list">
-                            {% for message in messages %}
-                                <li class="flash-message">{{ message }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
+                {% if messages %}
+                <ul class="flash-list">
+                    {% for message in messages %}
+                    <li class="flash-item">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
                 {% endwith %}
             </div>
-            {% block content %}
-            {% endblock %}
+            {% block content %}{% endblock %}
         </main>
 
-        <aside id="scroller">
+        <aside id="layout-scroller">
             <pre id="scroller-code"></pre>
         </aside>
-
     </div>
 </body>
 </html>

@@ -1,71 +1,83 @@
 {% extends 'admin.html' %}
 
 {% block subcontent %}
-    <h2 class="content-subcontent">users</h2>
+    <h2 class="page-subheader">users</h2>
+    
     {% if selected_user %}
-    <div id="admin-user-detail" class="card glass">
-        <h3 id="admin-user-detail-username">// {{ selected_user.username }}</h3>
-        <a href="{{ url_for('admin.users') }}" id="admin-user-detail-close">[close]</a>
-        <div id="admin-user-detail-content">
-            <div class="admin-user-detail-item">
-                <span class="admin-user-detail-label">id: </span><span class="admin-user-detail-value">{{ selected_user.id }}</span>
+    <div id="admin-detail-pane" class="card glass">
+        <h3 id="admin-detail-username">// {{ selected_user.username }}</h3>
+        <a href="{{ url_for('admin.users') }}" id="admin-detail-close">[close]</a>
+        
+        <div id="admin-detail-content">
+            <div class="admin-detail-row">
+                <span class="admin-detail-label">id: </span>
+                <span class="admin-detail-value">{{ selected_user.id }}</span>
             </div>
-            <div class="admin-user-detail-item">
-                <span class="admin-user-detail-label">username: </span><span class="admin-user-detail-value">{{ selected_user.username }}</span>
+            <div class="admin-detail-row">
+                <span class="admin-detail-label">username: </span>
+                <span class="admin-detail-value">{{ selected_user.username }}</span>
             </div>
-            <div class="admin-user-detail-item">
-                <span class="admin-user-detail-label">email: </span><span class="admin-user-detail-value">{{ selected_user.email }}</span>
+            <div class="admin-detail-row">
+                <span class="admin-detail-label">email: </span>
+                <span class="admin-detail-value">{{ selected_user.email }}</span>
             </div>
-            <div class="admin-user-detail-item">
-                <span class="admin-user-detail-label">role: </span><span class="admin-user-detail-value">{{ selected_user.role }}</span>
+            <div class="admin-detail-row">
+                <span class="admin-detail-label">role: </span>
+                <span class="admin-detail-value">{{ selected_user.role }}</span>
             </div>
-            <div class="admin-user-detail-item">
-                <span class="admin-user-detail-label">status: </span><span class="admin-user-detail-value">{{ selected_user.status }}</span>
+            <div class="admin-detail-row">
+                <span class="admin-detail-label">status: </span>
+                <span class="admin-detail-value">{{ selected_user.status }}</span>
             </div>
             {% if selected_user.suspended_until %}
-            <div class="admin-user-detail-item">
-                <span class="admin-user-detail-label">t_suspend: </span><span class="admin-user-detail-value">{{ selected_user.suspended_until }}</span>
+            <div class="admin-detail-row">
+                <span class="admin-detail-label">t_suspend: </span>
+                <span class="admin-detail-value">{{ selected_user.suspended_until }}</span>
             </div>
             {% endif %}
         </div>
-        <div id="admin-user-detail-controls">
-            <form action="{{ url_for('admin.reset_pass', user_id=selected_user.id) }}" method="post"
-                    class="admin-user-detail-form confirm-action" data-message="reset password: {{ selected_user.username }}">
+
+        <div id="admin-detail-controls">
+            <form action="{{ url_for('admin.reset_pass', user_id=selected_user.id) }}" method="post" class="admin-action-form confirm-action" data-message="reset password: {{ selected_user.username }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-user-control-button">[reset pass]</button>
+                <button type="submit" class="admin-action-button">[reset pass]</button>
             </form>
+            
             {% if selected_user.status != 'suspended' %}
-            <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=24) }}" method="post" class="admin-user-detail-form">
+            <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=24) }}" method="post" class="admin-action-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-user-control-button">[suspend 24]</button>
+                <button type="submit" class="admin-action-button">[suspend 24h]</button>
             </form>
-            <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=72) }}" method="post" class="admin-user-detail-form">
+            <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=72) }}" method="post" class="admin-action-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-user-control-button">[suspend 72]</button>
+                <button type="submit" class="admin-action-button">[suspend 72h]</button>
             </form>
             {% endif %}
+            
             {% if selected_user.status != 'banned' %}
-            <form action="{{ url_for('admin.ban_user', user_id=selected_user.id) }}" method="post" class="admin-user-detail-form">
+            <form action="{{ url_for('admin.ban_user', user_id=selected_user.id) }}" method="post" class="admin-action-form confirm-action" data-message="Ban user {{ selected_user.username }}?">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-user-control-button">[ban]</button>
+                <button type="submit" class="admin-action-button">[ban]</button>
             </form>
             {% endif %}
+            
             {% if selected_user.status == 'banned' or selected_user.status == 'suspended' %}
-            <form action="{{ url_for('admin.reinstate_user', user_id=selected_user.id) }}" method="post" class="admin-user-detail-form">
+            <form action="{{ url_for('admin.reinstate_user', user_id=selected_user.id) }}" method="post" class="admin-action-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-user-control-button">[reinstate]</button>
+                <button type="submit" class="admin-action-button">[reinstate]</button>
             </form>
             {% endif %}
-            <form action="{{ url_for('admin.delete_user', user_id=selected_user.id) }}" method="post"
-                    class="admin-user-detail-form confirm-action" data-message="delete user: {{ selected_user.username }}">
+            
+            <form action="{{ url_for('admin.delete_user', user_id=selected_user.id) }}" method="post" class="admin-action-form confirm-action" data-message="delete user: {{ selected_user.username }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-user-control-button">[delete]</button>
+                <button type="submit" class="admin-action-button error-text">[delete]</button>
             </form>
         </div>
     </div>
     {% endif %}
-    <div id="admin-user-list">
-        <div id="admin-user-record-header">
+
+    <div id="admin-list-container">
+        <div id="admin-list-header">
             <span>ID</span>
             <span>Username</span>
             <span>Email</span>
@@ -75,28 +87,25 @@
         </div>
 
         {% for user in users %}
-        <div class="admin-user-record">
-            <span class="admin-user-id">{{ user.id }}</span>
-            <span class="admin-user-username">{{ user.username }}</span>
-            <span class="admin-user-email">{{ user.email }}</span>
-            <span class="admin-user-role">{{ user.role }}</span>
-            <span class="admin-user-joined">{{ user.created_at }}</span>
-            <span class="admin-user-status-{{ user.status }}">
+        <div class="admin-list-record">
+            <span class="admin-record-id">{{ user.id }}</span>
+            <span class="admin-record-username">{{ user.username }}</span>
+            <span class="admin-record-email">{{ user.email }}</span>
+            <span class="admin-record-role">{{ user.role }}</span>
+            <span class="admin-record-joined">{{ user.created_at }}</span>
+            <span class="admin-record-status status-{{ user.status }}">
                 {{ user.status }}
-                {% if user.suspended_until %}
-                - Suspended Until: {{ user.suspended_until }}
-                {% endif %}
+                {% if user.suspended_until %} (S) {% endif %}
             </span>
-            <span class="admin-user-actions">
+            <span class="admin-record-actions">
                 {% if user.status == 'requested' %}
-                <form action="{{ url_for('admin.approve', user_id=user.id) }}" method="post" class="admin-user-control">
+                <form action="{{ url_for('admin.approve', user_id=user.id) }}" method="post" class="admin-action-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <button type="submit" class="admin-user-control-button">[approve]</button>
+                    <button type="submit" class="admin-action-button">[approve]</button>
                 </form>
-                <form action="{{ url_for('admin.deny', user_id=user.id) }}" method="post"
-                        class="admin-user-control confirm-action" data-message="delete request for UID: {{ user.username }}?">
+                <form action="{{ url_for('admin.deny', user_id=user.id) }}" method="post" class="admin-action-form confirm-action" data-message="delete request for UID: {{ user.username }}?">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <button type="submit" class="admin-user-control-button ">[deny]</button>
+                    <button type="submit" class="admin-action-button">[deny]</button>
                 </form>
                 {% else %}
                 <a href="{{ url_for('admin.users', selected_user_id=user.id)}}">[modify]</a>

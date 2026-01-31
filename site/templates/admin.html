@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1 class="content-header">{{ title }}</h1>
-    <div id="content-navigation">
+    <h1 class="page-header">{{ title }}</h1>
+    <div id="admin-nav">
         <span><a href="{{ url_for('admin.users') }}">users</a></span>
-        {% block subcontent %}
-        {% endblock %}
+        {% block subcontent %}{% endblock %}
     </div>
 {% endblock %}
