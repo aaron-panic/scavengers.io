@@ -7,6 +7,7 @@ from middleware import check_access
 import db
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+ph = PasswordHasher()
 
 @admin_bp.before_request
 def restrict_access():
