@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
 </head>
 <body>
-    <div class="pollen">
+    <div class="content-pollen">
         <aside class="navigation glass">
             <div id="navigation-head">
                 <div id="navigation-title">
@@ -79,6 +79,8 @@
                     {% if not session.get('username') %}
                         <div class="navigation-item">
                             <a href="{{ url_for('auth.login') }}">login</a>
+                        </div>
+                        <div class="navigation-item">
                             <a href="{{ url_for('auth.register') }}">register</a>
                         </div>
                     {% endif %}

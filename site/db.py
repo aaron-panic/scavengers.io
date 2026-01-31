@@ -3,7 +3,9 @@ import mysql.connector
 from mysql.connector import Error
 from flask import g
 
-# Configuration from Environment
+# ---------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------
 DB_HOST = "db"
 DB_NAME = "scavengers"
 
@@ -15,35 +17,11 @@ ROLE_MAP = {
     'user': 'DB_PASS_USER'
 }
 
-# Return proper connection based on role
-def get_connection(role):
-    if role not in ROLE_MAP:
-        raise ValueError(f"Invalid Role: {role}")
+# ---------------------------------------------------------
+# Execution Wrappers
+# ---------------------------------------------------------
 
-    password = os.environ.get(ROLE_MAP[role])
-    if not password:
-        raise ValueError(f"Password for '{role}' not found in env vars.")
-
-    try:
-        conn = mysql.connector.connect(
-            host = DB_HOST,
-            database = DB_NAME,
-            user = f"scav_{role}",
-            password = password
-        )
-        return conn
-    except Error as e:
-        print(f"Error connecting to database as {role}: {e}")
-        raise
-
-# Generic execution function
-# conn: Active Database connection object
-# query: SQL String
-# params: Paramaters to expand in string (tuple)
-# commit: Set to True for INSERT/UPDATE/DELTE
-# Returns list of dictionaries with SELECT
-# Returns LastRowID with INSERT
-# Returns RowCount with UPDATE/DELETE
+# Generic execution for Standard SQL (INSERT, UPDATE, DELETE, simple SELECT)
 def execute_query(conn, query, params=None, commit=False):
     cursor = conn.cursor(dictionary=True)
     result = None
@@ -67,31 +45,56 @@ def execute_query(conn, query, params=None, commit=False):
 
     return result
 
-# Connects as 'scav_login_bot' and retrieves password hash for username with (STORED PROCEDURE)
-def fetch_user_auth(username):
-    conn = None
-    auth_data = None
-
+# Generic execution for Stored Procedures (Handling callproc + stored_results)
+# Returns: List of dictionaries (all rows from the first result set)
+def execute_procedure(conn, proc_name, args=(), commit=False):
+    cursor = conn.cursor(dictionary=True)
+    results = []
     try:
-        conn = get_connection('login_bot')
-        cursor = conn.cursor(dictionary=True)
-
-        cursor.callproc('sp_get_user_auth', [username])
-
+        cursor.callproc(proc_name, args)
+        
+        if commit:
+            conn.commit()
+        
         for result in cursor.stored_results():
             rows = result.fetchall()
             if rows:
-                auth_data = rows[0]
-    
+                results.extend(rows)
+
     except Error as e:
-        print(f"Authentication fetch error: {e}")
+        print(f"Procedure execution error ({proc_name}): {e}")
+        raise
     finally:
-        if conn and conn.is_connected():
-            conn.close()
+        cursor.close()
 
-    return auth_data
+    return results
 
-# New Database connection based on role
+# ---------------------------------------------------------
+# Connection Logic
+# ---------------------------------------------------------
+
+# Return proper connection based on role
+def get_connection(role):
+    if role not in ROLE_MAP:
+        raise ValueError(f"Invalid Role: {role}")
+
+    password = os.environ.get(ROLE_MAP[role])
+    if not password:
+        raise ValueError(f"Password for '{role}' not found in env vars.")
+
+    try:
+        conn = mysql.connector.connect(
+            host = DB_HOST,
+            database = DB_NAME,
+            user = f"scav_{role}",
+            password = password
+        )
+        return conn
+    except Error as e:
+        print(f"Error connecting to database as {role}: {e}")
+        raise
+
+# New Database connection based on role (Flask Context Aware)
 def get_db(role='social'):
     if 'db_conns' not in g:
         g.db_conns = {}
@@ -110,26 +113,40 @@ def close_dbs(e=None):
             if conn.is_connected():
                 conn.close()
 
-# Fetch users for admin panel (STORED PROCEDURE)
-def fetch_all_users():
+# ---------------------------------------------------------
+# Data Access Objects
+# ---------------------------------------------------------
+
+# Fetch password_hash for username
+def fetch_user_auth(username):
     conn = None
-    users = []
-
+    auth_data = None
     try:
-        conn = get_connection('admin_bot')
-        cursor = conn.cursor(dictionary=True)
-
-        cursor.callproc('sp_admin_list_users')
-
-        for result in cursor.stored_results():
-            users = result.fetchall()
-
-    except Error as e:
-        print(f"Admin fetch error: {e}")
+        conn = get_connection('login_bot')
+        # Cleaner implementation using wrapper
+        rows = execute_procedure(conn, 'sp_get_user_auth', [username])
+        if rows:
+            auth_data = rows[0]
+    except Error:
+        pass # Logging handled in wrapper
     finally:
         if conn and conn.is_connected():
             conn.close()
+    return auth_data
 
+# Fetch users for admin panel
+def fetch_all_users():
+    conn = None
+    users = []
+    try:
+        conn = get_connection('admin_bot')
+        # Cleaner implementation
+        users = execute_procedure(conn, 'sp_admin_list_users')
+    except Error:
+        pass
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
     return users
 
 # Approve newly requested user
@@ -137,9 +154,9 @@ def approve_user(user_id):
     conn = None
     try:
         conn = get_connection('admin_bot')
-        execute_query(conn, "CALL sp_admin_approve_requested(%s)", (user_id,), commit=True)
-    except Error as e:
-        print(f"Approve error: {e}")
+        # Note: We use execute_procedure with commit=True for actions
+        execute_procedure(conn, 'sp_admin_approve_requested', [user_id], commit=True)
+    except Error:
         raise
     finally:
         if conn and conn.is_connected():
@@ -150,10 +167,75 @@ def deny_user(user_id):
     conn = None
     try:
         conn = get_connection('admin_bot')
-        execute_query(conn, "CALL sp_admin_deny_requested(%s)", (user_id,), commit=True)
-    except Error as e:
-        print(f"Deny error: {e}")
+        execute_procedure(conn, 'sp_admin_deny_requested', [user_id], commit=True)
+    except Error:
         raise
     finally:
         if conn and conn.is_connected():
             conn.close()
+
+# Fetch all user details except password_hash
+def fetch_user_details(user_id):
+    conn = None
+    user_data = None
+    try:
+        conn = get_connection('admin_bot')
+        rows = execute_procedure(conn, 'sp_admin_get_user_details', [user_id])
+        if rows:
+            user_data = rows[0]
+    except Error:
+        pass
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+    return user_data
+
+# Suspend
+def suspend_user(user_id, hours):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_procedure(conn, 'sp_admin_suspend_user', [user_id, hours], commit=True)
+    except Error: raise
+    finally:
+        if conn and conn.is_connected(): conn.close()
+
+# Ban
+def ban_user(user_id):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_procedure(conn, 'sp_admin_ban_user', [user_id], commit=True)
+    except Error: raise
+    finally:
+        if conn and conn.is_connected(): conn.close()
+
+# Reinstate
+def reinstate_user(user_id):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_procedure(conn, 'sp_admin_reinstate_user', [user_id], commit=True)
+    except Error: raise
+    finally:
+        if conn and conn.is_connected(): conn.close()
+
+# Delete
+def delete_user(user_id):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_procedure(conn, 'sp_admin_delete_user', [user_id], commit=True)
+    except Error: raise
+    finally:
+        if conn and conn.is_connected(): conn.close()
+
+# Reset Password
+def reset_password(user_id, new_hash):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_procedure(conn, 'sp_admin_reset_password', [user_id, new_hash], commit=True)
+    except Error: raise
+    finally:
+        if conn and conn.is_connected(): conn.close()

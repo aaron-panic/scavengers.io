@@ -1,6 +1,6 @@
--- Login & Unsuspend (if suspension expired)
 DELIMITER //
 
+-- Login & Unsuspend (if suspension expired)
 CREATE PROCEDURE sp_get_user_auth(IN p_username VARCHAR(50))
 BEGIN
     UPDATE Users
@@ -14,11 +14,7 @@ BEGIN
     WHERE username = p_username;
 END //
 
-DELIMITER ;
-
 -- Registration Request (new user)
-DELIMITER //
-
 CREATE PROCEDURE sp_register_user(
     IN p_username VARCHAR(50),
     IN p_password_hash VARCHAR(255),
