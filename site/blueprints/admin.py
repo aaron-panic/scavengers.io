@@ -2,7 +2,7 @@ import secrets
 import string
 from flask import Blueprint, render_template, flash, redirect, url_for
 from argon2 import PasswordHasher
-from middleware import check_acces
+from middleware import check_access
 
 import db
 
