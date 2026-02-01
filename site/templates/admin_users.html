@@ -5,7 +5,7 @@
     <div id="admin-detail-pane" class="card glass">
         <a href="{{ url_for('admin.users') }}" id="admin-detail-close">[close]</a>
 
-        <h3 id="admin-detail-username">// {{ selected_user.username }}</h3>        
+        <h3 id="admin-detail-username">users/{{ selected_user.username }}</h3>        
         
         <div id="admin-detail-content">
             <div class="admin-detail-row">
@@ -76,7 +76,7 @@
     {% endif %}
 
     <div id="admin-list-container">
-        <h2 class="admin-list-subheader">users</h2>
+        <h3 class="admin-list-subheader">users</h3>
         <div id="admin-list-header">
             <span>id</span>
             <span>username</span>
