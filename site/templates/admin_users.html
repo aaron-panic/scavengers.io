@@ -1,12 +1,11 @@
 {% extends 'admin.html' %}
 
 {% block subcontent %}
-    <h2 class="page-subheader">users</h2>
-    
     {% if selected_user %}
     <div id="admin-detail-pane" class="card glass">
-        <h3 id="admin-detail-username">// {{ selected_user.username }}</h3>
         <a href="{{ url_for('admin.users') }}" id="admin-detail-close">[close]</a>
+
+        <h3 id="admin-detail-username">users/{{ selected_user.username }}</h3>        
         
         <div id="admin-detail-content">
             <div class="admin-detail-row">
@@ -77,26 +76,21 @@
     {% endif %}
 
     <div id="admin-list-container">
+        <h3 class="admin-list-subheader">users</h3>
         <div id="admin-list-header">
-            <span>ID</span>
-            <span>Username</span>
-            <span>Email</span>
-            <span>Role</span>
-            <span>Joined</span>
-            <span>Status</span>
+            <span>id</span>
+            <span>username</span>
+            <span>role</span>
+            <span>status</span>
+            <span>actions</span>
         </div>
 
         {% for user in users %}
         <div class="admin-list-record">
             <span class="admin-record-id">{{ user.id }}</span>
             <span class="admin-record-username">{{ user.username }}</span>
-            <span class="admin-record-email">{{ user.email }}</span>
             <span class="admin-record-role">{{ user.role }}</span>
-            <span class="admin-record-joined">{{ user.created_at }}</span>
-            <span class="admin-record-status status-{{ user.status }}">
-                {{ user.status }}
-                {% if user.suspended_until %} (S) {% endif %}
-            </span>
+            <span class="admin-record-status status-{{ user.status }}">{{ user.status }}</span>
             <span class="admin-record-actions">
                 {% if user.status == 'requested' %}
                 <form action="{{ url_for('admin.approve', user_id=user.id) }}" method="post" class="admin-action-form">
