@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - .scavengers</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/effects.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
 </head>
 <body>
     <div id="layout-wrapper">
-        <aside id="nav-container" class="glass">
+        <aside id="nav-container" class="nav-glass">
             <div id="nav-header">
                 <div id="nav-title">
                     <h3>.scavengers</h3>
@@ -68,18 +69,18 @@
                         </div>
 
                         <div class="nav-break"></div>
-                        <div class="nav-item" id="nav-logout">
+                        <div class="nav-item nav-logout">
                             <a href="{{ url_for('auth.logout') }}">logout</a>
                         </div>
                     {% endif %}
 
                     {% if not session.get('username') %}
-                    <div class="nav-item">
-                        <a href="{{ url_for('auth.login') }}">login</a>
-                    </div>
-                    <div class="nav-item">
-                        <a href="{{ url_for('auth.register') }}">register</a>
-                    </div>
+                        <div class="nav-item">
+                            <a href="{{ url_for('auth.login') }}">login</a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="{{ url_for('auth.register') }}">register</a>
+                        </div>
                     {% endif %}
                 </nav>
                 <div id="nav-status"></div>
@@ -102,8 +103,11 @@
         </main>
 
         <aside id="layout-scroller">
-            <pre id="scroller-code"></pre>
+            <pre id="scroller-content"></pre>
         </aside>
     </div>
+
+    <script src="{{ url_for('static', filename='js/scroller.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </body>
 </html>

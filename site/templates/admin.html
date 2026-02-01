@@ -2,8 +2,9 @@
 
 {% block content %}
     <h1 class="page-header">{{ title }}</h1>
-    <div id="admin-nav">
-        <span><a href="{{ url_for('admin.users') }}">users</a></span>
+
+    <div id="page-nav">
+        <a href="{{ url_for('admin.users') }}">users</a>
         {% block subcontent %}{% endblock %}
     </div>
 {% endblock %}

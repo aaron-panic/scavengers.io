@@ -1,0 +1,30 @@
+:root {
+    --font-main: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Noto Mono", "Liberation Mono", "Courier New", monospace;
+}
+
+* {
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    height: 100%;
+}
+
+body {
+    position: relative;
+    
+    display: flex;
+    
+    width: 100%;
+    height: 100%;
+    
+    overflow: hidden;
+
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;    
+}
