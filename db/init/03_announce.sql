@@ -12,3 +12,23 @@ CREATE TABLE IF NOT EXISTS Announcements (
         REFERENCES Users (id)
         ON DELETE CASCADE
 );
+
+DELIMITER //
+
+-- Fetch Announcements
+CREATE PROCEDURE sp_get_announcements()
+BEGIN
+    SELECT
+        a.id,
+        a.title,
+        a.subtitle,
+        a.content,
+        a.footnote,
+        a.created_at,
+        u.username
+    FROM Announcements a
+    JOIN Users u ON a.u_id = u.id
+    ORDER BY a.created_at DESC;
+END //
+
+DELIMITER ;
