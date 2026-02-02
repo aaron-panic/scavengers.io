@@ -28,7 +28,7 @@
                         {% endif %}
 
                         {% if session['role'] in ['admin', 'user'] %}
-                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.media') }}">library</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.media') }}">media</a></li>
                         <li class="nav-item nav-item-user"><a href="{{ url_for('user.req') }}">requests</a></li>
                         <li class="nav-item nav-item-user"><a href="{{ url_for('user.report') }}">reports</a></li>
                         <li class="nav-item nav-item-user"><a href="{{ url_for('user.dev') }}">dev</a></li>

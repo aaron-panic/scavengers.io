@@ -9,10 +9,3 @@ def start():
     if 'username' in session:
         return redirect(url_for('social.announce'))
     return redirect(url_for('auth.login'))
-
-@home_bp.route('/profile')
-def profile():
-    access_check = check_access(['admin','user','social'])
-    if access_check:
-        return access_check
-    return render_template('profile.html', title='profile')

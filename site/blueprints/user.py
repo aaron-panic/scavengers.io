@@ -18,3 +18,7 @@ def req():
 @user_bp.route('/report')
 def report():
     return render_template('report.html', title='report')
+
+@user_bp.route('/dev')
+def dev():
+    return render_template('cev.html', title='dev')

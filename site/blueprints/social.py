@@ -22,14 +22,14 @@ def announce():
 def feed():
     return render_template('feed.html', title='feed')
 
-@social_bp.route('/bulletin')
-def bulletin():
-    return render_template('bulletin.html', title='bulletin')
+@social_bp.route('/board')
+def board():
+    return render_template('board.html', title='board')
 
 @social_bp.route('/chat')
 def chat():
     return render_template('chat.html', title='chat')
 
-@social_bp.route('/app')
-def app():
-    return render_template('app.html', title='app')
+@social_bp.route('/profile')
+def profile():
+    return render_template('profile.html', title='profile')
