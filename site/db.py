@@ -117,30 +117,28 @@ def close_dbs(e=None):
 # Data Access Objects
 # ---------------------------------------------------------
 
-# Fetch password_hash for username
+# Fetch password_hash for username (Login)
 def fetch_user_auth(username):
     conn = None
     auth_data = None
     try:
         conn = get_connection('login_bot')
-        # Cleaner implementation using wrapper
         rows = execute_procedure(conn, 'sp_get_user_auth', [username])
         if rows:
             auth_data = rows[0]
     except Error:
-        pass # Logging handled in wrapper
+        pass
     finally:
         if conn and conn.is_connected():
             conn.close()
     return auth_data
 
-# Fetch users for admin panel
+# Fetch users for admin panel (Admin)
 def fetch_all_users():
     conn = None
     users = []
     try:
         conn = get_connection('admin_bot')
-        # Cleaner implementation
         users = execute_procedure(conn, 'sp_admin_list_users')
     except Error:
         pass
@@ -149,7 +147,7 @@ def fetch_all_users():
             conn.close()
     return users
 
-# Approve newly requested user
+# Approve newly requested user (Admin)
 def approve_user(user_id):
     conn = None
     try:
@@ -162,7 +160,7 @@ def approve_user(user_id):
         if conn and conn.is_connected():
             conn.close()
 
-# Deny newly requested user
+# Deny newly requested user (Admin)
 def deny_user(user_id):
     conn = None
     try:
@@ -174,7 +172,7 @@ def deny_user(user_id):
         if conn and conn.is_connected():
             conn.close()
 
-# Fetch all user details except password_hash
+# Fetch all user details except password_hash (Admin)
 def fetch_user_details(user_id):
     conn = None
     user_data = None
@@ -190,7 +188,7 @@ def fetch_user_details(user_id):
             conn.close()
     return user_data
 
-# Suspend
+# Suspend (Admin)
 def suspend_user(user_id, hours):
     conn = None
     try:
@@ -200,7 +198,7 @@ def suspend_user(user_id, hours):
     finally:
         if conn and conn.is_connected(): conn.close()
 
-# Ban
+# Ban (Admin)
 def ban_user(user_id):
     conn = None
     try:
@@ -210,7 +208,7 @@ def ban_user(user_id):
     finally:
         if conn and conn.is_connected(): conn.close()
 
-# Reinstate
+# Reinstate (Admin)
 def reinstate_user(user_id):
     conn = None
     try:
@@ -220,7 +218,7 @@ def reinstate_user(user_id):
     finally:
         if conn and conn.is_connected(): conn.close()
 
-# Delete
+# Delete (Admin)
 def delete_user(user_id):
     conn = None
     try:
@@ -230,7 +228,7 @@ def delete_user(user_id):
     finally:
         if conn and conn.is_connected(): conn.close()
 
-# Reset Password
+# Reset Password (Admin)
 def reset_password(user_id, new_hash):
     conn = None
     try:
@@ -239,3 +237,17 @@ def reset_password(user_id, new_hash):
     except Error: raise
     finally:
         if conn and conn.is_connected(): conn.close()
+
+# Fetch Announcements (Social)
+def fetch_announcements():
+    conn = None
+    posts = []
+    try:
+        conn = get_connection('social')
+        posts = execute_procedure(conn, 'sp_get_announcements')
+    except Error:
+        pass
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+    return posts

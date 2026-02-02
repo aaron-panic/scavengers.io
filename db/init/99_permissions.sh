@@ -27,6 +27,7 @@ GRANT ALL PRIVILEGES ON scavengers.* TO 'scav_admin'@'%';
 
 -- Social
 CREATE USER IF NOT EXISTS 'scav_social'@'%' IDENTIFIED BY '${DB_PASS_SOCIAL}';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_get_announcements TO 'scav_social'@'%';
 
 -- User
 CREATE USER IF NOT EXISTS 'scav_user'@'%' IDENTIFIED BY '${DB_PASS_USER}';

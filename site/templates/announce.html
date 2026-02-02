@@ -2,4 +2,35 @@
 
 {% block content %}
     <h2 class="page-header">{{ title }}</h2>
+
+    <div class="layout-feed">
+        {% for post in posts %}
+        <article class="panel theme-panel">
+            <header class="panel-header">
+                <h3 class="panel-title">{{ post.title }}</h3>
+                <span class="panel-meta">
+                    // {{ post.username }} @ {{ post.created_at }}
+                </span>
+            </header>
+            
+            <div class="panel-body">
+                {% if post.subtitle %}
+                <h4 class="panel-subtitle">{{ post.subtitle }}</h4>
+                {% endif %}
+                
+                <p>{{ post.content | format_post }}</p>
+            </div>
+
+            {% if post.footnote %}
+            <footer class="panel-footer">
+                <p class="panel-footnote">{{ post.footnote }}</p>
+            </footer>
+            {% endif %}
+        </article>
+        {% endfor %}
+        
+        {% if not posts %}
+        <p class="panel-footnote">[No announcements found]</p>
+        {% endif %}
+    </div>
 {% endblock %}

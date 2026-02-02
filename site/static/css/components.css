@@ -48,6 +48,23 @@
 }
 
 /* ==========================================================================
+   PANEL TYPOGRAPHY & ELEMENTS
+   ========================================================================== */
+.panel-meta {
+    font-size: 0.8em; 
+    font-weight: normal;
+    text-align: right;
+}
+
+.panel-subtitle {
+    margin-bottom: 1rem;
+    font-size: 1rem; 
+    line-height: 1.4;
+    border-bottom: 1px dashed var(--color-border);
+    padding-bottom: 0.25rem;
+}
+
+/* ==========================================================================
    SPECIFIC PANEL VARIANTS
    ========================================================================== */
 

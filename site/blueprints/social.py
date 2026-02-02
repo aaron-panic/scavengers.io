@@ -1,7 +1,13 @@
 from flask import Blueprint, render_template
 from middleware import check_access
+import db
+from utils import format_post
 
 social_bp = Blueprint('social', __name__, url_prefix='/social')
+
+@social_bp.app_template_filter('format_post')
+def format_post_filter(text):
+    return format_post(text)
 
 @social_bp.before_request
 def restrict_access():
@@ -9,11 +15,12 @@ def restrict_access():
 
 @social_bp.route('/announce')
 def announce():
-    return render_template('announce.html', title='announce')
+    posts = db.fetch_announcements()
+    return render_template('announce.html', title='announce', posts=posts)
 
-@social_bp.route('/post')
-def post():
-    return render_template('post.html', title='post')
+@social_bp.route('/feed')
+def feed():
+    return render_template('feed.html', title='feed')
 
 @social_bp.route('/bulletin')
 def bulletin():
