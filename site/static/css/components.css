@@ -1,0 +1,57 @@
+/* ==========================================================================
+   PANEL SYSTEM
+   ========================================================================== */
+.panel {
+    display: flex;
+    flex-direction: column;
+    
+    width: 100%;
+    
+    background-color: var(--color-bg-main);
+    border: var(--border-width) solid var(--color-border);
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    padding: 0.85rem 1rem 0.65rem 1rem;
+    
+    border-bottom: var(--border-width) solid var(--color-border);
+    
+    font-family: var(--font-mono);
+    font-weight: bold;
+}
+
+.panel-title {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.panel-body {
+    padding: 1.5rem;
+    
+    overflow-x: auto;
+}
+
+.panel-footer {
+    padding: 0.75rem 1rem;
+    
+    border-top: var(--border-width) solid var(--color-border);
+}
+
+.panel-footnote {
+    font-size: 0.6rem;
+    color: var(--color-text-main);
+}
+
+/* ==========================================================================
+   SPECIFIC PANEL VARIANTS
+   ========================================================================== */
+
+.panel-auth {
+    width: 100%;
+    max-width: 400px;
+}

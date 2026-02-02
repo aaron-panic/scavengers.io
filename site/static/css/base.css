@@ -1,0 +1,164 @@
+/* ==========================================================================
+   VARIABLES & THEME TOKENS
+   ========================================================================== */
+:root {
+    /* Color Palette */
+    --color-bg-main: #dcdcdc;     /* Center: Standard Light Grey */
+    --color-bg-sidebar: #222222;  /* Left: Dark Grey */
+    --color-bg-scroller: #808080; /* Right: Mid Grey */
+    
+    --color-text-main: #111111;    /* Near Black */
+    --color-text-sidebar: #eeeeee; /* Off-White for contrast */
+    --color-border: #000000;       /* Pure Black */
+
+    /* Typography */
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, 
+                 "Noto Sans", "Liberation Sans", sans-serif;
+    
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
+                 "Liberation Mono", "Courier New", "Noto Sans Mono", "DejaVu Sans Mono", monospace;
+
+    /* Metrics */
+    --border-width: 3px;
+}
+
+/* ==========================================================================
+   GLOBAL TYPOGRAPHY & RESET
+   ========================================================================== */
+body {
+    background-color: var(--color-bg-main);
+    color: var(--color-text-main);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+   LINKS (Brackets & Clean)
+   ========================================================================== */
+a {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Programmatic Brackets */
+a::before {
+    content: "[";
+    margin-right: 2px;
+}
+
+a::after {
+    content: "]";
+    margin-left: 2px;
+}
+
+a:hover {
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   COLUMN STYLING (Backgrounds & Borders)
+   ========================================================================== */
+#layout-sidebar {
+    background-color: var(--color-bg-sidebar);
+    color: var(--color-text-sidebar);
+    border-right: var(--border-width) solid var(--color-border);
+}
+
+main {
+    background-color: var(--color-bg-main);
+    color: var(--color-text-main);
+    border-right: var(--border-width) solid var(--color-border);
+}
+
+#layout-scroller {
+    background-color: var(--color-bg-scroller);
+    /* Scroller text color implied by user preference later, keeping default for now */
+}
+
+/* ==========================================================================
+   SECTION SPECIFIC STYLING
+   ========================================================================== */
+/* Node Status - Monospace */
+#node-status,
+#user-profile,
+#flash-messages {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
+/* Auth Form - Monospace Target */
+#auth-form {
+    font-family: var(--font-mono);
+}
+
+/* Ensure inputs inside the auth form inherit the font */
+#auth-form input,
+#auth-form button,
+#auth-form .form-control {
+    font-family: inherit;
+}
+
+/* ==========================================================================
+   FORMS (Base Classes)
+   ========================================================================== */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+}
+
+/* The actual input elements */
+.form-control input {
+    width: 100%;
+    padding: 0.25rem 0.5rem;
+    
+    background-color: var(--color-bg-main); /* Match main bg */
+    border: 2px solid var(--color-border);
+    color: var(--color-text-main);
+    
+    outline: none;
+}
+
+.form-control input:focus {
+    background-color: #ffffff;
+}
+
+.form-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.form-button input,
+.form-button button {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--color-border);
+    background-color: var(--color-bg-main);
+    color: var(--color-text-main);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.form-button input:hover,
+.form-button button:hover {
+    background-color: var(--color-text-main);
+    color: var(--color-bg-main);
+}

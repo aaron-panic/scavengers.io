@@ -6,16 +6,17 @@
     <title>{{ title }} - .scavengers</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 </head>
 <body>
     <div id="layout-wrapper">
         <aside id="layout-sidebar">
-            {% if session.get('username') %}
             <header id="user-profile">
-                <data value="{{ session['uid'] }}">//{{ session['username'] }}</data>
+                <span>//</span>
+                {% if session.get('username') %}
+                <data value="{{ session['uid'] }}">{{ session['username'] }}</data>
+                {% endif %}
             </header>
-            {% endif %}
             
             <nav aria-label="Main Navigation">
                 <ul id="navigation-list">
@@ -69,13 +70,11 @@
             </header>
 
             {% with messages = get_flashed_messages() %}
-            {% if messages %}
+            
             <div id="flash-messages" role="alert" aria-live="polite">
-                {% for message in messages %}
-                <p class="flash-message">{{ message }}</p>
-                {% endfor %}
+                <p class="flash-message">> {% for message in messages %} {{ message }} {% endfor %}</p>
             </div>
-            {% endif %}
+            
             {% endwith %}
 
             {% block content %}{% endblock %}

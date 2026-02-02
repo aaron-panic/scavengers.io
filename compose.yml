@@ -1,6 +1,6 @@
 services:
   db:
-    image: mariadb:10.11
+    image: mariadb:latest
     container_name: scavengers_db
     restart: unless-stopped
     env_file:
