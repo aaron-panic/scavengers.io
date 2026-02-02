@@ -6,108 +6,84 @@
     <title>{{ title }} - .scavengers</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-<!--    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/effects.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}"> -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}"> -->
 </head>
 <body>
     <div id="layout-wrapper">
-        <aside id="nav-container" class="nav-glass">
-            <div id="nav-header">
-                <div id="nav-title">
-                    <h1>.scavengers</h1>
-                    {% if session.get('username') %}
-                    <span id="nav-user-indicator">// {{ session['username'] }}</span>
-                    {% endif %}
-                </div>
-            </div>
-            <div id="nav-body">
-                <nav>
-                    {% if session.get('username') %}
-                        {% if session['role'] in ['admin'] %}
-                        <div class="nav-item nav-item-admin">
-                            <a href="{{ url_for('admin.dashboard') }}">admin</a>
-                        </div>
-                        <div class="nav-break"></div>
+        <aside id="layout-sidebar">
+            {% if session.get('username') %}
+            <header id="user-profile">
+                <data value="{{ session['uid'] }}">//{{ session['username'] }}</data>
+            </header>
+            {% endif %}
+            
+            <nav aria-label="Main Navigation">
+                <ul id="navigation-list">
+                    {% if session.get('username') %} {# Fixed typo: sesion -> session #}
+                    
+                        {% if session['role'] == 'admin' %}
+                        <li class="nav-item nav-item-admin"><a href="{{ url_for('admin.dashboard') }}">admin</a></li>
+                        <li class="nav-item-break"></li>
                         {% endif %}
 
                         {% if session['role'] in ['admin', 'user'] %}
-                        <div class="nav-break"></div>
-                        <div class="nav-item nav-item-user">
-                            <a href="{{ url_for('user.media') }}">media</a>
-                        </div>
-                        <div class="nav-item nav-item-user">
-                            <a href="{{ url_for('user.req') }}">req</a>
-                        </div>
-                        <div class="nav-item nav-item-user">
-                            <a href="{{ url_for('user.report') }}">report</a>
-                        </div>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.media') }}">library</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.req') }}">requests</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.report') }}">reports</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.dev') }}">dev</a></li>
+                        <li class="nav-item-break"></li>
                         {% endif %}
 
                         {% if session['role'] in ['admin', 'user', 'social'] %}
-                        <div class="nav-item nav-item-social">
-                            <a href="{{ url_for('social.announce') }}">announce</a>
-                        </div>
-                        <div class="nav-item nav-item-social">
-                            <a href="{{ url_for('social.post') }}">post</a>
-                        </div>
-                        <div class="nav-item nav-item-social">
-                            <a href="{{ url_for('social.bulletin') }}">bulletin</a>
-                        </div>
-                        <div class="nav-item nav-item-social">
-                            <a href="{{ url_for('social.chat') }}">chat</a>
-                        </div>
-                        <div class="nav-item nav-item-social">
-                            <a href="{{ url_for('social.app') }}">app</a>
-                        </div>
+                        <li class="nav-item nav-item-social"><a href="{{ url_for('social.announce') }}">announce</a></li> {# Fixed quote #}
+                        <li class="nav-item nav-item-social"><a href="{{ url_for('social.feed') }}">feed</a></li>
+                        <li class="nav-item nav-item-social"><a href="{{ url_for('social.chat') }}">chat</a></li>
+                        <li class="nav-item nav-item-social"><a href="{{ url_for('social.board') }}">board</a></li>
+                        <li class="nav-item nav-item-social"><a href="{{ url_for('social.profile') }}">profile</a></li>
+                        <li class="nav-item-break"></li>
                         {% endif %}
 
-                        <div class="nav-break"></div>
-                        <div class="nav-item">
-                            <a href="{{ url_for('home.profile') }}">profile</a>
-                        </div>
-
-                        <div class="nav-break"></div>
-                        <div class="nav-item nav-logout">
-                            <a href="{{ url_for('auth.logout') }}">logout</a>
-                        </div>
+                        <li class="nav-item text-critical"><a href="{{ url_for('auth.logout') }}">logout</a></li>
+                    
+                    {% else %}
+                        <li class="nav-item"><a href="{{ url_for('auth.login') }}">login</a></li>
+                        <li class="nav-item"><a href="{{ url_for('auth.register') }}">register</a></li>
                     {% endif %}
+                </ul>
+            </nav>
 
-                    {% if not session.get('username') %}
-                        <div class="nav-item">
-                            <a href="{{ url_for('auth.login') }}">login</a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="{{ url_for('auth.register') }}">register</a>
-                        </div>
-                    {% endif %}
-                </nav>
-                <div id="nav-status"></div>
-            </div>
+            <section id="node-status">
+                <h3>node status</h3>
+                <dl>
+                        <dt>chell</dt><dd>online</dd>
+                        <dt>jill</dt><dd>online</dd>
+                        <dt>emily</dt><dd>offline</dd>
+                        <dt>aya</dt><dd>online</dd>
+                </dl>
+            </section>
         </aside>
 
-        <main id="layout-main">
-            <div id="layout-flash-container">
-                {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                <ul class="flash-list">
-                    {% for message in messages %}
-                    <li class="flash-item">{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-                {% endwith %}
+        <main>
+            <header>
+                <h1>.scavengers</h1>
+            </header>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div id="flash-messages" role="alert" aria-live="polite">
+                {% for message in messages %}
+                <p class="flash-message">{{ message }}</p>
+                {% endfor %}
             </div>
+            {% endif %}
+            {% endwith %}
+
             {% block content %}{% endblock %}
         </main>
 
-        <aside id="layout-scroller">
+        <aside id="layout-scroller" aria-hidden="true">
             <pre id="scroller-content"></pre>
         </aside>
     </div>
-
-    <script src="{{ url_for('static', filename='js/scroller.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/responsive.js') }}"></script>
 </body>
 </html>
