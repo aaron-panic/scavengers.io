@@ -21,4 +21,4 @@ def report():
 
 @user_bp.route('/dev')
 def dev():
-    return render_template('cev.html', title='dev')
+    return render_template('dev.html', title='dev')
