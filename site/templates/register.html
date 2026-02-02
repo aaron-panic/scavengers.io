@@ -1,36 +1,45 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
+<h2 id="page-header">{{ title }}</h2>
 <div class="layout-content-centered">
-    <h2 class="page-header">{{ title }}</h2>
 
-    <form action="" method="post" id="register-form" class="card glass">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            <span class="form-label">{{ form.username.label }}</span>
-            <span class="form-control">{{ form.username(size=32) }}</span>
+    <section class="panel theme-panel panel-auth">
+        <header class="panel-header">
+            <h3 class="panel-title">sys.new_user_request</h3>
+        </header>
+
+        <div class="panel-body">
+            <form action="" method="post" id="register-form">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <span class="form-label">{{ form.username.label }}</span>
+                    <span class="form-control">{{ form.username(size=32) }}</span>
+                </div>
+                <div class="form-group">
+                    <span class="form-label">{{ form.email.label }}</span>
+                    <span class="form-control">{{ form.email(size=32) }}</span>
+                </div>
+                <div class="form-group">
+                    <span class="form-label">{{ form.password.label }}</span>
+                    <span class="form-control">{{ form.password(size=32, id="register-input-password") }}</span>
+                    <span id="register-password-status" class="form-status-indicator"></span>
+                </div>
+                <div class="form-group">
+                    <span class="form-label">{{ form.confirm.label }}</span>
+                    <span class="form-control">{{ form.confirm(size=32, id="register-input-confirm") }}</span>
+                    <span id="register-confirm-status" class="form-status-indicator"></span>
+                </div>
+                <div class="form-actions">
+                    <span class="form-button">{{ form.submit() }}</span>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            <span class="form-label">{{ form.email.label }}</span>
-            <span class="form-control">{{ form.email(size=32) }}</span>
-        </div>
-        <div class="form-group">
-            <span class="form-label">{{ form.password.label }}</span>
-            <span class="form-control">{{ form.password(size=32, id="register-input-password") }}</span>
-            <span id="register-password-status" class="form-status-indicator"></span>
-        </div>
-        <div class="form-group">
-            <span class="form-label">{{ form.confirm.label }}</span>
-            <span class="form-control">{{ form.confirm(size=32, id="register-input-confirm") }}</span>
-            <span id="register-confirm-status" class="form-status-indicator"></span>
-            <div class="form-hint">
-                min. 12 chars (Upper, Lower, Number, Symbol) -OR- >24 chars (any)
-            </div>
-        </div>
-        <div class="form-actions">
-            {{ form.submit() }}
-        </div>
-    </form>
+
+        <footer class="panel-footer">
+            <p class="panel-footnote">min. 12 chars (Upper, Lower, Number, Symbol) -OR- >24 chars (any)</p>
+        </footer>
+    </section>
 
     <script src="{{ url_for('static', filename='js/register.js') }}"></script>
 </div>
