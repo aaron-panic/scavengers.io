@@ -81,6 +81,7 @@ main header {
     z-index: var(--z-nav);
 
     flex: 0 0 225px;
+    order: 1;
 
     display: flex;
     flex-direction: column;
@@ -157,6 +158,7 @@ main {
     z-index: var(--z-layout);
 
     flex-grow: 1;
+    order: 2;
     
     display: flex;
     flex-direction: column;
@@ -201,6 +203,7 @@ main {
     z-index: var(--z-scroller);
 
     flex: 0 0 27%;
+    order: 3;
 
     height: 100%;
     
