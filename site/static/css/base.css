@@ -178,7 +178,7 @@ main {
 }
 
 .form-control textarea {
-    min-height: 15rem;
+    min-height: 14rem;
     resize: vertical;
 }
 

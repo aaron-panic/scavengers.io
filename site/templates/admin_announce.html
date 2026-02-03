@@ -61,8 +61,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
                 <div class="form-group">
                     <label class="form-label">Footnote (Optional)</label>
-                    <div class="form-control">
-                        <textarea name="footnote" style="min-height: 5rem;">{{ edit_data.footnote if edit_data else '' }}</textarea>
+                    <div id="form-announce-footnote" class="form-control">
+                        <textarea name="footnote">{{ edit_data.footnote if edit_data else '' }}</textarea>
                     </div>
                 </div>
 
