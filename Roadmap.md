@@ -12,8 +12,8 @@
 
 ### User Management
 * **Phase 1: Restoration & Stability (Current Priority)**
-    - [ ] Repair `admin_users.html` (fix broken HTML/logic from pattern switch).
-    - [ ] Ensure "As-Is" functionality works: List, Approve, Ban, Suspend, Reset Password.
+    - [x] Repair `admin_users.html` (fix broken HTML/logic from pattern switch).
+    - [x] Ensure "As-Is" functionality works: List, Approve, Ban, Suspend, Reset Password.
 * **Phase 2: Public Registration Gateway**
     - [ ] Move `/register` endpoint to public-facing (non-VPN) access.
     - [ ] Implement Altcha PoW verification on public form.

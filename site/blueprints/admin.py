@@ -16,7 +16,8 @@
 
 import secrets
 import string
-from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, request
+import math
 from argon2 import PasswordHasher
 from middleware import check_access
 
@@ -36,16 +37,41 @@ def dashboard():
 @admin_bp.route('/users')
 @admin_bp.route('/users/<int:selected_user_id>')
 def users(selected_user_id=None):
-    user_list = db.fetch_all_users()
+    page = request.args.get('page', 1, type=int)
+    sort_col = request.args.get('sort', 'id')
+    sort_dir = request.args.get('dir', 'desc')
+    
+    per_page = 50
+    offset = (page - 1) * per_page
+    
+    user_list = db.fetch_all_users(per_page, offset, sort_col, sort_dir)
+    
+    total_records = 0
+    if user_list:
+        total_records = user_list[0]['total_records']
+    
+    total_pages = math.ceil(total_records / per_page)
     
     selected_user = None
     if selected_user_id:
         selected_user = db.fetch_user_details(selected_user_id)
         if not selected_user:
             flash(f"No Details: UID: {selected_user_id}")
-            return redirect(url_for('admin.users'))
+            return redirect(url_for('admin.users', page=page, sort=sort_col, dir=sort_dir))
         
-    return render_template('admin_users.html', title='users', users=user_list, selected_user=selected_user)
+    return render_template(
+        'admin_users.html', 
+        title='users', 
+        users=user_list, 
+        selected_user=selected_user,
+        pagination={
+            'current_page': page,
+            'total_pages': total_pages,
+            'total_records': total_records,
+            'sort_col': sort_col,
+            'sort_dir': sort_dir
+        }
+    )
 
 @admin_bp.route('/users/approve/<int:user_id>', methods=['POST'])
 def approve(user_id):

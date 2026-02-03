@@ -16,16 +16,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% extends 'admin.html' %}
 
+{% macro sort_link(col_name, label) %}
+    <a href="{{ url_for('admin.users', page=pagination.current_page, sort=col_name, dir='asc' if pagination.sort_col == col_name and pagination.sort_dir == 'desc' else 'desc') }}">
+        {{ label }}
+        {% if pagination.sort_col == col_name %}
+            {{ '▲' if pagination.sort_dir == 'asc' else '▼' }}
+        {% endif %}
+    </a>
+{% endmacro %}
+
 {% block subcontent %}
     {# --- USER LIST VIEW --- #}
     <table class="table-data">
         <thead>
             <tr>
-                <th id="col-id">id</th>
-                <th id="col-username">Username</th>
-                <th id="col-role">role</th>
-                <th id="col-status">status</th>
-                <th id="col-actions">actions</th>
+                <th id="col-id">{{ sort_link('id', 'id') }}</th>
+                <th id="col-username">{{ sort_link('username', 'username') }}</th>
+                <th id="col-role">{{ sort_link('role', 'role') }}</th>
+                <th id="col-status">{{ sort_link('status', 'status') }}</th>
+                <th id="col-actions" class="text-right">actions</th>
             </tr>
         </thead>
         <tbody>
@@ -128,7 +137,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% block subcontent_footer %}
     <div class="panel-meta">
-        [Displaying {{ users|length }} records]
-        <a href="#">prev</a> 1 <a href="#">next</a>
+        [Records: {{ pagination.total_records }}]
+        
+        {% if pagination.current_page > 1 %}
+            <a href="{{ url_for('admin.users', page=pagination.current_page - 1, sort=pagination.sort_col, dir=pagination.sort_dir) }}">[prev]</a>
+        {% else %}
+            <span class="text-muted">[prev]</span>
+        {% endif %}
+
+        {{ pagination.current_page }} / {{ pagination.total_pages }}
+
+        {% if pagination.current_page < pagination.total_pages %}
+            <a href="{{ url_for('admin.users', page=pagination.current_page + 1, sort=pagination.sort_col, dir=pagination.sort_dir) }}">[next]</a>
+        {% else %}
+            <span class="text-muted">[next]</span>
+        {% endif %}
     </div>
 {% endblock %}

@@ -150,12 +150,12 @@ def fetch_user_auth(username):
     return auth_data
 
 # Fetch users for admin panel (Admin)
-def fetch_all_users():
+def fetch_all_users(limit, offset, sort_col, sort_dir):
     conn = None
     users = []
     try:
         conn = get_connection('admin_bot')
-        users = execute_procedure(conn, 'sp_admin_list_users')
+        users = execute_procedure(conn, 'sp_admin_list_users', [limit, offset, sort_col, sort_dir])
     except Error:
         pass
     finally:
