@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS Announcements (
     subtitle VARCHAR(255),
     content TEXT NOT NULL,
     footnote TEXT,
+    is_visible BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT fk_u_id
         FOREIGN KEY (u_id)
         REFERENCES Users (id)
@@ -44,7 +45,9 @@ BEGIN
         u.username
     FROM Announcements a
     JOIN Users u ON a.u_id = u.id
-    ORDER BY a.created_at DESC;
+    WHERE a.is_visible = TRUE
+    ORDER BY a.created_at DESC
+    LIMIT 25;
 END //
 
 DELIMITER ;

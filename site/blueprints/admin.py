@@ -166,18 +166,20 @@ def announce():
         footnote = request.form.get('footnote')
         edit_id = request.form.get('edit_id')
 
+        is_visible = 1 if 'is_visible' in request.form else 0
+
         if not title or not content:
             flash("Error: Title and Content are required.")
         else:
             try:
                 if edit_id:
                     # UPDATE
-                    db.update_announcement(edit_id, title, subtitle, content, footnote)
+                    db.update_announcement(edit_id, title, subtitle, content, footnote, is_visible)
                     flash(f"Announcement '{title}' updated.")
                 else:
                     # CREATE
                     # Use session ID for security
-                    db.create_announcement(session['uid'], title, subtitle, content, footnote)
+                    db.create_announcement(session['uid'], title, subtitle, content, footnote, is_visible)
                     flash(f"Announcement '{title}' published.")
             except Exception as e:
                 flash(f"Error saving announcement: {e}")

@@ -66,6 +66,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="is_visible" 
+                        {% if not edit_data or edit_data.is_visible %}checked{% endif %}>
+                        Visible to Users
+                    </label>
+                </div>
+
                 <div class="form-actions">
                     <button type="submit" class="form-button">
                         {{ 'update' if edit_data else 'publish' }}
@@ -75,10 +83,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </div>
     </div>
 
-    {# --- LIST VIEW --- #}
     <table id="panel-admin-announce" class="table-data">
         <thead>
-            <tr>
+            <tr class="{{ 'opacity-50' if not post.is_visible else '' }}">
                 <th id="col-id">id</th>
                 <th id="col-date">date</th>
                 <th id="col-title">title</th>
