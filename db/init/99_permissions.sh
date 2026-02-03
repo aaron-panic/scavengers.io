@@ -27,6 +27,8 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_register_user TO 'scav_login_bot'@'%';
 
 -- scav_admin_bot
 CREATE USER IF NOT EXISTS 'scav_admin_bot'@'%' IDENTIFIED BY '${DB_PASS_ADMIN_BOT}';
+
+-- Admin (Users)
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_users TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_approve_requested TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_deny_requested TO 'scav_admin_bot'@'%';
@@ -36,6 +38,13 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_ban_user TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_reinstate_user TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_user TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_reset_password TO 'scav_admin_bot'@'%';
+
+-- Admin (Announcements)
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_create_announcement TO 'scav_admin_bot'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_announcement TO 'scav_admin_bot'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_announcement TO 'scav_admin_bot'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_get_announcement TO 'scav_admin_bot'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_announcements TO 'scav_admin_bot'@'%';
 
 -- Admin
 CREATE USER IF NOT EXISTS 'scav_admin'@'%' IDENTIFIED BY '${DB_PASS_ADMIN}';

@@ -26,8 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 {% endmacro %}
 
 {% block subcontent %}
-    {# --- USER LIST VIEW --- #}
-    <table class="table-data">
+    <table id="panel-admin-users" class="table-data">
         <thead>
             <tr>
                 <th id="col-id">{{ sort_link('id', 'id') }}</th>
@@ -63,7 +62,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </tbody>
     </table>
 
-    {# --- MODAL DETAIL VIEW --- #}
     {% if selected_user %}
     <div class="modal-backdrop">
         <article class="panel theme-panel modal">

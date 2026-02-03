@@ -51,7 +51,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
                  "Liberation Mono", "Courier New", "Noto Sans Mono", "DejaVu Sans Mono", monospace;
 
     /* Metrics */
-    --border-width: 3px;
+    --border-width: 1px;
 }
 
 /* ==========================================================================
@@ -164,18 +164,26 @@ main {
     width: 100%;
 }
 
-.form-control input {
+.form-control input,
+.form-control textarea {
     width: 100%;
     padding: 0.25rem 0.5rem;
     
     background-color: var(--color-bg-main);
     border: 2px solid var(--color-border);
     color: var(--color-text-main);
+    font-family: inherit;
     
     outline: none;
 }
 
-.form-control input:focus {
+.form-control textarea {
+    min-height: 15rem;
+    resize: vertical;
+}
+
+.form-control input:focus,
+.form-control textarea:focus {
     background-color: #ffffff;
 }
 

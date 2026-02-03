@@ -16,7 +16,7 @@
 
 import secrets
 import string
-from flask import Blueprint, render_template, flash, redirect, url_for, request
+from flask import Blueprint, render_template, flash, redirect, url_for, request, session
 import math
 from argon2 import PasswordHasher
 from middleware import check_access
@@ -33,6 +33,10 @@ def restrict_access():
 @admin_bp.route('/')
 def dashboard():
     return render_template('admin.html', title='admin')
+
+# ---------------------------------------------------------
+# User Management
+# ---------------------------------------------------------
 
 @admin_bp.route('/users')
 @admin_bp.route('/users/<int:selected_user_id>')
@@ -147,3 +151,75 @@ def reset_pass(user_id):
         flash(f"Error resetting password: {e}")
         
     return redirect(url_for('admin.users', selected_user_id=user_id))
+
+    # ---------------------------------------------------------
+# Announcements
+# ---------------------------------------------------------
+
+@admin_bp.route('/announce', methods=['GET', 'POST'])
+def announce():
+    # Handle Create / Update Form Submission
+    if request.method == 'POST':
+        title = request.form.get('title')
+        subtitle = request.form.get('subtitle')
+        content = request.form.get('content')
+        footnote = request.form.get('footnote')
+        edit_id = request.form.get('edit_id')
+
+        if not title or not content:
+            flash("Error: Title and Content are required.")
+        else:
+            try:
+                if edit_id:
+                    # UPDATE
+                    db.update_announcement(edit_id, title, subtitle, content, footnote)
+                    flash(f"Announcement '{title}' updated.")
+                else:
+                    # CREATE
+                    # Use session ID for security
+                    db.create_announcement(session['uid'], title, subtitle, content, footnote)
+                    flash(f"Announcement '{title}' published.")
+            except Exception as e:
+                flash(f"Error saving announcement: {e}")
+        
+        return redirect(url_for('admin.announce'))
+
+    # Handle View / Edit State
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = (page - 1) * per_page
+
+    posts = db.list_announcements_admin(per_page, offset)
+    
+    total_records = 0
+    if posts:
+        total_records = posts[0]['total_records']
+    total_pages = math.ceil(total_records / per_page)
+
+    edit_data = None
+    edit_id = request.args.get('edit_id')
+    if edit_id:
+        edit_data = db.get_announcement(edit_id)
+        if not edit_data:
+            flash(f"Error: Could not fetch post ID {edit_id}")
+
+    return render_template(
+        'admin_announce.html',
+        title='announce',
+        posts=posts,
+        edit_data=edit_data,
+        pagination={
+            'current_page': page,
+            'total_pages': total_pages,
+            'total_records': total_records
+        }
+    )
+
+@admin_bp.route('/announce/delete/<int:post_id>', methods=['POST'])
+def delete_announce(post_id):
+    try:
+        db.delete_announcement(post_id)
+        flash(f"Announcement deleted.")
+    except Exception as e:
+        flash(f"Error deleting: {e}")
+    return redirect(url_for('admin.announce'))

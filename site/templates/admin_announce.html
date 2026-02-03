@@ -1,0 +1,130 @@
+<!-- admin_users.html - Admin panel subcontent for user management template
+Copyright (C) 2026 Aaron Reichenbach
+
+This program is free software: you can redistribute it and/or modify         
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+
+{% extends 'admin.html' %}
+
+{% block subcontent %}
+    <div class="panel">
+        <header class="panel-header">
+            <h3 class="panel-title">
+                {% if edit_data %}
+                editor/edit [ID: {{ edit_data.id }}]
+                {% else %}
+                editor/create
+                {% endif %}
+            </h3>
+            {% if edit_data %}
+            <a href="{{ url_for('admin.announce') }}">cancel</a>
+            {% endif %}
+        </header>
+
+        <div class="panel-body">
+            <form action="{{ url_for('admin.announce') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                {% if edit_data %}
+                <input type="hidden" name="edit_id" value="{{ edit_data.id }}">
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <div class="form-control">
+                        <input type="text" name="title" value="{{ edit_data.title if edit_data else '' }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Subtitle (Optional)</label>
+                    <div class="form-control">
+                        <input type="text" name="subtitle" value="{{ edit_data.subtitle if edit_data else '' }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Content (Raw Text/Links)</label>
+                    <div class="form-control">
+                        <textarea name="content" required>{{ edit_data.content if edit_data else '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Footnote (Optional)</label>
+                    <div class="form-control">
+                        <textarea name="footnote" style="min-height: 5rem;">{{ edit_data.footnote if edit_data else '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="form-button">
+                        {{ 'update' if edit_data else 'publish' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# --- LIST VIEW --- #}
+    <table id="panel-admin-announce" class="table-data">
+        <thead>
+            <tr>
+                <th id="col-id">id</th>
+                <th id="col-date">date</th>
+                <th id="col-title">title</th>
+                <th id="col-username">author</th>
+                <th id="col-actions" class="text-right">actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in posts %}
+            <tr>
+                <td>{{ post.id }}</td>
+                <td>{{ post.created_at }}</td>
+                <td title="{{ post.title }}">{{ post.title }}</td>
+                <td>{{ post.username }}</td>
+                <td class="text-right">
+                    <a href="{{ url_for('admin.announce', edit_id=post.id) }}">edit</a>
+                    
+                    <form action="{{ url_for('admin.delete_announce', post_id=post.id) }}" method="post" class="form-inline confirm-action" data-message="Delete announcement '{{ post.title }}'?">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="link-button error-text">[del]</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
+
+{% block subcontent_footer %}
+    <div class="panel-meta">
+        [Records: {{ pagination.total_records }}]
+        
+        {% if pagination.current_page > 1 %}
+            <a href="{{ url_for('admin.announce', page=pagination.current_page - 1) }}">[prev]</a>
+        {% else %}
+            <span class="text-muted">[prev]</span>
+        {% endif %}
+
+        {{ pagination.current_page }} / {{ pagination.total_pages }}
+
+        {% if pagination.current_page < pagination.total_pages %}
+            <a href="{{ url_for('admin.announce', page=pagination.current_page + 1) }}">[next]</a>
+        {% else %}
+            <span class="text-muted">[next]</span>
+        {% endif %}
+    </div>
+{% endblock %}
