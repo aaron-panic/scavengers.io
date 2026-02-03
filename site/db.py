@@ -149,6 +149,28 @@ def fetch_user_auth(username):
             conn.close()
     return auth_data
 
+# ---------------------------------------------------------
+# Announcements
+# ---------------------------------------------------------
+
+# Fetch Announcements (Social)
+def fetch_announcements():
+    conn = None
+    posts = []
+    try:
+        conn = get_connection('social')
+        posts = execute_procedure(conn, 'sp_get_announcements')
+    except Error:
+        pass
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+    return posts
+
+# ---------------------------------------------------------
+# User Management (Admin)
+# ---------------------------------------------------------
+
 # Fetch users for admin panel (Admin)
 def fetch_all_users(limit, offset, sort_col, sort_dir):
     conn = None
@@ -254,16 +276,57 @@ def reset_password(user_id, new_hash):
     finally:
         if conn and conn.is_connected(): conn.close()
 
-# Fetch Announcements (Social)
-def fetch_announcements():
+# ---------------------------------------------------------
+# Announcement Management (Admin)
+# ---------------------------------------------------------
+
+def create_announcement(uid, title, subtitle, content, footnote):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_procedure(conn, 'sp_admin_create_announcement', [uid, title, subtitle, content, footnote], commit=True)
+    except Error: raise
+    finally:
+        if conn and conn.is_connected(): conn.close()
+
+def update_announcement(id, title, subtitle, content, footnote):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_procedure(conn, 'sp_admin_update_announcement', [id, title, subtitle, content, footnote], commit=True)
+    except Error: raise
+    finally:
+        if conn and conn.is_connected(): conn.close()
+
+def delete_announcement(id):
+    conn = None
+    try:
+        conn = get_connection('admin_bot')
+        execute_procedure(conn, 'sp_admin_delete_announcement', [id], commit=True)
+    except Error: raise
+    finally:
+        if conn and conn.is_connected(): conn.close()
+
+def get_announcement(id):
+    conn = None
+    post = None
+    try:
+        conn = get_connection('admin_bot')
+        rows = execute_procedure(conn, 'sp_admin_get_announcement', [id])
+        if rows:
+            post = rows[0]
+    except Error: pass
+    finally:
+        if conn and conn.is_connected(): conn.close()
+    return post
+
+def list_announcements_admin(limit, offset):
     conn = None
     posts = []
     try:
-        conn = get_connection('social')
-        posts = execute_procedure(conn, 'sp_get_announcements')
-    except Error:
-        pass
+        conn = get_connection('admin_bot')
+        posts = execute_procedure(conn, 'sp_admin_list_announcements', [limit, offset])
+    except Error: pass
     finally:
-        if conn and conn.is_connected():
-            conn.close()
+        if conn and conn.is_connected(): conn.close()
     return posts

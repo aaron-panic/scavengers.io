@@ -85,6 +85,7 @@ def login():
                         return render_template('login.html', title='login', form=form)
 
                     session['username'] = username
+                    session['uid'] = user_auth['id']
                     session['role'] = user_auth['role']
                     return redirect(url_for('social.announce'))
             except VerifyMismatchError:

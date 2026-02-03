@@ -24,9 +24,11 @@
     - [ ] Automated emailing of credentials to user.
 
 ### Announcements
-* **Phase 1: Basic Publishing**
-    - [ ] Create simple text-based CRUD interface (Create, Read, Update, Delete).
-    - [ ] Ensure formatting handles basic line breaks/paragraphs without HTML injection risks.
+* **Phase 1: Basic Management**
+    - [x] Create simple text-based CRUD interface (Create, Read, Update, Delete).
+    - [ ] Add ability to 'hide' announcements'.
+    - [ ] Restrict number of returns from database call to render to user.
+    - [x] Ensure formatting handles basic line breaks/paragraphs without HTML injection risks.
 * **Phase 2: Rich Text**
     - [ ] Research and implement lightweight Markdown editor (minimal dependencies).
 

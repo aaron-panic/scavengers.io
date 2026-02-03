@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2 class="page-header">{{ title }}</h2>
+    <h2 id="page-header">{{ title }}</h2>
 
     <div class="layout-feed">
         {% for post in posts %}

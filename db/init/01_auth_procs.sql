@@ -25,7 +25,7 @@ BEGIN
         AND status = 'suspended'
         AND suspended_until <= NOW();
 
-    SELECT password_hash, role, status, suspended_until
+    SELECT id, password_hash, role, status, suspended_until
     FROM Users
     WHERE username = p_username;
 END //

@@ -14,8 +14,19 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
-.table-data {
+#panel-admin-users {
     min-width: 620px;
+}
+
+#panel-admin-announce {
+    min-width: 760px;
+}
+
+#form-announce-footnote textarea {
+    min-height: 3rem;
+}
+
+.table-data {
     font-size: 0.7rem;
 }
 
@@ -47,4 +58,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 #col-actions {
     width: 180px;
     text-align: right
+}
+
+#col-date {
+    width: 130px;
+}
+
+#col-title {
+    width: 250px;
 }

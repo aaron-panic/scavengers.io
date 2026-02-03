@@ -24,7 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 {% endblock %}
 
 {% block content %}
-    <h2 class="page-header">{{ title }}</h2>
+    <h2 id="page-header">{{ title }}</h2>
 
     <section class="panel">
         <header class="panel-header">
@@ -32,6 +32,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
             <nav class="panel-nav">
                 <a href="{{ url_for('admin.users') }}">users</a>
+                <a href="{{ url_for('admin.announce') }}">announce</a>
             </nav>
         </header>
 
