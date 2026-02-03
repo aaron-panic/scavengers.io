@@ -186,7 +186,9 @@ main {
 }
 
 .form-button input,
-.form-button button {
+.form-button button,
+input.form-button,
+button.form-button {
     padding: 0.5rem 1rem;
     border: 2px solid var(--color-border);
     background-color: var(--color-bg-main);
@@ -196,11 +198,23 @@ main {
 }
 
 .form-button input:hover,
-.form-button button:hover {
+.form-button button:hover,
+input.form-button:hover,
+button.form-button:hover {
     background-color: var(--color-text-main);
     color: var(--color-bg-main);
 }
 
 .form-inline {
     display: inline;
+}
+
+button.form-button.error-text {
+    color: var(--color-error);
+    border-color: var(--color-error);
+}
+
+button.form-button.error-text:hover {
+    background-color: var(--color-error);
+    color: var(--color-bg-main);
 }

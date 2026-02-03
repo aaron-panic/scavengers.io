@@ -15,6 +15,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 
 #col-id { width: 50px; }
+#col-username { width: 150px; }
 #col-role { width: 100px; }
 #col-status { width: 120px; }
-#col-actions { width: 140px; }
+#col-actions { text-align: right }

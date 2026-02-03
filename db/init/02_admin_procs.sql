@@ -35,7 +35,7 @@ BEGIN
         suspended_until,
         created_at
     FROM Users
-    ORDER BY created_at DESC;
+    ORDER BY id DESC;
 END //
 
 -- Approve New Request

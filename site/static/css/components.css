@@ -46,6 +46,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
     line-height: 1;
 }
 
+.panel-nav {
+    display: flex;
+    gap: 1rem;
+}
+
 .panel-body {
     padding: 1.5rem;
     
@@ -173,8 +178,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 }
 
 .detail-actions {
-    margin-top: 1.5rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 0.5rem;
+
+    width: fit-content;
+    margin: 1rem auto 0 auto;
+}
+
+.detail-actions form {
+    width: 100%;
+}
+
+.detail-actions .form-button {
+    width: 100%;
+    text-align: center;
 }

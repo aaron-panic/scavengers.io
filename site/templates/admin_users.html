@@ -22,10 +22,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         <thead>
             <tr>
                 <th id="col-id">id</th>
-                <th>Username</th>
+                <th id="col-username">Username</th>
                 <th id="col-role">role</th>
                 <th id="col-status">status</th>
-                <th id="col-actions" class="text-right">actions</th>
+                <th id="col-actions">actions</th>
             </tr>
         </thead>
         <tbody>
@@ -85,37 +85,37 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 <div class="detail-actions">
                     <form action="{{ url_for('admin.reset_pass', user_id=selected_user.id) }}" method="post" class="confirm-action" data-message="Reset password for {{ selected_user.username }}?">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button">[pass reset]</button>
+                        <button type="submit" class="form-button">pass reset</button>
                     </form>
 
                     {% if selected_user.status != 'suspended' and selected_user.status != 'banned' %}
                     <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=24) }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button">[suspend 24h]</button>
+                        <button type="submit" class="form-button">suspend 24h</button>
                     </form>
                     <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=72) }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button">[suspend 72h]</button>
+                        <button type="submit" class="form-button">suspend 72h</button>
                     </form>
                     {% endif %}
 
                     {% if selected_user.status != 'banned' %}
                     <form action="{{ url_for('admin.ban_user', user_id=selected_user.id) }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button error-text">[ban]</button>
+                        <button type="submit" class="form-button error-text">ban</button>
                     </form>
                     {% endif %}
 
                     {% if selected_user.status == 'banned' or selected_user.status == 'suspended' %}
                     <form action="{{ url_for('admin.reinstate_user', user_id=selected_user.id) }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button">[reinstate]</button>
+                        <button type="submit" class="form-button">reinstate</button>
                     </form>
                     {% endif %}
                     
                      <form action="{{ url_for('admin.delete_user', user_id=selected_user.id) }}" method="post" class="confirm-action" data-message="DELETE USER {{ selected_user.username }}? This cannot be undone.">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button error-text">[delete]</button>
+                        <button type="submit" class="form-button error-text">delete</button>
                     </form>
                 </div>
             </div>
@@ -126,7 +126,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 
-{% block panel_footer %}
+{% block subcontent_footer %}
     <div class="panel-meta">
         [Displaying {{ users|length }} records]
         <a href="#">prev</a> 1 <a href="#">next</a>
