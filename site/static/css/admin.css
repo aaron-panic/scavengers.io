@@ -1,0 +1,50 @@
+/* admin.css - Fromatting specific to administrator panel
+Copyright (C) 2026 Aaron Reichenbach
+
+This program is free software: you can redistribute it and/or modify         
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
+
+.table-data {
+    min-width: 620px;
+    font-size: 0.7rem;
+}
+
+.link-button {
+    font-size: 0.7rem;
+}
+
+.panel-body {
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+}
+
+#col-id {
+    width: 80px;
+}
+
+#col-username {
+    width: 130px;
+}
+
+#col-role {
+    width: 100px;
+}
+
+#col-status {
+    width: 130px;
+}
+
+#col-actions {
+    width: 180px;
+    text-align: right
+}

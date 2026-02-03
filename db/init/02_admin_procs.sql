@@ -17,15 +17,20 @@
 DELIMITER //
 
 -- List All Users
-CREATE PROCEDURE sp_admin_list_users()
+CREATE PROCEDURE sp_admin_list_users(
+    IN p_limit INT,
+    IN p_offset INT,
+    IN p_sort_col VARCHAR(20),
+    IN p_sort_dir VARCHAR(4)
+)
 BEGIN
-    -- Remove suspensions if expired
+    -- Maintenance: Remove expired suspensions
     UPDATE Users
     SET status = 'active', suspended_until = NULL
     WHERE status = 'suspended'
         AND suspended_until <= NOW();
 
-    -- Get user data
+    -- Fetch Data with Window Function for Total Count
     SELECT
         id,
         username,
@@ -33,9 +38,27 @@ BEGIN
         role,
         status,
         suspended_until,
-        created_at
+        created_at,
+        COUNT(*) OVER() as total_records
     FROM Users
-    ORDER BY created_at DESC;
+    ORDER BY
+        CASE WHEN UPPER(p_sort_dir) = 'DESC' THEN
+            CASE 
+                WHEN p_sort_col = 'id' THEN id
+                WHEN p_sort_col = 'username' THEN username
+                WHEN p_sort_col = 'role' THEN role
+                WHEN p_sort_col = 'status' THEN status
+            END
+        END DESC,
+        CASE WHEN UPPER(p_sort_dir) = 'ASC' THEN
+            CASE 
+                WHEN p_sort_col = 'id' THEN id
+                WHEN p_sort_col = 'username' THEN username
+                WHEN p_sort_col = 'role' THEN role
+                WHEN p_sort_col = 'status' THEN status
+            END
+        END ASC
+    LIMIT p_limit OFFSET p_offset;
 END //
 
 -- Approve New Request

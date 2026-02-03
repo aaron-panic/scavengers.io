@@ -16,11 +16,33 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% extends 'base.html' %}
 
+{% block stylesheets %}
+
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+{% endblock %}
+
 {% block content %}
     <h2 class="page-header">{{ title }}</h2>
 
-    <div id="page-nav">
-        <a href="{{ url_for('admin.users') }}">users</a>
-        {% block subcontent %}{% endblock %}
-    </div>
+    <section class="panel">
+        <header class="panel-header">
+            <h3 class="panel-title">sys.admin</h3>
+
+            <nav class="panel-nav">
+                <a href="{{ url_for('admin.users') }}">users</a>
+            </nav>
+        </header>
+
+        <div class="panel-body">
+            {% block subcontent %}
+            {% endblock %}
+        </div>
+
+        <footer class="panel-footer">
+            {% block subcontent_footer %}
+            {% endblock %}
+        </footer>
+    </section>
 {% endblock %}

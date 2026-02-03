@@ -46,6 +46,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
     line-height: 1;
 }
 
+.panel-nav {
+    display: flex;
+    gap: 1rem;
+}
+
 .panel-body {
     padding: 1.5rem;
     
@@ -81,12 +86,111 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 }
 
 /* ==========================================================================
-   SPECIFIC PANEL VARIANTS
+   DATA TABLES (Semantic)
    ========================================================================== */
-
-.panel-auth {
+.table-data {
     width: 100%;
-    max-width: 400px;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    table-layout: fixed;
 }
 
-/* end file */
+.table-data th {
+    padding: 0.5rem;
+    border-bottom: var(--border-width) solid var(--color-border);
+    background-color: var(--table-th-bg);
+    text-align: left;
+    font-weight: bold;
+}
+
+.table-data td {
+    padding: 0.5rem;
+    border-bottom: 1px dashed var(--color-border);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.table-data tr:last-child td {
+    border-bottom: none;
+}
+
+.table-data tr:hover {
+    background-color: var(--table-row-hover-bg);
+}
+
+/* Status Indicators */
+.status-active {
+    color: var(--status-active-color);
+}
+
+.status-banned {
+    color: var(--status-banned-color);
+    font-weight: bold;
+}
+
+.status-suspended {
+    color: var(--status-suspended-color);
+}
+
+.status-requested {
+    color: var(--status-requested-color);
+}
+
+/* ==========================================================================
+   MODALS (Popups)
+   ========================================================================== */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    
+    background-color: var(--modal-backdrop-bg);
+    backdrop-filter: blur(2px);
+    
+    z-index: var(--z-modal);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    box-shadow: 10px 10px 0px var(--modal-shadow-color);
+}
+
+.modal .panel-body {
+    overflow-y: auto;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px dotted var(--color-border);
+}
+
+.detail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    width: fit-content;
+    margin: 1rem auto 0 auto;
+}
+
+.detail-actions form {
+    width: 100%;
+}
+
+.detail-actions .form-button {
+    width: 100%;
+    text-align: center;
+}

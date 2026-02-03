@@ -20,9 +20,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - .scavengers</title>
+    
+    {% block stylesheets %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    {% endblock %}
+    
 </head>
 <body>
     <div id="layout-wrapper">
