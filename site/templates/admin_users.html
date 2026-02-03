@@ -17,112 +17,118 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 {% extends 'admin.html' %}
 
 {% block subcontent %}
+    {# --- USER LIST VIEW --- #}
+    <table class="table-data">
+        <thead>
+            <tr>
+                <th id="col-id">id</th>
+                <th>Username</th>
+                <th id="col-role">role</th>
+                <th id="col-status">status</th>
+                <th id="col-actions" class="text-right">actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td title="{{ user.username }}">{{ user.username }}</td>
+                <td>{{ user.role }}</td>
+                <td class="status-{{ user.status }}">{{ user.status }}</td>
+                <td class="text-right">
+                    {% if user.status == 'requested' %}
+                    <form action="{{ url_for('admin.approve', user_id=user.id) }}" method="post" class="form-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="link-button">[approve]</button>
+                    </form>
+                    <form action="{{ url_for('admin.deny', user_id=user.id) }}" method="post" class="form-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="link-button error-text">[deny]</button>
+                    </form>
+                    {% else %}
+                    <a href="{{ url_for('admin.users', selected_user_id=user.id)}}">edit</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {# --- MODAL DETAIL VIEW --- #}
     {% if selected_user %}
-    <div id="admin-detail-pane" class="card glass">
-        <a href="{{ url_for('admin.users') }}" id="admin-detail-close">[close]</a>
+    <div class="modal-backdrop">
+        <article class="panel theme-panel modal">
+            <header class="panel-header">
+                <h3 class="panel-title">users/{{ selected_user.username }}</h3>
+                <a href="{{ url_for('admin.users') }}">close</a>
+            </header>
 
-        <h3 id="admin-detail-username">users/{{ selected_user.username }}</h3>        
-        
-        <div id="admin-detail-content">
-            <div class="admin-detail-row">
-                <span class="admin-detail-label">id: </span>
-                <span class="admin-detail-value">{{ selected_user.id }}</span>
-            </div>
-            <div class="admin-detail-row">
-                <span class="admin-detail-label">username: </span>
-                <span class="admin-detail-value">{{ selected_user.username }}</span>
-            </div>
-            <div class="admin-detail-row">
-                <span class="admin-detail-label">email: </span>
-                <span class="admin-detail-value">{{ selected_user.email }}</span>
-            </div>
-            <div class="admin-detail-row">
-                <span class="admin-detail-label">role: </span>
-                <span class="admin-detail-value">{{ selected_user.role }}</span>
-            </div>
-            <div class="admin-detail-row">
-                <span class="admin-detail-label">status: </span>
-                <span class="admin-detail-value">{{ selected_user.status }}</span>
-            </div>
-            {% if selected_user.suspended_until %}
-            <div class="admin-detail-row">
-                <span class="admin-detail-label">t_suspend: </span>
-                <span class="admin-detail-value">{{ selected_user.suspended_until }}</span>
-            </div>
-            {% endif %}
-        </div>
+            <div class="panel-body">
+                <div class="detail-row">
+                    <strong>id:</strong> <span>{{ selected_user.id }}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>email:</strong> <span>{{ selected_user.email }}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>role:</strong> <span>{{ selected_user.role }}</span>
+                </div>
+                <div class="detail-row">
+                    <strong>status:</strong> <span class="status-{{ selected_user.status }}">{{ selected_user.status }}</span>
+                </div>
+                {% if selected_user.suspended_until %}
+                <div class="detail-row">
+                    <strong>suspended Until:</strong> <span>{{ selected_user.suspended_until }}</span>
+                </div>
+                {% endif %}
 
-        <div id="admin-detail-controls">
-            <form action="{{ url_for('admin.reset_pass', user_id=selected_user.id) }}" method="post" class="admin-action-form confirm-action" data-message="reset password: {{ selected_user.username }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-action-button">[reset pass]</button>
-            </form>
-            
-            {% if selected_user.status != 'suspended' %}
-            <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=24) }}" method="post" class="admin-action-form">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-action-button">[suspend 24h]</button>
-            </form>
-            <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=72) }}" method="post" class="admin-action-form">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-action-button">[suspend 72h]</button>
-            </form>
-            {% endif %}
-            
-            {% if selected_user.status != 'banned' %}
-            <form action="{{ url_for('admin.ban_user', user_id=selected_user.id) }}" method="post" class="admin-action-form confirm-action" data-message="Ban user {{ selected_user.username }}?">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-action-button">[ban]</button>
-            </form>
-            {% endif %}
-            
-            {% if selected_user.status == 'banned' or selected_user.status == 'suspended' %}
-            <form action="{{ url_for('admin.reinstate_user', user_id=selected_user.id) }}" method="post" class="admin-action-form">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-action-button">[reinstate]</button>
-            </form>
-            {% endif %}
-            
-            <form action="{{ url_for('admin.delete_user', user_id=selected_user.id) }}" method="post" class="admin-action-form confirm-action" data-message="delete user: {{ selected_user.username }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="admin-action-button error-text">[delete]</button>
-            </form>
-        </div>
+                <div class="detail-actions">
+                    <form action="{{ url_for('admin.reset_pass', user_id=selected_user.id) }}" method="post" class="confirm-action" data-message="Reset password for {{ selected_user.username }}?">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="form-button">[pass reset]</button>
+                    </form>
+
+                    {% if selected_user.status != 'suspended' and selected_user.status != 'banned' %}
+                    <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=24) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="form-button">[suspend 24h]</button>
+                    </form>
+                    <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=72) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="form-button">[suspend 72h]</button>
+                    </form>
+                    {% endif %}
+
+                    {% if selected_user.status != 'banned' %}
+                    <form action="{{ url_for('admin.ban_user', user_id=selected_user.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="form-button error-text">[ban]</button>
+                    </form>
+                    {% endif %}
+
+                    {% if selected_user.status == 'banned' or selected_user.status == 'suspended' %}
+                    <form action="{{ url_for('admin.reinstate_user', user_id=selected_user.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="form-button">[reinstate]</button>
+                    </form>
+                    {% endif %}
+                    
+                     <form action="{{ url_for('admin.delete_user', user_id=selected_user.id) }}" method="post" class="confirm-action" data-message="DELETE USER {{ selected_user.username }}? This cannot be undone.">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="form-button error-text">[delete]</button>
+                    </form>
+                </div>
+            </div>
+        </article>
     </div>
     {% endif %}
 
-    <div id="admin-list-container">
-        <h3 class="admin-list-subheader">users</h3>
-        <div id="admin-list-header">
-            <span>id</span>
-            <span>username</span>
-            <span>role</span>
-            <span>status</span>
-            <span>actions</span>
-        </div>
-
-        {% for user in users %}
-        <div class="admin-list-record">
-            <span class="admin-record-id">{{ user.id }}</span>
-            <span class="admin-record-username">{{ user.username }}</span>
-            <span class="admin-record-role">{{ user.role }}</span>
-            <span class="admin-record-status status-{{ user.status }}">{{ user.status }}</span>
-            <span class="admin-record-actions">
-                {% if user.status == 'requested' %}
-                <form action="{{ url_for('admin.approve', user_id=user.id) }}" method="post" class="admin-action-form">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <button type="submit" class="admin-action-button">[approve]</button>
-                </form>
-                <form action="{{ url_for('admin.deny', user_id=user.id) }}" method="post" class="admin-action-form confirm-action" data-message="delete request for UID: {{ user.username }}?">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <button type="submit" class="admin-action-button">[deny]</button>
-                </form>
-                {% else %}
-                <a href="{{ url_for('admin.users', selected_user_id=user.id)}}">[modify]</a>
-                {% endif %}
-            </span>
-        </div>
-        {% endfor %}
-    </div>
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
+
+{% block panel_footer %}
+    <div class="panel-meta">
+        [Displaying {{ users|length }} records]
+        <a href="#">prev</a> 1 <a href="#">next</a>
+    </div>
 {% endblock %}

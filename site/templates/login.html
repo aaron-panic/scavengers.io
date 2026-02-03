@@ -16,6 +16,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% extends "base.html" %}
 
+{% block stylesheets %}
+
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+
+{% endblock %}
+
 {% block content %}
 <div class="layout-content-centered">
     <section class="panel theme-panel panel-auth">

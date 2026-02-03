@@ -27,6 +27,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
     --color-text-sidebar: #eeeeee; /* Off-White for contrast */
     --color-border: #000000;       /* Pure Black */
 
+    --color-error: #cc0000;
+
+    /* Component: Data Tables */
+    --table-th-bg: rgba(0,0,0,0.05);
+    --table-row-hover-bg: #ffffff;
+
+    /* Component: Modals */
+    --modal-backdrop-bg: rgba(0, 0, 0, 0.5);
+    --modal-shadow-color: rgba(0,0,0,0.2);
+
+    /* Component: Status Indicators */
+    --status-active-color: #008000;    /* green */
+    --status-banned-color: #ff0000;    /* red */
+    --status-suspended-color: #ffa500; /* orange */
+    --status-requested-color: #0000ff; /* blue */
+
     /* Typography */
     --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, 
                  "Noto Sans", "Liberation Sans", sans-serif;
@@ -56,6 +72,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================================================
+   TYPOGRAPHY HELPERS
+   ========================================================================== */
+
+.text-right {
+    text-align: right;
+}
+
+.error-text {
+    color: var(--color-error);
+}
+
+/* ==========================================================================
    LINKS (Brackets & Clean)
    ========================================================================== */
 a {
@@ -64,7 +92,6 @@ a {
     cursor: pointer;
 }
 
-/* Programmatic Brackets */
 a::before {
     content: "[";
     margin-right: 2px;
@@ -77,6 +104,16 @@ a::after {
 
 a:hover {
     font-weight: bold;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 /* ==========================================================================
@@ -96,30 +133,16 @@ main {
 
 #layout-scroller {
     background-color: var(--color-bg-scroller);
-    /* Scroller text color implied by user preference later, keeping default for now */
 }
 
 /* ==========================================================================
    SECTION SPECIFIC STYLING
    ========================================================================== */
-/* Node Status - Monospace */
 #node-status,
 #user-profile,
 #flash-messages {
     font-family: var(--font-mono);
     font-size: 0.9rem;
-}
-
-/* Auth Form - Monospace Target */
-#auth-form {
-    font-family: var(--font-mono);
-}
-
-/* Ensure inputs inside the auth form inherit the font */
-#auth-form input,
-#auth-form button,
-#auth-form .form-control {
-    font-family: inherit;
 }
 
 /* ==========================================================================
@@ -141,12 +164,11 @@ main {
     width: 100%;
 }
 
-/* The actual input elements */
 .form-control input {
     width: 100%;
     padding: 0.25rem 0.5rem;
     
-    background-color: var(--color-bg-main); /* Match main bg */
+    background-color: var(--color-bg-main);
     border: 2px solid var(--color-border);
     color: var(--color-text-main);
     
@@ -179,4 +201,6 @@ main {
     color: var(--color-bg-main);
 }
 
-/* end file */
+.form-inline {
+    display: inline;
+}
