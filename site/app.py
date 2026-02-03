@@ -19,6 +19,7 @@ from datetime import timedelta
 
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from db import close_dbs
 from extensions import limiter
@@ -36,6 +37,9 @@ def create_app():
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE='Lax'
     )
+
+    # Trust X-forwarded-for headers (so limiter targets the right IP address) 
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
     # Database Teardown
     app.teardown_appcontext(close_dbs)
