@@ -67,3 +67,18 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
 #col-title {
     width: 250px;
 }
+
+.form-actions {
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.form-actions .form-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    cursor: pointer;
+    line-height: 1; 
+    padding-bottom: 0.3rem; 
+}

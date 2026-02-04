@@ -39,34 +39,40 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                 {% endif %}
 
                 <div class="form-group">
-                    <label class="form-label">Title</label>
+                    <label class="form-label">title</label>
                     <div class="form-control">
                         <input type="text" name="title" value="{{ edit_data.title if edit_data else '' }}" required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Subtitle (Optional)</label>
+                    <label class="form-label">subtitle (opt.)</label>
                     <div class="form-control">
                         <input type="text" name="subtitle" value="{{ edit_data.subtitle if edit_data else '' }}">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Content (Raw Text/Links)</label>
+                    <label class="form-label">content</label>
                     <div class="form-control">
                         <textarea name="content" required>{{ edit_data.content if edit_data else '' }}</textarea>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Footnote (Optional)</label>
+                    <label class="form-label">footnote (opt.)</label>
                     <div id="form-announce-footnote" class="form-control">
                         <textarea name="footnote">{{ edit_data.footnote if edit_data else '' }}</textarea>
                     </div>
                 </div>
-
                 <div class="form-actions">
+                    <label class="form-label" style="margin-bottom: 0; cursor: pointer;">
+                        visible 
+                        <input type="checkbox" name="is_visible" 
+                            {% if not edit_data or edit_data.is_visible %}checked{% endif %}>
+                            
+                    </label>
+    
                     <button type="submit" class="form-button">
                         {{ 'update' if edit_data else 'publish' }}
                     </button>
@@ -75,7 +81,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </div>
     </div>
 
-    {# --- LIST VIEW --- #}
     <table id="panel-admin-announce" class="table-data">
         <thead>
             <tr>
@@ -88,7 +93,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </thead>
         <tbody>
             {% for post in posts %}
-            <tr>
+            <tr class="{{ 'opacity-50' if not post.is_visible else '' }}">
                 <td>{{ post.id }}</td>
                 <td>{{ post.created_at }}</td>
                 <td title="{{ post.title }}">{{ post.title }}</td>

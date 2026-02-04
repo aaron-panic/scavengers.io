@@ -280,20 +280,20 @@ def reset_password(user_id, new_hash):
 # Announcement Management (Admin)
 # ---------------------------------------------------------
 
-def create_announcement(uid, title, subtitle, content, footnote):
+def create_announcement(uid, title, subtitle, content, footnote, is_visible):
     conn = None
     try:
         conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_create_announcement', [uid, title, subtitle, content, footnote], commit=True)
+        execute_procedure(conn, 'sp_admin_create_announcement', [uid, title, subtitle, content, footnote, is_visible], commit=True)
     except Error: raise
     finally:
         if conn and conn.is_connected(): conn.close()
 
-def update_announcement(id, title, subtitle, content, footnote):
+def update_announcement(id, title, subtitle, content, footnote, is_visible):
     conn = None
     try:
         conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_update_announcement', [id, title, subtitle, content, footnote], commit=True)
+        execute_procedure(conn, 'sp_admin_update_announcement', [id, title, subtitle, content, footnote, is_visible], commit=True)
     except Error: raise
     finally:
         if conn and conn.is_connected(): conn.close()

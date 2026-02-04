@@ -22,11 +22,12 @@ CREATE PROCEDURE sp_admin_create_announcement(
     IN p_title VARCHAR(255),
     IN p_subtitle VARCHAR(255),
     IN p_content TEXT,
-    IN p_footnote TEXT
+    IN p_footnote TEXT,
+    IN p_is_visible BOOLEAN
 )
 BEGIN
-    INSERT INTO Announcements (u_id, title, subtitle, content, footnote)
-    VALUES (p_uid, p_title, p_subtitle, p_content, p_footnote);
+    INSERT INTO Announcements (u_id, title, subtitle, content, footnote, is_visible)
+    VALUES (p_uid, p_title, p_subtitle, p_content, p_footnote, p_is_visible);
 END //
 
 -- Update Announcement
@@ -35,14 +36,16 @@ CREATE PROCEDURE sp_admin_update_announcement(
     IN p_title VARCHAR(255),
     IN p_subtitle VARCHAR(255),
     IN p_content TEXT,
-    IN p_footnote TEXT
+    IN p_footnote TEXT,
+    IN p_is_visible BOOLEAN
 )
 BEGIN
     UPDATE Announcements
     SET title = p_title,
         subtitle = p_subtitle,
         content = p_content,
-        footnote = p_footnote
+        footnote = p_footnote,
+        is_visible = p_is_visible
     WHERE id = p_id;
 END //
 
@@ -59,7 +62,7 @@ CREATE PROCEDURE sp_admin_get_announcement(
     IN p_id INT
 )
 BEGIN
-    SELECT id, title, subtitle, content, footnote
+    SELECT id, title, subtitle, content, footnote, is_visible
     FROM Announcements
     WHERE id = p_id;
 END //
@@ -74,6 +77,7 @@ BEGIN
         a.id,
         a.title,
         a.created_at,
+        a.is_visible,
         u.username,
         COUNT(*) OVER() as total_records
     FROM Announcements a
