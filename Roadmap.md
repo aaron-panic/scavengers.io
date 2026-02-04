@@ -26,8 +26,8 @@
 ### Announcements
 * **Phase 1: Basic Management**
     - [x] Create simple text-based CRUD interface (Create, Read, Update, Delete).
-    - [ ] Add ability to 'hide' announcements'.
-    - [ ] Restrict number of returns from database call to render to user.
+    - [x] Add ability to 'hide' announcements'.
+    - [x] Restrict number of returns from database call to render to user.
     - [x] Ensure formatting handles basic line breaks/paragraphs without HTML injection risks.
 * **Phase 2: Rich Text**
     - [ ] Research and implement lightweight Markdown editor (minimal dependencies).
@@ -38,6 +38,8 @@
 * **Phase 2: Admin Tooling**
     - [ ] Create web-based "Theme Uploader" for admins (accepts `.css` files).
     - [ ] Validation logic to ensure uploaded themes don't break layout.
+    - [ ] Write an app to template css widgets in
+    - [ ] Fix CSS to act more like a widget toolkit
 
 ### System Health
 * **Phase 1: Dashboard Metrics**
