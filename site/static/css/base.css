@@ -160,7 +160,7 @@ main {
     display: block;
     margin-bottom: 0.25rem;
     font-weight: 600;
-    font-size: 0.9em;
+    font-size: 0.8em;
 }
 
 .form-control {
@@ -182,7 +182,7 @@ main {
 }
 
 .form-control textarea {
-    min-height: 14rem;
+    min-height: 13rem;
     resize: vertical;
 }
 
@@ -229,4 +229,10 @@ button.form-button.error-text {
 button.form-button.error-text:hover {
     background-color: var(--color-error);
     color: var(--color-bg-main);
+}
+
+input[type="checkbox"] {
+    margin-left: 0.3rem;
+    accent-color: var(--color-bg-sidebar);
+    cursor: pointer;
 }
