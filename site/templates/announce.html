@@ -14,39 +14,36 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% import "components/panel.html" as Panel %}
 
 {% block content %}
-    <h2 id="page-header">{{ title }}</h2>
 
-    <div class="layout-feed">
-        {% for post in posts %}
-        <article class="panel">
-            <header class="panel-header">
-                <h3 class="panel-title">{{ post.title }}</h3>
-                <span class="panel-meta">
-                    // {{ post.username }} @ {{ post.created_at }}
-                </span>
-            </header>
-            
-            <div class="panel-body">
-                {% if post.subtitle %}
-                <h4 class="panel-subtitle">{{ post.subtitle }}</h4>
-                {% endif %}
-                
-                <p>{{ post.content | format_post }}</p>
-            </div>
-
-            {% if post.footnote %}
-            <footer class="panel-footer">
-                <p class="panel-footnote">{{ post.footnote }}</p>
-            </footer>
-            {% endif %}
-        </article>
-        {% endfor %}
+    {% for post in posts %}
         
-        {% if not posts %}
-        <p class="panel-footnote">[No announcements found]</p>
-        {% endif %}
-    </div>
+        {% set header_data = {
+            'title': post.title,
+            'subtitle': post.subtitle,
+            'author': post.username,
+            'date': post.created_at
+        } %}
+
+        {% call Panel.render(
+            type='article',
+            header=header_data,
+            footer=post.footnote
+        ) %}
+            {{ post.content | format_post }}
+        {% endcall %}
+
+    {% else %}
+        
+        {% call Panel.render(type='empty') %}
+            <p class="system-message">
+                // System Status: Normal. No new announcements.
+            </p>
+        {% endcall %}
+
+    {% endfor %}
+
 {% endblock %}

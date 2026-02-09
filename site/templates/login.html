@@ -15,37 +15,41 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% extends "base.html" %}
+{% import "components/panel.html" as Panel %}
+{% import "components/form.html" as Form %}
 
 {% block stylesheets %}
-
     {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-
 {% endblock %}
 
 {% block content %}
-<div class="layout-content-centered">
-    <section class="panel panel-auth">
-        <header class="panel-header">
-            <h3 class="panel-title">// {{ title }}</h3>
-        </header>
+    
+    {% set login_form = {
+        'action': url_for('auth.login'),
+        'method': 'POST',
+        'fields': [
+            {'name': 'username', 'label': 'Username', 'type': 'text', 'width': 'full-width', 'placeholder': 'Enter your username'},
+            {'name': 'password', 'label': 'Password', 'type': 'password', 'width': 'full-width', 'placeholder': 'Enter your password'}
+        ],
+        'buttons': [
+            {'label': 'Login', 'type': 'submit', 'class': 'inverted'}
+        ]
+    } %}
 
-        <div class="panel-body">
-            <form action="" method="post" id="auth-form">
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                    <span class="form-label">{{ form.username.label }}</span>
-                    <span class="form-control">{{ form.username(size=32) }}</span>
-                </div>
-                <div class="form-group">
-                    <span class="form-label">{{ form.password.label }}</span>
-                    <span class="form-control">{{ form.password(size=32) }}</span>
-                </div>
-                <div class="form-actions">
-                    <span class="form-button">{{ form.submit() }}</span>
-                </div>
-            </form>
-        </div>
-    </section>
-</div>
+    {# Define footer content #}
+    {% set footer_content %}
+        <p class="auth-footer">
+            No account? <a href="{{ url_for('auth.register') }}">Register here</a>.
+        </p>
+    {% endset %}
+
+    {% call Panel.render(
+        type='article',
+        header={'title': 'System Access', 'subtitle': 'Please authenticate to continue.'},
+        footer=footer_content
+    ) %}
+        {{ Form.render(login_form) }}
+    {% endcall %}
+
 {% endblock %}

@@ -1,0 +1,40 @@
+<!-- card.html - Card component - small format data
+#    Copyright (C) 2026  Aaron Reichenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
+
+{% macro render(data) %}
+<div class="card">
+    <header>
+        <h3>{{ data.title }}</h3>
+        {% if data.meta %}
+        <span class="meta-date">{{ data.meta }}</span>
+        {% endif %}
+    </header>
+    
+    <div class="content">
+        <p>{{ data.description }}</p>
+    </div>
+
+    {% if data.tags %}
+    <footer>
+        <div class="tag-cloud">
+            {% for tag in data.tags %}
+            <span class="tag">#{{ tag }}</span>
+            {% endfor %}
+        </div>
+    </footer>
+    {% endif %}
+</div>
+{% endmacro %}

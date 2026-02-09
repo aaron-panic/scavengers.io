@@ -1,0 +1,53 @@
+<!-- table.html - Table component for displaying data
+#    Copyright (C) 2026  Aaron Reichenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
+
+{% macro render(columns, rows, actions=None, classes=[]) %}
+<div class="table-container {{ classes|join(' ') }}">
+    <table>
+        <thead>
+            <tr>
+                {% for col in columns %}
+                <th scope="col" class="{{ col.class if col.class else '' }}">{{ col.label }}</th>
+                {% endfor %}
+                <th scope="col" class="col-actions">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                {% for col in columns %}
+                <td class="{{ col.class if col.class else '' }}">{{ row[col.key] }}</td>
+                {% endfor %}
+                
+                <td class="col-actions">
+                    <div class="action-group">
+                        {% if actions %}
+                            {% for action in actions %}
+                            <button class="btn icon-only {{ action.class }}" aria-label="{{ action.label }}" title="{{ action.label }}">
+                                {{ action.icon | safe }}
+                            </button>
+                            {% endfor %}
+                        {% else %}
+                            <button class="btn icon-only" aria-label="Details" title="Details">&#8505;</button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
