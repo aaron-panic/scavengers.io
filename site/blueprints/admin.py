@@ -36,7 +36,7 @@ def restrict_access():
 
 @admin_bp.route('/')
 def dashboard():
-    return render_template('admin.html', title='admin')
+    return render_redirect(url_for('admin.users'))
 
 # ---------------------------------------------------------
 # User Management
@@ -399,3 +399,160 @@ def delete_announce(post_id):
     except Exception as e:
         flash(f"Error deleting: {e}")
     return redirect(url_for('admin.announce'))
+
+# ---------------------------------------------------------
+# Requests Management
+# ---------------------------------------------------------
+
+@admin_bp.route('/requests', methods=['GET', 'POST'])
+def requests_list():
+    # 1. State Management
+    page = request.args.get('page', 1, type=int)
+
+    sort_col = request.args.get('sort', 'created_at')
+    sort_dir = request.args.get('dir', 'desc')
+    edit_id = request.args.get('edit_id')
+
+    # Validation
+    valid_cols = ['id', 'title', 'username', 'created_at', 'status']
+    if sort_col not in valid_cols: sort_col = 'created_at'
+    if sort_dir not in ['asc', 'desc']: sort_dir = 'desc'
+
+    # 2. Fetch Modal Data (if editing)
+    modal_data = None
+    if edit_id:
+        req = db.get_request(edit_id)
+        if req:
+            modal_data = {
+                'title': f"Request #{req['id']}",
+                'close_href': url_for('admin.requests_list', page=page, sort=sort_col, dir=sort_dir),
+                'details': [
+                    {'key': 'Title', 'value': req['title']},
+                    {'key': 'User', 'value': req['username']},
+                    {'key': 'Created', 'value': req['created_at']},
+                    {'key': 'Status', 'value': req['status']},
+                    {'key': 'Status Message', 'value': req['status_message'] if req['status_message'] else '-'},
+                    {'key': 'Description', 'value': req['description']},
+                    {'key': 'Reference 1', 'value': req['ref_1'] if req['ref_1'] else '-'},
+                    {'key': 'Reference 2', 'value': req['ref_2'] if req['ref_2'] else '-'},
+                    {'key': 'Reference 3', 'value': req['ref_3'] if req['ref_3'] else '-'}
+                ],
+                'request': req # Pass full object for form population
+            }
+        else:
+            flash(f"Error: Request ID {edit_id} not found.")
+
+    # 3. Fetch List Data
+    per_page = 25
+    offset = (page - 1) * per_page
+    requests = db.list_requests_admin(per_page, offset, sort_col, sort_dir)
+
+    # 4. Prepare Table Rows
+    table_rows = []
+    for r in requests:
+        table_rows.append({
+            'id': r['id'],
+            'title': r['title'],
+            'username': r['username'],
+            'created_at': r['created_at'],
+            'status': r['status'],
+            'actions': [
+                {
+                    'label': 'Modify',
+                    'icon': '&#8505;', # i
+                    'href': url_for('admin.requests_list', edit_id=r['id'], page=page, sort=sort_col, dir=sort_dir),
+                    'method': 'GET',
+                    'class': ''
+                },
+                {
+                    'label': 'Delete',
+                    'icon': '&#10006;', # x
+                    'href': url_for('admin.delete_request', request_id=r['id']),
+                    'method': 'POST',
+                    'class': 'destructive',
+                    'confirm': f"Delete request #{r['id']}?"
+                }
+            ]
+        })
+
+    # 5. Build Sortable Columns
+    base_columns = [
+        {'key': 'id', 'label': 'ID'},
+        {'key': 'title', 'label': 'Title'},
+        {'key': 'username', 'label': 'User'},
+        {'key': 'created_at', 'label': 'Date'},
+        {'key': 'status', 'label': 'Status'}
+    ]
+
+    columns = []
+    for col in base_columns:
+        next_dir = 'desc'
+        label = col['label']
+        if col['key'] == sort_col:
+            next_dir = 'asc' if sort_dir == 'desc' else 'desc'
+            label += ' ▼' if sort_dir == 'desc' else ' ▲'
+        
+        columns.append({
+            'key': col['key'],
+            'label': label,
+            'sort_href': url_for('admin.requests_list', page=1, sort=col['key'], dir=next_dir)
+        })
+
+    # Pagination
+    total_records = 0
+    if requests:
+        total_records = requests[0]['total_records']
+    total_pages = math.ceil(total_records / per_page) if total_records > 0 else 1
+
+    pagination = {
+        'page': page,
+        'has_next': page < total_pages,
+        'has_prev': page > 1,
+        'next_href': url_for('admin.requests_list', page=page + 1, sort=sort_col, dir=sort_dir),
+        'prev_href': url_for('admin.requests_list', page=page - 1, sort=sort_col, dir=sort_dir),
+        'pages': total_pages,
+        'total_records': total_records,
+        'sort': sort_col,
+        'dir': sort_dir
+    }
+
+    return render_template(
+        'admin_requests.html',
+        title='requests',
+        columns=columns,
+        rows=table_rows,
+        modal_data=modal_data,
+        pagination=pagination
+    )
+
+@admin_bp.route('/requests/update/<int:request_id>', methods=['POST'])
+def update_request(request_id):
+    # Retrieve form data
+    new_status = request.form.get('status')
+    new_message = request.form.get('status_message')
+
+    # Logic: Convert empty strings to None to trigger SQL COALESCE (No Change)
+    if not new_message or new_message.strip() == "":
+        new_message = None
+    
+    # We pass new_status directly. 
+    # If the dropdown matches current status, SQL updates to same value (No Change).
+    
+    try:
+        db.update_request(request_id, new_status, new_message)
+        flash(f"Request #{request_id} updated.")
+    except Exception as e:
+        flash(f"Error updating request: {e}")
+
+    # Return to list with state preserved
+    return redirect(url_for('admin.requests_list', **get_state()))
+
+@admin_bp.route('/requests/delete/<int:request_id>', methods=['POST'])
+def delete_request(request_id):
+    try:
+        db.delete_request(request_id)
+        flash(f"Request #{request_id} deleted.")
+    except Exception as e:
+        flash(f"Error deleting request: {e}")
+    
+    return redirect(url_for('admin.requests_list', **get_state()))

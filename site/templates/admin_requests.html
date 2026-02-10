@@ -1,0 +1,91 @@
+<!-- admin_requests.html - Admin panel for request management
+Copyright (C) 2026 Aaron Reichenbach
+
+This program is free software: you can redistribute it and/or modify         
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
+
+{% extends 'admin.html' %}
+{% import "components/table.html" as Table %}
+{% import "components/modal.html" as Modal %}
+
+{% block subcontent %}
+
+    {# Render the Table #}
+    {{ Table.render(columns, rows, classes=['table-data']) }}
+
+    {# Render the Modal (if editing) #}
+    {% if modal_data %}
+        
+        {% set req = modal_data.request %}
+        {% set p_page = pagination.page %}
+        {% set p_sort = pagination.sort %}
+        {% set p_dir = pagination.dir %}
+
+        {% set form_content %}
+            <div class="separator" style="margin: var(--space-m) 0;"></div>
+            
+            <form action="{{ url_for('admin.update_request', request_id=req.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post" class="form-grid">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                
+                <div class="field-group full-width">
+                    <label for="status">Update Status</label>
+                    <div class="form-control">
+                        <select name="status" id="status" style="width: 100%; padding: var(--space-s);">
+                            <option value="Pending" {{ 'selected' if req.status == 'Pending' else '' }}>Pending</option>
+                            <option value="In_Progress" {{ 'selected' if req.status == 'In_Progress' else '' }}>In Progress</option>
+                            <option value="Completed" {{ 'selected' if req.status == 'Completed' else '' }}>Completed</option>
+                            <option value="Rejected" {{ 'selected' if req.status == 'Rejected' else '' }}>Rejected</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field-group full-width">
+                    <label for="status_message">Status Message (Optional)</label>
+                    <input type="text" name="status_message" id="status_message" placeholder="Enter new message to update, or leave blank to keep existing." style="width: 100%;">
+                </div>
+
+                <div class="action-group" style="margin-top: var(--space-m);">
+                    <button type="submit" class="btn inverted full-width">Update Request</button>
+                </div>
+            </form>
+        {% endset %}
+
+        {# Inject Form into Modal Content #}
+        {% set _ = modal_data.update({'content': form_content}) %}
+        
+        {{ Modal.render('request-modal', modal_data, classes=['open']) }}
+
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
+
+{% block subcontent_footer %}
+    <div class="panel-meta">
+        [Records: {{ pagination.total_records }}]
+        
+        {% if pagination.has_prev %}
+            <a href="{{ pagination.prev_href }}">[prev]</a>
+        {% else %}
+            <span class="text-muted">[prev]</span>
+        {% endif %}
+
+        {{ pagination.page }} / {{ pagination.pages }}
+
+        {% if pagination.has_next %}
+            <a href="{{ pagination.next_href }}">[next]</a>
+        {% else %}
+            <span class="text-muted">[next]</span>
+        {% endif %}
+    </div>
+{% endblock %}
