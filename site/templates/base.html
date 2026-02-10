@@ -24,9 +24,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     {% block stylesheets %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/widget.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navigation.css') }}">
     {% endblock %}
-    
 </head>
 <body>
     <div id="layout-wrapper">
@@ -40,7 +40,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             
             <nav aria-label="Main Navigation">
                 <ul id="navigation-list">
-                    {% if session.get('username') %} {# Fixed typo: sesion -> session #}
+                    {% if session.get('username') %}
                     
                         {% if session['role'] == 'admin' %}
                         <li class="nav-item nav-item-admin"><a href="{{ url_for('admin.dashboard') }}">admin</a></li>
@@ -48,15 +48,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                         {% endif %}
 
                         {% if session['role'] in ['admin', 'user'] %}
-                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.media') }}">media</a></li>
-                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.req') }}">requests</a></li>
-                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.report') }}">reports</a></li>
-                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.dev') }}">dev</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('users.media') }}">media</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('users.requests') }}">requests</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('users.report') }}">reports</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('users.dev') }}">dev</a></li>
                         <li class="nav-item-break"></li>
                         {% endif %}
 
                         {% if session['role'] in ['admin', 'user', 'social'] %}
-                        <li class="nav-item nav-item-social"><a href="{{ url_for('social.announce') }}">announce</a></li> {# Fixed quote #}
+                        <li class="nav-item nav-item-social"><a href="{{ url_for('social.announce') }}">announce</a></li>
                         <li class="nav-item nav-item-social"><a href="{{ url_for('social.feed') }}">feed</a></li>
                         <li class="nav-item nav-item-social"><a href="{{ url_for('social.chat') }}">chat</a></li>
                         <li class="nav-item nav-item-social"><a href="{{ url_for('social.board') }}">board</a></li>
@@ -89,20 +89,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         </aside>
 
         <main>
-            <header>
-                <h1>.scavengers</h1>
-            </header>
-
+            {# Flash Messages Panel #}
             {% with messages = get_flashed_messages() %}
-            
-            <div id="flash-messages" role="alert" aria-live="polite">
-                <p class="flash-message">> {% for message in messages %} {{ message }} {% endfor %}</p>
-            </div>
-            
+            {% if messages %}
+            <article class="panel flash-panel">
+                <div class="content flash-content">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            </article>
+            {% endif %}
             {% endwith %}
 
             {% block content %}{% endblock %}
         </main>
     </div>
+
+    {# UI Script for Modals #}
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
 </body>
 </html>

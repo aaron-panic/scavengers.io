@@ -1,238 +1,82 @@
-/* base.css - Text and Element basic formatting
-Copyright (C) 2026 Aaron Reichenbach
+/*   base.css - Variable styling - meant to be overwritten for theming
+#    Copyright (C) 2026  Aaron Reichenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
-This program is free software: you can redistribute it and/or modify         
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.*/
-
-/* ==========================================================================
-   VARIABLES & THEME TOKENS
-   ========================================================================== */
 :root {
-    /* Color Palette */
-    --color-bg-main: #dcdcdc;     /* Center: Standard Light Grey */
-    --color-bg-sidebar: #222222;  /* Left: Dark Grey */
-    --color-bg-scroller: #808080; /* Right: Mid Grey */
+    /* TYPOGRAPHY */
+    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", "DejaVu Sans", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", "Noto Sans Mono", "Liberation Mono", "DejaVu Sans Mono", monospace;
+
+    --font-size-base: 1rem;
+    --font-size-2xs: 0.6rem;
+    --font-size-xs: 0.75rem;
+    --font-size-s: 0.875rem;
+    --font-size-sm: 0.925rem;
+    --font-size-m: var(--font-size-base);
+    --font-size-l: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2x: 1.75rem;
+
+    --line-height-standard: 1.5;
+    --line-height-compact: 1.2;
+
+    /* COLOUR PALETTE */
+    --text-colour-primary: #1a1a1a;
+    --text-colour-secondary: #4a4a4a;
+    --text-colour-tertiary: #717171;
     
-    --color-text-main: #111111;    /* Near Black */
-    --color-text-sidebar: #eeeeee; /* Off-White for contrast */
-    --color-border: #000000;       /* Pure Black */
+    --text-colour-ok: #2e7d32;
+    --text-colour-error: #d32f2f;
 
-    --color-error: #cc0000;
+    --link-colour-primary: #000000;
+    --link-colour-secondary: #4a4a4a;
 
-    /* Component: Data Tables */
-    --table-th-bg: rgba(0,0,0,0.05);
-    --table-row-hover-bg: #ffffff;
+    --bg-colour-primary: #ffffff;
+    --bg-colour-secondary: #f5f5f5;
+    --bg-colour-tertiary: #e0e0e0;
 
-    /* Component: Modals */
-    --modal-backdrop-bg: rgba(0, 0, 0, 0.5);
-    --modal-shadow-color: rgba(0,0,0,0.2);
+    --border-colour-primary: #cccccc;
+    --border-colour-secondary: #e0e0e0;
 
-    /* Component: Status Indicators */
-    --status-active-color: #008000;    /* green */
-    --status-banned-color: #ff0000;    /* red */
-    --status-suspended-color: #ffa500; /* orange */
-    --status-requested-color: #0000ff; /* blue */
-
-    /* Typography */
-    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, 
-                 "Noto Sans", "Liberation Sans", sans-serif;
+    /* COMPONENT SPECIFIC */
+    --tag-bg: #e0e0e0;
+    --tag-text: #4a4a4a;
     
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 
-                 "Liberation Mono", "Courier New", "Noto Sans Mono", "DejaVu Sans Mono", monospace;
-
-    /* Metrics */
-    --border-width: 1px;
-}
-
-/* ==========================================================================
-   GLOBAL TYPOGRAPHY & RESET
-   ========================================================================== */
-body {
-    background-color: var(--color-bg-main);
-    color: var(--color-text-main);
-    font-family: var(--font-sans);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-}
-
-/* ==========================================================================
-   HELPERS
-   ========================================================================== */
-
-.text-right {
-    text-align: right;
-}
-
-.error-text {
-    color: var(--color-error);
-}
-
-.opacity-50 {
-    opacity: 0.5;
-}
-
-/* ==========================================================================
-   LINKS (Brackets & Clean)
-   ========================================================================== */
-a {
-    color: inherit;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-a::before {
-    content: "[";
-    margin-right: 2px;
-}
-
-a::after {
-    content: "]";
-    margin-left: 2px;
-}
-
-a:hover {
-    font-weight: bold;
-}
-
-.link-button {
-    background: none;
-    border: none;
-    padding: 0;
-    font-family: inherit;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-/* ==========================================================================
-   COLUMN STYLING (Backgrounds & Borders)
-   ========================================================================== */
-#layout-sidebar {
-    background-color: var(--color-bg-sidebar);
-    color: var(--color-text-sidebar);
-    border-right: var(--border-width) solid var(--color-border);
-}
-
-main {
-    background-color: var(--color-bg-main);
-    color: var(--color-text-main);
-    border-right: var(--border-width) solid var(--color-border);
-}
-
-#layout-scroller {
-    background-color: var(--color-bg-scroller);
-}
-
-/* ==========================================================================
-   SECTION SPECIFIC STYLING
-   ========================================================================== */
-#node-status,
-#user-profile,
-#flash-messages {
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
-}
-
-/* ==========================================================================
-   FORMS (Base Classes)
-   ========================================================================== */
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.25rem;
-    font-weight: 600;
-    font-size: 0.8em;
-}
-
-.form-control {
-    display: block;
-    width: 100%;
-}
-
-.form-control input,
-.form-control textarea {
-    width: 100%;
-    padding: 0.25rem 0.5rem;
+    /* GEOMETRY */
+    --width-full: 100%;
+    --width-half: 50%;
+    --width-max-main: 900px;
     
-    background-color: var(--color-bg-main);
-    border: 2px solid var(--color-border);
-    color: var(--color-text-main);
-    font-family: inherit;
-    
-    outline: none;
-}
+    --space-0: 0;
+    --space-xs: 0.25rem;
+    --space-s: 0.5rem;
+    --space-m: 1rem;
+    --space-l: 1.5rem;
+    --space-xl: 2rem;
 
-.form-control textarea {
-    min-height: 13rem;
-    resize: vertical;
-}
+    /* MODAL */
+    --z-modal: 1000;
+    --z-overlay: 900;
 
-.form-control input:focus,
-.form-control textarea:focus {
-    background-color: #ffffff;
-}
+    /* OVERLAYS */
+    --color-overlay: rgba(0, 0, 0, 0.5);
 
-.form-actions {
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.form-button input,
-.form-button button,
-input.form-button,
-button.form-button {
-    padding: 0.5rem 1rem;
-    border: 2px solid var(--color-border);
-    background-color: var(--color-bg-main);
-    color: var(--color-text-main);
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.form-button input:hover,
-.form-button button:hover,
-input.form-button:hover,
-button.form-button:hover {
-    background-color: var(--color-text-main);
-    color: var(--color-bg-main);
-}
-
-.form-inline {
-    display: inline;
-}
-
-button.form-button.error-text {
-    color: var(--color-error);
-    border-color: var(--color-error);
-}
-
-button.form-button.error-text:hover {
-    background-color: var(--color-error);
-    color: var(--color-bg-main);
-}
-
-input[type="checkbox"] {
-    margin-left: 0.3rem;
-    accent-color: var(--color-bg-sidebar);
-    cursor: pointer;
+    /* FORMS */
+    --input-height: 2rem;
+    --input-border: #cccccc;
+    --input-bg: #ffffff;
+    --input-focus: #000000;
 }

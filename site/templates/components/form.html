@@ -1,0 +1,55 @@
+<!-- form.html - Forms component
+#    Copyright (C) 2026  Aaron Reichenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
+
+{% macro render(data) %}
+{# ADDED: id attribute is required for external buttons to work #}
+<form id="{{ data.id }}" action="{{ data.action }}" method="{{ data.method }}">
+    
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <section class="form-grid">
+        {% for field in data.fields %}
+        <div class="field-group {{ field.width }}">
+            <label for="{{ field.name }}">{{ field.label }}</label>
+            
+            {% if field.type == 'textarea' %}
+                <textarea 
+                    id="{{ field.name }}" 
+                    name="{{ field.name }}" 
+                    class="{{ field.height }}"
+                    placeholder="{{ field.placeholder if field.placeholder else '' }}"
+                ></textarea>
+            {% else %}
+                <input 
+                    type="{{ field.type }}" 
+                    id="{{ field.name }}" 
+                    name="{{ field.name }}" 
+                    placeholder="{{ field.placeholder if field.placeholder else '' }}"
+                >
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+</form>
+{% endmacro %}
+
+{% macro render_actions(data) %}
+<div class="action-group">
+    {% for btn in data.buttons %}
+    <button type="{{ btn.type }}" form="{{ data.id }}" class="btn {{ btn.class }}">{{ btn.label }}</button>
+    {% endfor %}
+</div>
+{% endmacro %}

@@ -1,0 +1,92 @@
+<!-- panel.html - Panel component, container for data
+#    Copyright (C) 2026  Aaron Reichenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
+
+{% macro render(type='article', header=None, footer=None, tabs=None, filters=None, pagination=None, classes=[], content_classes=[]) %}
+<article class="panel {{ classes|join(' ') }}">
+    
+    {% if header or tabs %}
+    <header>
+        {% if header %}
+            <h1>{{ header.title }}</h1>
+            
+            {% if header.subtitle %}
+                <p class="subtitle">{{ header.subtitle }}</p>
+            {% endif %}
+
+            {% if type == 'article' and (header.author or header.date) %}
+            <dl class="meta">
+                {% if header.author %}
+                    <dt>//</dt><dd>{{ header.author }}</dd>
+                {% endif %}
+                {% if header.date %}
+                    <dt>Posted</dt><dd><time>{{ header.date }}</time></dd>
+                {% endif %}
+            </dl>
+            {% endif %}
+        {% endif %}
+
+        {% if tabs %}
+        <nav aria-label="Panel Navigation">
+            <ul>
+                {% for tab in tabs %}
+                <li>
+                    <a href="{{ tab.href }}" 
+                       class="{{ 'current' if tab.active else '' }}"
+                       {% if tab.active %}aria-current="page"{% endif %}>
+                        {{ tab.label }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
+    </header>
+    {% endif %}
+
+    {% if type == 'grid' and filters %}
+    <div class="toolbar">
+        <div class="filters">
+            <span class="label">Filter:</span>
+            {% for filter in filters %}
+            <a href="{{ filter.href }}" class="btn {{ 'inverted' if filter.active else '' }}">
+                {{ filter.label }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if caller %}
+    <section class="content {{ 'grid-layout' if type == 'grid' else '' }} {{ content_classes|join(' ') }}">
+        {{ caller() }}
+    </section>
+    {% endif %}
+
+    {% if pagination or footer %}
+    <footer>
+        {% if pagination %}
+        <nav class="pagination" aria-label="Pagination">
+            <a href="{{ pagination.prev_href }}" class="btn {{ 'disabled' if not pagination.has_prev else '' }}" {% if not pagination.has_prev %}aria-disabled="true"{% endif %}>&larr; Prev</a>
+            <span class="status">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+            <a href="{{ pagination.next_href }}" class="btn {{ 'disabled' if not pagination.has_next else '' }}" {% if not pagination.has_next %}aria-disabled="true"{% endif %}>Next &rarr;</a>
+        </nav>
+        {% elif footer %}
+            {{ footer | safe }}
+        {% endif %}
+    </footer>
+    {% endif %}
+</article>
+{% endmacro %}

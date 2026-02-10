@@ -15,55 +15,41 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% extends "base.html" %}
+{% import "components/panel.html" as Panel %}
+{% import "components/form.html" as Form %}
 
 {% block stylesheets %}
-
     {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-
 {% endblock %}
 
 {% block content %}
-<h2 id="page-header">{{ title }}</h2>
-<div class="layout-content-centered">
 
-    <section class="panel panel-auth">
-        <header class="panel-header">
-            <h3 class="panel-title">sys.new_user_request</h3>
-        </header>
+    {% set register_form = {
+        'id': 'register-form',
+        'action': url_for('auth.register'),
+        'method': 'POST',
+        'fields': [
+            {'name': 'username', 'label': 'Username', 'type': 'text', 'width': 'full-width'},
+            {'name': 'email', 'label': 'Email Address', 'type': 'email', 'width': 'full-width'},
+            {'name': 'password', 'label': 'Password', 'type': 'password', 'width': 'full-width'},
+            {'name': 'confirm_password', 'label': 'Confirm Password', 'type': 'password', 'width': 'full-width'}
+        ],
+        'buttons': [
+            {'label': 'Request Account', 'type': 'submit', 'class': 'inverted'}
+        ]
+    } %}
 
-        <div class="panel-body">
-            <form action="" method="post" id="register-form">
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                    <span class="form-label">{{ form.username.label }}</span>
-                    <span class="form-control">{{ form.username(size=32) }}</span>
-                </div>
-                <div class="form-group">
-                    <span class="form-label">{{ form.email.label }}</span>
-                    <span class="form-control">{{ form.email(size=32) }}</span>
-                </div>
-                <div class="form-group">
-                    <span class="form-label">{{ form.password.label }}</span>
-                    <span class="form-control">{{ form.password(size=32, id="register-input-password") }}</span>
-                    <span id="register-password-status" class="form-status-indicator"></span>
-                </div>
-                <div class="form-group">
-                    <span class="form-label">{{ form.confirm.label }}</span>
-                    <span class="form-control">{{ form.confirm(size=32, id="register-input-confirm") }}</span>
-                    <span id="register-confirm-status" class="form-status-indicator"></span>
-                </div>
-                <div class="form-actions">
-                    <span class="form-button">{{ form.submit() }}</span>
-                </div>
-            </form>
-        </div>
+    {% set footer_content %}
+        {{ Form.render_actions(register_form) }}
+    {% endset %}
 
-        <footer class="panel-footer">
-            <p class="panel-footnote">min. 12 chars (Upper, Lower, Number, Symbol) -OR- >24 chars (any)</p>
-        </footer>
-    </section>
+    {% call Panel.render(
+        type='article',
+        header={'title': 'New User Request', 'subtitle': 'Join the Scavengers network.'},
+        footer=footer_content
+    ) %}
+        {{ Form.render(register_form) }}
+    {% endcall %}
 
-    <script src="{{ url_for('static', filename='js/register.js') }}"></script>
-</div>
 {% endblock %}

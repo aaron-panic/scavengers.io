@@ -1,0 +1,49 @@
+<!-- modal.html - Modal Dialog component
+#    Copyright (C) 2026  Aaron Reichenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
+
+{% macro render(id, data, classes=[]) %}
+<dialog id="{{ id }}" class="modal {{ classes|join(' ') }}">
+    <form method="dialog">
+        <header>
+            <h1>{{ data.title }}</h1>
+            <button class="btn btn-close" aria-label="Close">&times;</button>
+        </header>
+        
+        <section class="content">
+            {% if data.details %}
+                <dl class="details-grid">
+                    {% for item in data.details %}
+                        <dt>{{ item.key }}</dt>
+                        <dd>{{ item.value }}</dd>
+                    {% endfor %}
+                </dl>
+            {% else %}
+                <p>{{ data.content | safe }}</p>
+            {% endif %}
+        </section>
+
+        <menu>
+            {% for action in data.actions %}
+                {% if action.role == 'cancel' %}
+                    <button value="cancel" class="btn {{ action.class }}">{{ action.label }}</button>
+                {% else %}
+                    <button type="button" class="btn {{ action.class }}">{{ action.label }}</button>
+                {% endif %}
+            {% endfor %}
+        </menu>
+    </form>
+</dialog>
+{% endmacro %}
