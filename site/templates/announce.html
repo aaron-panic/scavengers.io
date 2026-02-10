@@ -28,6 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             'date': post.created_at
         } %}
     
+        {# Prepare footer content with paragraph wrapper (New Pattern) #}
         {% set footer_content %}
         {% if post.footnote %}
             <p class="footnote">{{ post.footnote }}</p>
@@ -38,14 +39,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             type='article',
             header=header_data,
             footer=footer_content
-        ) %}
-            {{ post.content | format_post }}
-        {% endcall %}
-
-        {% call Panel.render(
-            type='article',
-            header=header_data,
-            footer=post.footnote
         ) %}
             {{ post.content | format_post }}
         {% endcall %}

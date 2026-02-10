@@ -26,6 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 {% block content %}
 
     {% set register_form = {
+        'id': 'register-form',
         'action': url_for('auth.register'),
         'method': 'POST',
         'fields': [
