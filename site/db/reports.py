@@ -36,18 +36,33 @@ def create_report(u_id, target, description):
 # Admin Management
 # ---------------------------------------------------------
 
-def fetch_reports(limit=25, offset=0):
+def fetch_reports(limit=25, offset=0, sort_col='created_at', sort_dir='desc'):
     conn = None
     reports = []
     try:
         conn = get_connection('admin_bot')
-        reports = execute_procedure(conn, 'sp_admin_list_reports', [limit, offset])
+        reports = execute_procedure(conn, 'sp_admin_list_reports', [limit, offset, sort_col, sort_dir])
     except Error:
         pass
     finally:
         if conn and conn.is_connected():
             conn.close()
     return reports
+
+def get_report(report_id):
+    conn = None
+    report = None
+    try:
+        conn = get_connection('admin_bot')
+        rows = execute_procedure(conn, 'sp_admin_get_report', [report_id])
+        if rows:
+            report = rows[0]
+    except Error:
+        pass
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+    return report
 
 def update_report(report_id, status=None, message=None):
     conn = None

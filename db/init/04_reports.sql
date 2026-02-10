@@ -41,10 +41,12 @@ BEGIN
     VALUES (p_u_id, p_target, p_description);
 END //
 
--- List Reports (Admin) - Paginated with Total Count
+-- List Reports (Admin) - Sortable with Pagination
 CREATE PROCEDURE sp_admin_list_reports(
     IN p_limit INT,
-    IN p_offset INT
+    IN p_offset INT,
+    IN p_sort_col VARCHAR(20),
+    IN p_sort_dir VARCHAR(4)
 )
 BEGIN
     SELECT
@@ -58,8 +60,41 @@ BEGIN
         COUNT(*) OVER() as total_records
     FROM Reports r
     JOIN Users u ON r.u_id = u.id
-    ORDER BY r.created_at DESC
+    ORDER BY
+        CASE WHEN p_sort_col = 'id' AND UPPER(p_sort_dir) = 'ASC' THEN r.id END ASC,
+        CASE WHEN p_sort_col = 'id' AND UPPER(p_sort_dir) = 'DESC' THEN r.id END DESC,
+        
+        CASE WHEN p_sort_col = 'target' AND UPPER(p_sort_dir) = 'ASC' THEN r.target END ASC,
+        CASE WHEN p_sort_col = 'target' AND UPPER(p_sort_dir) = 'DESC' THEN r.target END DESC,
+
+        CASE WHEN p_sort_col = 'status' AND UPPER(p_sort_dir) = 'ASC' THEN r.status END ASC,
+        CASE WHEN p_sort_col = 'status' AND UPPER(p_sort_dir) = 'DESC' THEN r.status END DESC,
+
+        CASE WHEN p_sort_col = 'username' AND UPPER(p_sort_dir) = 'ASC' THEN u.username END ASC,
+        CASE WHEN p_sort_col = 'username' AND UPPER(p_sort_dir) = 'DESC' THEN u.username END DESC,
+
+        CASE WHEN p_sort_col = 'created_at' AND UPPER(p_sort_dir) = 'ASC' THEN r.created_at END ASC,
+        CASE WHEN p_sort_col = 'created_at' AND UPPER(p_sort_dir) = 'DESC' THEN r.created_at END DESC
     LIMIT p_limit OFFSET p_offset;
+END //
+
+-- Get Single Report (Admin Modal)
+CREATE PROCEDURE sp_admin_get_report(
+    IN p_id INT
+)
+BEGIN
+    SELECT 
+        r.id,
+        r.target,
+        r.description,
+        r.status,
+        r.status_message,
+        r.created_at,
+        u.username,
+        u.email
+    FROM Reports r
+    JOIN Users u ON r.u_id = u.id
+    WHERE r.id = p_id;
 END //
 
 -- Update Report Status/Message (Admin)

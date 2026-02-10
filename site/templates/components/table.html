@@ -20,7 +20,13 @@
         <thead>
             <tr>
                 {% for col in columns %}
-                <th scope="col" class="{{ col.class if col.class else '' }}">{{ col.label }}</th>
+                <th scope="col" class="{{ col.class if col.class else '' }}">
+                    {% if col.sort_href %}
+                        <a href="{{ col.sort_href }}" class="sort-link">{{ col.label }}</a>
+                    {% else %}
+                        {{ col.label }}
+                    {% endif %}
+                </th>
                 {% endfor %}
                 <th scope="col" class="col-actions">Actions</th>
             </tr>
@@ -34,14 +40,29 @@
                 
                 <td class="col-actions">
                     <div class="action-group">
-                        {% if actions %}
-                            {% for action in actions %}
-                            <button class="btn icon-only {{ action.class }}" aria-label="{{ action.label }}" title="{{ action.label }}">
-                                {{ action.icon | safe }}
-                            </button>
+                        {# LOGIC: Check for row-specific actions first, else use global actions #}
+                        {% set row_actions = row.actions if row.actions else actions %}
+                        
+                        {% if row_actions %}
+                            {% for action in row_actions %}
+                            
+                            {# Support for Forms (POST) vs Links (GET) #}
+                            {% if action.method == 'POST' %}
+                                <form action="{{ action.href }}" method="POST" class="inline-form {{ 'confirm-action' if action.confirm else '' }}" data-message="{{ action.confirm }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn icon-only {{ action.class }}" aria-label="{{ action.label }}" title="{{ action.label }}">
+                                        {{ action.icon | safe }}
+                                    </button>
+                                </form>
+                            {% else %}
+                                <a href="{{ action.href }}" class="btn icon-only {{ action.class }}" aria-label="{{ action.label }}" title="{{ action.label }}">
+                                    {{ action.icon | safe }}
+                                </a>
+                            {% endif %}
+
                             {% endfor %}
                         {% else %}
-                            <button class="btn icon-only" aria-label="Details" title="Details">&#8505;</button>
+                            <span class="text-muted">-</span>
                         {% endif %}
                     </div>
                 </td>

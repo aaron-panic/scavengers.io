@@ -213,24 +213,109 @@ table tbody tr:hover {
     background-color: var(--bg-colour-secondary);
 }
 
-/* ========================================================================= */
-/* MODALS */
-dialog.modal {
-    background-color: var(--bg-colour-primary);
-    border: 1px solid var(--border-colour-primary);
-    border-radius: 6px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-}
-dialog.modal::backdrop {
-    background-color: var(--color-overlay);
-    backdrop-filter: blur(2px);
+table th a.sort-link {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
 }
 
-.details-grid dt {
-    font-weight: bold;
-    color: var(--text-colour-tertiary);
+table th a.sort-link:hover {
+    color: var(--text-colour-primary);
+    text-decoration: underline;
 }
-.details-grid dt::after { content: ":"; }
+
+/* ========================================================================= */
+/* MODALS */
+
+dialog.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    
+    padding: 0;
+    border: none;
+    border-radius: 6px; /* Hardcoded since --border-radius-m is missing */
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+    
+    /* FIX: Use --bg-colour-primary (white) instead of undefined --bg-colour-panel */
+    background: var(--bg-colour-primary); 
+    color: var(--text-colour-primary);
+    
+    z-index: 1000;
+    
+    display: none; 
+    flex-direction: column;
+}
+
+dialog.modal[open] {
+    display: flex;
+}
+
+dialog.modal::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+}
+
+/* Modal Internal Layout */
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.modal header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-m);
+    /* FIX: Use --bg-colour-secondary (light gray) for contrast */
+    background: var(--bg-colour-secondary);
+    border-bottom: 1px solid var(--border-colour-primary);
+}
+
+.modal header h2 {
+    margin: 0;
+    font-size: var(--font-size-l);
+}
+
+.modal-body {
+    padding: var(--space-m);
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.modal footer {
+    padding: var(--space-s) var(--space-m);
+    /* FIX: Use --bg-colour-secondary */
+    background: var(--bg-colour-secondary);
+    border-top: 1px solid var(--border-colour-primary);
+}
+
+/* Close Button */
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--text-colour-secondary);
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0 var(--space-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-close:hover {
+    color: var(--text-colour-primary);
+}
 
 /* ========================================================================= */
 /* BUTTONS */
@@ -265,6 +350,62 @@ dialog.modal::backdrop {
     border: none;
     font-size: var(--font-size-l);
     line-height: 1;
+}
+
+.btn.full-width {
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+
+.modal-actions-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    width: 100%;
+    align-items: center; /* Centers the buttons and spacers horizontally */
+}
+
+.modal-actions-column form {
+    width: 33%; /* Sets the width of the form container */
+    min-width: 200px; /* Prevents buttons from becoming unreadably small */
+    margin: 0;
+}
+
+.modal-actions-column .separator {
+    height: 1px;
+    background-color: var(--border-colour-secondary);
+    margin: var(--space-xs) 0;
+    width: 33%; /* Matches the button width */
+    min-width: 200px;
+}
+
+.details-grid {
+    display: grid;
+    /* CONTROL WIDTH HERE: Change '150px' to your desired width */
+    grid-template-columns: 150px 1fr; 
+    gap: var(--space-s) var(--space-m);
+    align-items: baseline;
+    margin-top: var(--space-m);
+    margin-bottom: var(--space-m);
+}
+
+.details-grid dt {
+    font-weight: bold;
+    color: var(--text-colour-tertiary);
+    font-size: var(--font-size-xs);
+}
+
+/* Adds a colon automatically, remove if not desired */
+.details-grid dt::after { 
+    content: ":"; 
+}
+
+.details-grid dd {
+    margin: 0; /* Removes the browser's default indented 'dead space' */
+    color: var(--text-colour-primary);
+    overflow-wrap: break-word; /* Prevents long text from breaking layout */
+    font-size: var(--font-size-xs);
 }
 
 /* ========================================================================= */

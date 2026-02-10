@@ -64,18 +64,24 @@ def report():
             flash('Report submitted successfully.', 'success')
             return redirect(url_for('users.report'))
         except Exception as e:
-            print(f"Error submitting report: {e}")
-            flash('An error occurred. Please try again.', 'error')
+            # DEBUG: Print to console for docker logs
+            print(f"CRITICAL DB ERROR: {e}")
+            # VISUAL: Flash the actual error to the user interface
+            flash(f'System Error: {e}', 'error')
+    
+    # Catch validation errors (just in case)
+    elif form.errors:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"Validation Error in {field}: {error}", 'error')
 
     return render_template('report.html', title='users.report', form=form)
     
 @users_bp.route('/requests', methods=['GET', 'POST'])
 def requests():
-    # 1. Capture State
     tab_sel = request.args.get('tab_sel', 'all')
     page = request.args.get('page', 1, type=int)
-    
-    # 2. Navigation / Filter Definition
+
     tabs = [
         {'slug': 'all',         'label': 'all'},
         {'slug': 'Pending',     'label': 'pending'},
@@ -124,22 +130,21 @@ def requests():
             show_form=True
         )
 
-    # --- LIST MODE ---
+    # List Users
     raw_requests = []
     per_page = 12
     offset = (page - 1) * per_page
 
     # Fetch data based on filter
-    # Note: We now fetch exactly 'per_page' because we rely on total_records for pagination logic
     if tab_sel == 'my_requests':
         raw_requests = db.fetch_requests_by_uid(uid=session.get('uid'), limit=per_page, offset=offset)
     else:
         raw_requests = db.fetch_requests_by_status(status=tab_sel, limit=per_page, offset=offset)
 
-    # 3. Calculate Pagination Metrics
+    # Calculate pages
     total_records = 0
     if raw_requests:
-        # Extract the total count provided by the window function in SQL
+        # SQL gives us total records
         total_records = raw_requests[0]['total_records']
 
     # Avoid division by zero, default to 1 page if empty

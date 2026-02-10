@@ -39,6 +39,7 @@ from .users import (
 from .reports import (
     create_report,
     fetch_reports,
+    get_report,
     update_report,
     delete_report
 )
@@ -47,5 +48,8 @@ from .requests import (
     fetch_requests_by_status,
     fetch_requests_by_uid,
     create_request,
+    list_requests_admin,
+    get_request,
+    update_request,
     delete_request
 )

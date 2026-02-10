@@ -48,10 +48,13 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_announcements TO 'scav_admin
 
 -- Admin (Reports)
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_reports TO 'scav_admin_bot'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_get_report TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_report TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_report TO 'scav_admin_bot'@'%';
 
 -- Admin (Requests)
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_requests TO 'scav_admin_bot'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_get_request TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_request TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_request TO 'scav_admin_bot'@'%';
 
@@ -61,8 +64,12 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_get_announcements TO 'scav_social'@'%';
 
 -- User
 CREATE USER IF NOT EXISTS 'scav_user'@'%' IDENTIFIED BY '${DB_PASS_USER}';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_get_requests_by_status TO 'scav_user'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_get_requests_by_uid TO 'scav_user'@'%';
+
+-- User (Requests)
+GRANT EXECUTE ON PROCEDURE scavengers.sp_list_requests_by_status TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_list_requests_by_user TO 'scav_user'@'%';
+
+-- User (Reports)
 GRANT EXECUTE ON PROCEDURE scavengers.sp_create_report TO 'scav_user'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_create_request TO 'scav_user'@'%';
 

@@ -78,12 +78,12 @@ def get_announcement(id):
         if conn and conn.is_connected(): conn.close()
     return post
 
-def list_announcements_admin(limit, offset):
+def list_announcements_admin(limit, offset, sort_col='created_at', sort_dir='desc'):
     conn = None
     posts = []
     try:
         conn = get_connection('admin_bot')
-        posts = execute_procedure(conn, 'sp_admin_list_announcements', [limit, offset])
+        posts = execute_procedure(conn, 'sp_admin_list_announcements', [limit, offset, sort_col, sort_dir])
     except Error: pass
     finally:
         if conn and conn.is_connected(): conn.close()

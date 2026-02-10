@@ -30,7 +30,7 @@ BEGIN
     WHERE status = 'suspended'
         AND suspended_until <= NOW();
 
-    -- Fetch Data with Window Function for Total Count
+    -- Fetch Data with Total Count
     SELECT
         id,
         username,
@@ -42,22 +42,19 @@ BEGIN
         COUNT(*) OVER() as total_records
     FROM Users
     ORDER BY
-        CASE WHEN UPPER(p_sort_dir) = 'DESC' THEN
-            CASE 
-                WHEN p_sort_col = 'id' THEN id
-                WHEN p_sort_col = 'username' THEN username
-                WHEN p_sort_col = 'role' THEN role
-                WHEN p_sort_col = 'status' THEN status
-            END
-        END DESC,
-        CASE WHEN UPPER(p_sort_dir) = 'ASC' THEN
-            CASE 
-                WHEN p_sort_col = 'id' THEN id
-                WHEN p_sort_col = 'username' THEN username
-                WHEN p_sort_col = 'role' THEN role
-                WHEN p_sort_col = 'status' THEN status
-            END
-        END ASC
+        -- Integer Sorting (ID)
+        CASE WHEN p_sort_col = 'id' AND UPPER(p_sort_dir) = 'ASC' THEN id END ASC,
+        CASE WHEN p_sort_col = 'id' AND UPPER(p_sort_dir) = 'DESC' THEN id END DESC,
+        
+        -- String Sorting (Username, Role, Status)
+        CASE WHEN p_sort_col = 'username' AND UPPER(p_sort_dir) = 'ASC' THEN username END ASC,
+        CASE WHEN p_sort_col = 'username' AND UPPER(p_sort_dir) = 'DESC' THEN username END DESC,
+        
+        CASE WHEN p_sort_col = 'role' AND UPPER(p_sort_dir) = 'ASC' THEN role END ASC,
+        CASE WHEN p_sort_col = 'role' AND UPPER(p_sort_dir) = 'DESC' THEN role END DESC,
+        
+        CASE WHEN p_sort_col = 'status' AND UPPER(p_sort_dir) = 'ASC' THEN status END ASC,
+        CASE WHEN p_sort_col = 'status' AND UPPER(p_sort_dir) = 'DESC' THEN status END DESC
     LIMIT p_limit OFFSET p_offset;
 END //
 
