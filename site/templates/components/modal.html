@@ -15,17 +15,15 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 {% macro render(id, data, classes=[]) %}
-{# ADDED: Check for 'open' class and add the 'open' attribute to the dialog tag #}
+{# LOGIC: 'open' attribute is required for the dialog to be visible #}
 <dialog id="{{ id }}" class="modal {{ classes|join(' ') }}" {% if 'open' in classes %}open{% endif %}>
     <div class="modal-content">
         <header>
             <h2>{{ data.title }}</h2>
             
-            {# ADDED: Support for link-based closing (Server-Side State) #}
             {% if data.close_href %}
                 <a href="{{ data.close_href }}" class="btn-close" aria-label="Close">&times;</a>
             {% else %}
-                {# Fallback for JS-based closing #}
                 <form method="dialog">
                     <button class="btn-close" aria-label="Close">&times;</button>
                 </form>
@@ -53,7 +51,6 @@
         <footer>
             <div class="action-group">
                 {% for action in data.actions %}
-                {# Support for links vs buttons in footer #}
                 {% if action.href %}
                     <a href="{{ action.href }}" class="btn {{ action.class }}">{{ action.label }}</a>
                 {% else %}

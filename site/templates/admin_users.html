@@ -37,7 +37,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {% set custom_content %}
             <div class="modal-actions-column">
                 
-                {# Password Reset #}
+                {# Password Reset (Always Available) #}
                 <form action="{{ url_for('admin.reset_pass', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post" class="confirm-action" data-message="Reset password for {{ user.username }}?">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn full-width">Reset Password</button>
@@ -45,6 +45,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
                 <div class="separator"></div>
 
+                {# State-Specific Actions #}
+                
                 {# ACTIVE #}
                 {% if user.status == 'active' %}
                     <form action="{{ url_for('admin.suspend_user', user_id=user.id, duration=24, page=p_page, sort=p_sort, dir=p_dir) }}" method="post">
@@ -59,6 +61,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn full-width destructive">Ban User</button>
                     </form>
+                    
+                    <div class="separator"></div> {# ADDED SPACER #}
+                    
                     <form action="{{ url_for('admin.delete_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post" class="confirm-action" data-message="PERMANENTLY DELETE {{ user.username }}?">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn full-width destructive">Delete User</button>
@@ -74,6 +79,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn full-width destructive">Ban User</button>
                     </form>
+
+                    <div class="separator"></div> {# ADDED SPACER #}
+
                     <form action="{{ url_for('admin.delete_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post" class="confirm-action" data-message="PERMANENTLY DELETE {{ user.username }}?">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn full-width destructive">Delete User</button>
@@ -85,6 +93,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn full-width inverted">Reinstate</button>
                     </form>
+                    
+                    <div class="separator"></div> {# ADDED SPACER #}
+
                     <form action="{{ url_for('admin.delete_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post" class="confirm-action" data-message="PERMANENTLY DELETE {{ user.username }}?">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn full-width destructive">Delete User</button>
