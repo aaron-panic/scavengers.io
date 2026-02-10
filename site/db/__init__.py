@@ -36,6 +36,13 @@ from .users import (
     reset_password
 )
 
+from .reports import (
+    create_report,
+    fetch_reports,
+    update_report,
+    delete_report
+)
+
 from .requests import (
     fetch_requests_by_status,
     fetch_requests_by_uid,

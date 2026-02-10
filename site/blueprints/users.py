@@ -15,6 +15,16 @@ users_bp = Blueprint('users', __name__, url_prefix='/users')
 # Forms
 # ---------------------------------------------------------
 
+class ReportForm(FlaskForm):
+    target = StringField('Target', validators=[
+        DataRequired(message="Target is required (e.g., User Name, Post Title)."),
+        Length(max=255, message="Target must be less than 255 characters.")
+    ])
+    description = TextAreaField('Description', validators=[
+        DataRequired(message="Description is required.")
+    ])
+    submit = SubmitField('Submit Report')
+
 class RequestForm(FlaskForm):
     title = StringField('Title', validators=[
         DataRequired(message="Title is required."),
@@ -40,6 +50,25 @@ def restrict_access():
 def media():
     return render_template('media.html', title='media')
 
+@users_bp.route('/report', methods=['GET', 'POST'])
+def report():
+    form = ReportForm()
+    
+    if form.validate_on_submit():
+        try:
+            db.create_report(
+                u_id=session.get('uid'),
+                target=form.target.data,
+                description=form.description.data
+            )
+            flash('Report submitted successfully.', 'success')
+            return redirect(url_for('users.report'))
+        except Exception as e:
+            print(f"Error submitting report: {e}")
+            flash('An error occurred. Please try again.', 'error')
+
+    return render_template('report.html', title='report', form=form)
+    
 @users_bp.route('/requests', methods=['GET', 'POST'])
 def requests():
     # 1. Capture State
@@ -136,10 +165,6 @@ def requests():
         pagination=pagination,
         show_form=False
     )
-
-@users_bp.route('/report')
-def report():
-    return render_template('report.html', title='report')
 
 @users_bp.route('/dev')
 def dev():

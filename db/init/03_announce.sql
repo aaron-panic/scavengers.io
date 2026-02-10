@@ -50,4 +50,76 @@ BEGIN
     LIMIT 25;
 END //
 
+-- ADMIN PROCS --
+
+-- Create Announcement
+CREATE PROCEDURE sp_admin_create_announcement(
+    IN p_uid INT,
+    IN p_title VARCHAR(255),
+    IN p_subtitle VARCHAR(255),
+    IN p_content TEXT,
+    IN p_footnote TEXT,
+    IN p_is_visible BOOLEAN
+)
+BEGIN
+    INSERT INTO Announcements (u_id, title, subtitle, content, footnote, is_visible)
+    VALUES (p_uid, p_title, p_subtitle, p_content, p_footnote, p_is_visible);
+END //
+
+-- Update Announcement
+CREATE PROCEDURE sp_admin_update_announcement(
+    IN p_id INT,
+    IN p_title VARCHAR(255),
+    IN p_subtitle VARCHAR(255),
+    IN p_content TEXT,
+    IN p_footnote TEXT,
+    IN p_is_visible BOOLEAN
+)
+BEGIN
+    UPDATE Announcements
+    SET title = p_title,
+        subtitle = p_subtitle,
+        content = p_content,
+        footnote = p_footnote,
+        is_visible = p_is_visible
+    WHERE id = p_id;
+END //
+
+-- Delete Announcement
+CREATE PROCEDURE sp_admin_delete_announcement(
+    IN p_id INT
+)
+BEGIN
+    DELETE FROM Announcements WHERE id = p_id;
+END //
+
+-- Get Single Announcement (For Editing)
+CREATE PROCEDURE sp_admin_get_announcement(
+    IN p_id INT
+)
+BEGIN
+    SELECT id, title, subtitle, content, footnote, is_visible
+    FROM Announcements
+    WHERE id = p_id;
+END //
+
+-- List Announcements (Admin View - Paginated)
+CREATE PROCEDURE sp_admin_list_announcements(
+    IN p_limit INT,
+    IN p_offset INT
+)
+BEGIN
+    SELECT
+        a.id,
+        a.title,
+        a.created_at,
+        a.is_visible,
+        u.username,
+        COUNT(*) OVER() as total_records
+    FROM Announcements a
+    JOIN Users u ON a.u_id = u.id
+    ORDER BY a.created_at DESC
+    LIMIT p_limit OFFSET p_offset;
+END //
+
 DELIMITER ;

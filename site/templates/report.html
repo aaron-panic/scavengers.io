@@ -15,7 +15,37 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% extends 'base.html' %}
+{% import "components/panel.html" as Panel %}
+{% import "components/form.html" as Form %}
 
 {% block content %}
-    <h2 class="page-header">{{ title }}</h2>
+
+    {% set report_form_data = {
+        'id': 'report-form',
+        'action': url_for('users.report'),
+        'method': 'POST',
+        'fields': [
+            {'name': 'target',      'label': 'target',      'type': 'text',     'width': 'full-width', 'placeholder': 'user, post id, media, or system component'},
+            {'name': 'description', 'label': 'description', 'type': 'textarea', 'width': 'full-width', 'placeholder': 'describe...', 'height': 'height-large'}
+        ],
+        'buttons': [
+            {'label': 'submit report', 'type': 'submit', 'class': 'inverted'}
+        ]
+    } %}
+
+    {# Prepare footer content #}
+    {% set footer_content %}
+        {{ Form.render_actions(report_form_data) }}
+    {% endset %}
+
+    {% call Panel.render(
+        type='article',
+        header={'title': 'file report', 'subtitle': 'submit an issue to administration.'},
+        footer=footer_content
+    ) %}
+        
+        {{ Form.render(report_form_data) }}
+
+    {% endcall %}
+
 {% endblock %}

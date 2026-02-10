@@ -14,9 +14,6 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
--- 05_requests.sql - Table and retrieval stored procedure for requests
--- Copyright (C) 2026 Aaron Reichenbach
-
 CREATE TABLE IF NOT EXISTS Requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     u_id INT NOT NULL,
