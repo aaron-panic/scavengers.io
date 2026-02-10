@@ -14,6 +14,9 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+-- 05_requests.sql - Table and retrieval stored procedure for requests
+-- Copyright (C) 2026 Aaron Reichenbach
+
 CREATE TABLE IF NOT EXISTS Requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     u_id INT NOT NULL,
@@ -33,7 +36,7 @@ CREATE TABLE IF NOT EXISTS Requests (
 
 DELIMITER //
 
--- Fetch requests by status, supports pagination
+-- Fetch requests by status, supports pagination + total count
 CREATE PROCEDURE sp_get_requests_by_status(
     IN p_status VARCHAR(20),
     IN p_limit INT,
@@ -50,7 +53,8 @@ BEGIN
         r.status,
         r.status_message,
         r.created_at,
-        u.username
+        u.username,
+        COUNT(*) OVER() as total_records
     FROM Requests r
     JOIN Users u ON r.u_id = u.id
     WHERE 
@@ -59,6 +63,7 @@ BEGIN
     LIMIT p_limit OFFSET p_offset;
 END //
 
+-- Fetch requests by UID, supports pagination + total count
 CREATE PROCEDURE sp_get_requests_by_uid(
     IN p_u_id INT,
     IN p_limit INT,
@@ -75,7 +80,8 @@ BEGIN
         r.status,
         r.status_message,
         r.created_at,
-        u.username
+        u.username,
+        COUNT(*) OVER() as total_records
     FROM Requests r
     JOIN Users u ON r.u_id = u.id
     WHERE (r.u_id = p_u_id)

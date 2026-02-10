@@ -18,8 +18,17 @@
 <div class="card">
     <header>
         <h3>{{ data.title }}</h3>
+        
+        {% if data.date %}
+        <span class="meta-date">{{ data.date }}</span>
+        {% endif %}
+
+        {% if data.author %}
+        <span class="meta-author">//{{ data.author }}</span>
+        {% endif %}
+
         {% if data.meta %}
-        <span class="meta-date">{{ data.meta }}</span>
+        <span class="meta-generic">{{ data.meta }}</span>
         {% endif %}
     </header>
     

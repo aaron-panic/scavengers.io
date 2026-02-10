@@ -1,24 +1,12 @@
 # user.py - Routing blueprint for /user (privileged user features)
 # Copyright (C) 2026 Aaron Reichenbach
-#
-# This program is free software: you can redistribute it and/or modify         
-# it under the terms of the GNU Affero General Public License as
-# published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional
 from middleware import check_access
+import math
 import db
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
@@ -61,10 +49,10 @@ def requests():
     # 2. Navigation / Filter Definition
     tabs = [
         {'slug': 'all',         'label': 'all'},
-        {'slug': 'pending',     'label': 'pending'},
-        {'slug': 'in_progress', 'label': 'in progress'},
-        {'slug': 'completed',   'label': 'completed'},
-        {'slug': 'rejected',    'label': 'rejected'},
+        {'slug': 'Pending',     'label': 'pending'},
+        {'slug': 'In_Progress', 'label': 'in progress'},
+        {'slug': 'Completed',   'label': 'completed'},
+        {'slug': 'Rejected',    'label': 'rejected'},
         {'slug': 'my_requests', 'label': 'my requests'},
         {'slug': 'new',         'label': 'new'}
     ]
@@ -76,14 +64,14 @@ def requests():
             'href': url_for('users.requests', tab_sel=tab['slug']),
             'active': (tab_sel == tab['slug'])
         })
-
-    if status == 'new':
-        # --- CREATE MODE ---
+    
+    # Create new
+    if tab_sel == 'new':
         form = RequestForm()
         
         if form.validate_on_submit():
             try:
-                u_id = session.get('user_id')
+                u_id = session.get('uid')
                 
                 db.create_request(
                     u_id=u_id,
@@ -94,7 +82,7 @@ def requests():
                     ref_3=form.ref_3.data
                 )
                 flash('Request submitted successfully.', 'success')
-                return redirect(url_for('user.requests', tab_sel='my_requests'))
+                return redirect(url_for('users.requests', tab_sel='my_requests'))
             except Exception as e:
                 print(f"Error creating request: {e}")
                 flash('An error occurred. Please try again.', 'error')
@@ -107,35 +95,44 @@ def requests():
             show_form=True
         )
 
+    # --- LIST MODE ---
     raw_requests = []
     per_page = 12
     offset = (page - 1) * per_page
 
+    # Fetch data based on filter
+    # Note: We now fetch exactly 'per_page' because we rely on total_records for pagination logic
     if tab_sel == 'my_requests':
-        raw_requests = db.fetch_requests_by_uid(uid=session.get('user_id'), limit=per_page + 1, offset=offset)
-    
+        raw_requests = db.fetch_requests_by_uid(uid=session.get('uid'), limit=per_page, offset=offset)
     else:
-        raw_requests = db.fetch_requests(status=tab_sel, limit=per_page + 1, offset=offset)
+        raw_requests = db.fetch_requests_by_status(status=tab_sel, limit=per_page, offset=offset)
 
-    has_next = len(raw_requests) > per_page
+    # 3. Calculate Pagination Metrics
+    total_records = 0
+    if raw_requests:
+        # Extract the total count provided by the window function in SQL
+        total_records = raw_requests[0]['total_records']
+
+    # Avoid division by zero, default to 1 page if empty
+    total_pages = math.ceil(total_records / per_page) if total_records > 0 else 1
+
+    has_next = page < total_pages
     has_prev = page > 1
-        
-    display_requests = raw_requests[:per_page]
-        
+    
     pagination = {
         'page': page,
         'has_next': has_next,
         'has_prev': has_prev,
-        'next_href': url_for('user.requests', status=status, page=page + 1) if has_next else '#',
-        'prev_href': url_for('user.requests', status=status, page=page - 1) if has_prev else '#',
-        'pages': '?' 
+        'next_href': url_for('users.requests', tab_sel=tab_sel, page=page + 1) if has_next else '#',
+        'prev_href': url_for('users.requests', tab_sel=tab_sel, page=page - 1) if has_prev else '#',
+        'pages': total_pages
     }
 
     return render_template(
         'requests.html',
         title='requests',
         filters=filters,
-        posts=display_requests,
+        posts=raw_requests,
         pagination=pagination,
         show_form=False
     )

@@ -21,6 +21,7 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", "Noto Sans Mono", "Liberation Mono", "DejaVu Sans Mono", monospace;
 
     --font-size-base: 1rem;
+    --font-size-2xs: 0.6rem;
     --font-size-xs: 0.75rem;
     --font-size-s: 0.875rem;
     --font-size-sm: 0.925rem;
@@ -74,7 +75,7 @@
     --color-overlay: rgba(0, 0, 0, 0.5);
 
     /* FORMS */
-    --input-height: 2.5rem;
+    --input-height: 2rem;
     --input-border: #cccccc;
     --input-bg: #ffffff;
     --input-focus: #000000;

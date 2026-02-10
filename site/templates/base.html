@@ -48,10 +48,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
                         {% endif %}
 
                         {% if session['role'] in ['admin', 'user'] %}
-                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.media') }}">media</a></li>
-                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.req') }}">requests</a></li>
-                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.report') }}">reports</a></li>
-                        <li class="nav-item nav-item-user"><a href="{{ url_for('user.dev') }}">dev</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('users.media') }}">media</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('users.requests') }}">requests</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('users.report') }}">reports</a></li>
+                        <li class="nav-item nav-item-user"><a href="{{ url_for('users.dev') }}">dev</a></li>
                         <li class="nav-item-break"></li>
                         {% endif %}
 

@@ -35,8 +35,12 @@
 }
 
 .panel header .subtitle {
-    font-size: var(--font-size-m);
+    font-size: var(--font-size-sm);
     color: var(--text-colour-secondary);
+}
+
+.panel header .subtitle::before {
+    content: "> ";
 }
 
 .panel header .meta {
@@ -74,7 +78,7 @@
 }
 
 .panel section {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-s);
 }
 
 /* Footer */
@@ -100,12 +104,36 @@
 
 .card header h3 {
     margin: 0;
-    font-size: var(--font-size-m);
+    padding: var(--space-xs);
+    font-size: var(--font-size-xs);
     color: var(--text-colour-primary);
+    line-height: var(--line-height-compact);
 }
+
 .card header .meta-date {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-2xs);
+    color: var(--text-colour-tertiary);
+    display: block;
+    padding: var(--space-xs)
+}
+
+.card header .meta-author {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-2xs);
+    color: var(--text-colour-secondary);
+    font-weight: bold;
+    display: block;
+    padding: 0 var(--space-xs) var(--space-xs) var(--space-xs);
+}
+
+.card header .meta-generic {
     font-size: var(--font-size-xs);
     color: var(--text-colour-tertiary);
+}
+
+.card .content {
+    font-size: var(--font-size-xs);
 }
 
 .tag {
@@ -140,6 +168,13 @@
     min-height: 5rem;
 }
 
+.field-group input::placeholder,
+.field-group textarea::placeholder {
+    font-size: var(--font-size-s);
+    color: var(--text-colour-tertiary);
+    opacity: 0.75;
+}
+
 .field-group input:focus,
 .field-group textarea:focus {
     outline: none;
@@ -148,6 +183,18 @@
 
 .form-actions {
     border-top: 1px solid var(--border-colour-secondary);
+}
+
+.field-group textarea.height-small {
+    min-height: 3rem;
+}
+
+.field-group textarea.height-medium {
+    min-height: 8rem;
+}
+
+.field-group textarea.height-large {
+    min-height: 15rem;
 }
 
 /* ========================================================================= */
@@ -192,7 +239,7 @@ dialog.modal::backdrop {
     border: 1px solid var(--border-colour-primary);
     border-radius: 4px;
     color: var(--text-colour-primary);
-    font-size: var(--font-size-s);
+    font-size: var(--font-size-xs);
     transition: background-color 0.1s;
 }
 .btn:hover {
@@ -245,8 +292,11 @@ dialog.modal::backdrop {
 /* ========================================================================= */
 /* SYSTEM MESSAGES */
 .system-message {
-    text-align: center;
     color: var(--text-colour-secondary);
     margin-top: var(--space-l);
     font-family: var(--font-mono);
+}
+
+.system-message p {
+    font-size: var(--font-size-s);
 }

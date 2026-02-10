@@ -154,9 +154,11 @@ main {
 .panel footer {
     padding: var(--space-0);
     margin: 0;
+    margin-top: var(--space-m);
     padding-top: var(--space-m);
     padding-bottom: var(--space-s);
     padding-left: var(--space-s);
+    padding-right: var(--space-s);
 }
 
 .panel footer p {
@@ -181,8 +183,9 @@ main {
 
 .card header {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
     padding: 0;
     margin-bottom: var(--space-s);
 }

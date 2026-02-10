@@ -15,7 +15,71 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% extends 'base.html' %}
+{% import "components/panel.html" as Panel %}
+{% import "components/card.html" as Card %}
+{% import "components/form.html" as Form %}
 
 {% block content %}
-    <h2 class="page-header">{{ title }}</h2>
+
+    {% if show_form %}
+        
+        {# --- CREATE MODE --- #}
+        
+        {% set request_form_data = {
+            'action': '', 
+            'method': 'POST',
+            'fields': [
+                {'name': 'title',       'label': 'title',       'type': 'text',     'width': 'full-width',      'placeholder': 'title'},
+                {'name': 'description', 'label': 'description', 'type': 'textarea', 'width': 'full-width',      'placeholder': 'describe in detail...', 'height': 'height-large'},
+                {'name': 'ref_1',       'label': 'reference 1', 'type': 'text',     'width': 'full-width', 'placeholder': 'opt. link or other helpful reference'},
+                {'name': 'ref_2',       'label': 'reference 2', 'type': 'text',     'width': 'full-width', 'placeholder': 'opt. link or other helpful reference'},
+                {'name': 'ref_3',       'label': 'reference 3', 'type': 'text',     'width': 'full-width', 'placeholder': 'opt. link or other helpful reference'}
+            ],
+            'buttons': [
+                {'label': 'submit', 'type': 'submit', 'class': 'inverted'}
+            ]
+        } %}
+
+        {% call Panel.render(
+            type='article',
+            header={'title': 'new request', 'subtitle': 'submit a request.'},
+            tabs=filters
+        ) %}
+            
+            {{ Form.render(request_form_data) }}
+
+        {% endcall %}
+
+    {% else %}
+
+        {# --- LIST MODE --- #}
+        
+        {% call Panel.render(
+            type='grid',
+            header={'title': 'requests', 'subtitle': 'browse requests.'},
+            tabs=filters,
+            pagination=pagination
+        ) %}
+            
+            {% for post in posts %}
+                {% set card_data = {
+                    'title': post.title,
+                    'description': post.description,
+                    'date': post.created_at.strftime('%Y-%m-%d'),
+                    'author': post.username,
+                    'tags': [post.status]
+                } %}
+                
+                {{ Card.render(card_data) }}
+            
+            {% else %}
+                <div class="system-message full-width">
+                    <p>// No requests found for this filter.</p>
+                </div>
+            {% endfor %}
+
+        {% endcall %}
+
+    {% endif %}
+
 {% endblock %}
