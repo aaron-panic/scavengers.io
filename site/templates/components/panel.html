@@ -84,7 +84,7 @@
             <a href="{{ pagination.next_href }}" class="btn {{ 'disabled' if not pagination.has_next else '' }}" {% if not pagination.has_next %}aria-disabled="true"{% endif %}>Next &rarr;</a>
         </nav>
         {% elif footer %}
-            <p class="footnote">{{ footer | safe }}</p>
+            {{ footer | safe }}
         {% endif %}
     </footer>
     {% endif %}

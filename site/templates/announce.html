@@ -27,6 +27,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
             'author': post.username,
             'date': post.created_at
         } %}
+    
+        {% set footer_content %}
+        {% if post.footnote %}
+            <p class="footnote">{{ post.footnote }}</p>
+        {% endif %}
+        {% endset %}
+
+        {% call Panel.render(
+            type='article',
+            header=header_data,
+            footer=footer_content
+        ) %}
+            {{ post.content | format_post }}
+        {% endcall %}
 
         {% call Panel.render(
             type='article',

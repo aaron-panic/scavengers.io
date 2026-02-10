@@ -23,14 +23,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
     {% if show_form %}
         
-        {# --- CREATE MODE --- #}
-        
         {% set request_form_data = {
+            'id': 'request-form',
             'action': '', 
             'method': 'POST',
             'fields': [
-                {'name': 'title',       'label': 'title',       'type': 'text',     'width': 'full-width',      'placeholder': 'title'},
-                {'name': 'description', 'label': 'description', 'type': 'textarea', 'width': 'full-width',      'placeholder': 'describe in detail...', 'height': 'height-large'},
+                {'name': 'title',       'label': 'title',       'type': 'text',     'width': 'full-width', 'placeholder': 'title'},
+                {'name': 'description', 'label': 'description', 'type': 'textarea', 'width': 'full-width', 'placeholder': 'describe in detail...', 'height': 'height-large'},
                 {'name': 'ref_1',       'label': 'reference 1', 'type': 'text',     'width': 'full-width', 'placeholder': 'opt. link or other helpful reference'},
                 {'name': 'ref_2',       'label': 'reference 2', 'type': 'text',     'width': 'full-width', 'placeholder': 'opt. link or other helpful reference'},
                 {'name': 'ref_3',       'label': 'reference 3', 'type': 'text',     'width': 'full-width', 'placeholder': 'opt. link or other helpful reference'}
@@ -43,7 +42,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
         {% call Panel.render(
             type='article',
             header={'title': 'new request', 'subtitle': 'submit a request.'},
-            tabs=filters
+            tabs=filters,
+            footer=Form.render_actions(request_form_data)
         ) %}
             
             {{ Form.render(request_form_data) }}

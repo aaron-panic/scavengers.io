@@ -15,7 +15,8 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
 {% macro render(data) %}
-<form action="{{ data.action }}" method="{{ data.method }}">
+{# ADDED: id attribute is required for external buttons to work #}
+<form id="{{ data.id }}" action="{{ data.action }}" method="{{ data.method }}">
     
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
@@ -42,13 +43,13 @@
         </div>
         {% endfor %}
     </section>
-
-    <footer class="form-actions">
-        <div class="action-group">
-            {% for btn in data.buttons %}
-            <button type="{{ btn.type }}" class="btn {{ btn.class }}">{{ btn.label }}</button>
-            {% endfor %}
-        </div>
-    </footer>
 </form>
+{% endmacro %}
+
+{% macro render_actions(data) %}
+<div class="action-group">
+    {% for btn in data.buttons %}
+    <button type="{{ btn.type }}" form="{{ data.id }}" class="btn {{ btn.class }}">{{ btn.label }}</button>
+    {% endfor %}
+</div>
 {% endmacro %}

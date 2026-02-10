@@ -40,9 +40,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     } %}
 
     {% set footer_content %}
-        <p class="auth-footer">
-            Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>.
-        </p>
+        {{ Form.render_actions(register_form) }}
     {% endset %}
 
     {% call Panel.render(
