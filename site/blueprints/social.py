@@ -32,20 +32,20 @@ def restrict_access():
 @social_bp.route('/announce')
 def announce():
     posts = db.fetch_announcements()
-    return render_template('announce.html', title='announce', posts=posts)
+    return render_template('announce.html', title='social.announce', posts=posts)
 
 @social_bp.route('/feed')
 def feed():
-    return render_template('feed.html', title='feed')
+    return render_template('offline.html', title='social.feed')
 
 @social_bp.route('/board')
 def board():
-    return render_template('board.html', title='board')
+    return render_template('offline.html', title='social.board')
 
 @social_bp.route('/chat')
 def chat():
-    return render_template('chat.html', title='chat')
+    return render_template('offline.html', title='social.chat')
 
 @social_bp.route('/profile')
 def profile():
-    return render_template('profile.html', title='profile')
+    return render_template('offline.html', title='social.profile')

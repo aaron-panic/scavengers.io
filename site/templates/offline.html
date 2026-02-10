@@ -15,12 +15,21 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% extends "base.html" %}
+{% import "components/panel.html" as Panel %}
 
 {% block content %}
-<div id="layout-content-centered">
-    <div id="announce-container">
-        <h2>//User -> {{ session['username'] }}</h2>
-        <p>System Status: Offline</p>
-    </div>
-</div>
+    
+    {% call Panel.render(
+        type='article',
+        header={'title': title, 'subtitle': 'System module currently unavailable.'}
+    ) %}
+        
+        <div class="system-message">
+            <p>// STATUS: OFFLINE</p>
+            <p>This module has been disabled by the administrator.</p>
+            <p>Please check back later for updates.</p>
+        </div>
+
+    {% endcall %}
+
 {% endblock %}
