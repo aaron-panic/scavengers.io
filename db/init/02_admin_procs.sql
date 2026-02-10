@@ -17,9 +17,6 @@
 DELIMITER //
 
 -- List All Users
-DELIMITER //
-
--- List All Users
 CREATE PROCEDURE sp_admin_list_users(
     IN p_limit INT,
     IN p_offset INT,

@@ -50,7 +50,7 @@ BEGIN
     LIMIT 25;
 END //
 
--- ADMIN PROCS --
+-- ADMIN PROCS
 
 -- Create Announcement
 CREATE PROCEDURE sp_admin_create_announcement(
@@ -103,10 +103,12 @@ BEGIN
     WHERE id = p_id;
 END //
 
--- List Announcements (Admin View - Paginated)
+-- List Announcements (Admin View)
 CREATE PROCEDURE sp_admin_list_announcements(
     IN p_limit INT,
-    IN p_offset INT
+    IN p_offset INT,
+    IN p_sort_col VARCHAR(20),
+    IN p_sort_dir VARCHAR(4)
 )
 BEGIN
     SELECT
@@ -118,7 +120,18 @@ BEGIN
         COUNT(*) OVER() as total_records
     FROM Announcements a
     JOIN Users u ON a.u_id = u.id
-    ORDER BY a.created_at DESC
+    ORDER BY
+        CASE WHEN p_sort_col = 'id' AND UPPER(p_sort_dir) = 'ASC' THEN a.id END ASC,
+        CASE WHEN p_sort_col = 'id' AND UPPER(p_sort_dir) = 'DESC' THEN a.id END DESC,
+        
+        CASE WHEN p_sort_col = 'title' AND UPPER(p_sort_dir) = 'ASC' THEN a.title END ASC,
+        CASE WHEN p_sort_col = 'title' AND UPPER(p_sort_dir) = 'DESC' THEN a.title END DESC,
+
+        CASE WHEN p_sort_col = 'created_at' AND UPPER(p_sort_dir) = 'ASC' THEN a.created_at END ASC,
+        CASE WHEN p_sort_col = 'created_at' AND UPPER(p_sort_dir) = 'DESC' THEN a.created_at END DESC,
+
+        CASE WHEN p_sort_col = 'username' AND UPPER(p_sort_dir) = 'ASC' THEN u.username END ASC,
+        CASE WHEN p_sort_col = 'username' AND UPPER(p_sort_dir) = 'DESC' THEN u.username END DESC
     LIMIT p_limit OFFSET p_offset;
 END //
 

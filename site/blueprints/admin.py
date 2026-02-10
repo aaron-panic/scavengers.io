@@ -257,7 +257,145 @@ def reset_pass(user_id):
         flash(f"Error resetting password: {e}")
     return redirect(url_for('admin.users', selected_user_id=user_id, **get_state()))
 
-# ... (Announcements route placeholder) ...
+# ---------------------------------------------------------
+# Announcements
+# ---------------------------------------------------------
+
 @admin_bp.route('/announce', methods=['GET', 'POST'])
 def announce():
-    return render_template('admin.html', title='announce')
+    # 1. Handle Form Submission (Create / Update)
+    if request.method == 'POST':
+        # ... (POST logic remains the same) ...
+        title = request.form.get('title')
+        subtitle = request.form.get('subtitle')
+        content = request.form.get('content')
+        footnote = request.form.get('footnote')
+        edit_id = request.form.get('edit_id')
+        is_visible = 1 if 'is_visible' in request.form else 0
+
+        if not title or not content:
+            flash("Error: Title and Content are required.")
+        else:
+            try:
+                if edit_id:
+                    db.update_announcement(edit_id, title, subtitle, content, footnote, is_visible)
+                    flash(f"Announcement '{title}' updated.")
+                else:
+                    db.create_announcement(session['uid'], title, subtitle, content, footnote, is_visible)
+                    flash(f"Announcement '{title}' published.")
+            except Exception as e:
+                flash(f"Error saving announcement: {e}")
+        
+        return redirect(url_for('admin.announce'))
+
+    # 2. View / Edit State Setup
+    page = request.args.get('page', 1, type=int)
+    sort_col = request.args.get('sort', 'created_at') # Default sort by date
+    sort_dir = request.args.get('dir', 'desc')
+    edit_id = request.args.get('edit_id')
+    
+    # Validation
+    valid_cols = ['id', 'title', 'username', 'created_at']
+    if sort_col not in valid_cols: sort_col = 'created_at'
+    if sort_dir not in ['asc', 'desc']: sort_dir = 'desc'
+
+    # Fetch Data for Edit Form
+    edit_data = None
+    if edit_id:
+        edit_data = db.get_announcement(edit_id)
+        if not edit_data:
+            flash(f"Error: Could not fetch post ID {edit_id}")
+
+    # 3. Fetch Data for List
+    per_page = 25
+    offset = (page - 1) * per_page
+    # Pass sort params to DB
+    posts = db.list_announcements_admin(per_page, offset, sort_col, sort_dir)
+    
+    # 4. Prepare Table Data
+    table_rows = []
+    for post in posts:
+        display_title = post['title']
+        if len(display_title) > 25:
+            display_title = display_title[:25] + "..."
+
+        table_rows.append({
+            'id': post['id'],
+            'title': display_title,
+            'username': post['username'],
+            'created_at': post['created_at'],
+            'actions': [
+                {
+                    'label': 'Edit',
+                    'icon': '&#8505;', 
+                    'href': url_for('admin.announce', edit_id=post['id'], page=page, sort=sort_col, dir=sort_dir),
+                    'method': 'GET',
+                    'class': ''
+                },
+                {
+                    'label': 'Delete',
+                    'icon': '&#10006;', 
+                    'href': url_for('admin.delete_announce', post_id=post['id']),
+                    'method': 'POST',
+                    'class': 'destructive',
+                    'confirm': f"Delete announcement '{post['title']}'?"
+                }
+            ]
+        })
+
+    # 5. Build Columns with Sort Links
+    base_columns = [
+        {'key': 'id', 'label': 'ID'},
+        {'key': 'created_at', 'label': 'Date'},
+        {'key': 'title', 'label': 'Title'},
+        {'key': 'username', 'label': 'Author'}
+    ]
+
+    columns = []
+    for col in base_columns:
+        next_dir = 'desc'
+        label = col['label']
+
+        if col['key'] == sort_col:
+            next_dir = 'asc' if sort_dir == 'desc' else 'desc'
+            label += ' ▼' if sort_dir == 'desc' else ' ▲'
+        
+        columns.append({
+            'key': col['key'],
+            'label': label,
+            'sort_href': url_for('admin.announce', page=1, sort=col['key'], dir=next_dir)
+        })
+
+    # Pagination Logic
+    total_records = 0
+    if posts:
+        total_records = posts[0]['total_records']
+    total_pages = math.ceil(total_records / per_page) if total_records > 0 else 1
+
+    pagination = {
+        'page': page,
+        'has_next': page < total_pages,
+        'has_prev': page > 1,
+        'next_href': url_for('admin.announce', page=page + 1, sort=sort_col, dir=sort_dir),
+        'prev_href': url_for('admin.announce', page=page - 1, sort=sort_col, dir=sort_dir),
+        'pages': total_pages,
+        'total_records': total_records
+    }
+
+    return render_template(
+        'admin_announce.html',
+        title='announcements',
+        edit_data=edit_data,
+        columns=columns,
+        rows=table_rows,
+        pagination=pagination
+    )
+
+@admin_bp.route('/announce/delete/<int:post_id>', methods=['POST'])
+def delete_announce(post_id):
+    try:
+        db.delete_announcement(post_id)
+        flash(f"Announcement deleted.")
+    except Exception as e:
+        flash(f"Error deleting: {e}")
+    return redirect(url_for('admin.announce'))

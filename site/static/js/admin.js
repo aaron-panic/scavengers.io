@@ -15,15 +15,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Generic submission confirmation
-document.addEventListener("DOMContentLoaded", function() {
-    const forms = document.querySelectorAll('.confirm-action');
-
-    forms.forEach(form => {
-        form.addEventListener('submit', function(event) {
-            const message = this.getAttribute('data-message');
-
-            if (!confirm(message))
-                event.preventDefault();
-        });
-    });
+document.addEventListener('submit', function(e) {
+    // Check if the submitted form has the 'confirm-action' class
+    if (e.target && e.target.classList.contains('confirm-action')) {
+        const message = e.target.getAttribute('data-message') || 'Are you sure?';
+        
+        if (!confirm(message)) {
+            e.preventDefault(); // Stop submission if user clicks Cancel
+        }
+    }
 });
