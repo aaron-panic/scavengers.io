@@ -45,6 +45,8 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_announcement TO 'scav_admi
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_announcement TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_get_announcement TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_announcements TO 'scav_admin_bot'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_request TO 'scav_admin_bot'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_request TO 'scav_admin_bot'@'%';
 
 -- Admin
 CREATE USER IF NOT EXISTS 'scav_admin'@'%' IDENTIFIED BY '${DB_PASS_ADMIN}';
@@ -56,6 +58,9 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_get_announcements TO 'scav_social'@'%';
 
 -- User
 CREATE USER IF NOT EXISTS 'scav_user'@'%' IDENTIFIED BY '${DB_PASS_USER}';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_get_requests_by_status TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_get_requests_by_uid TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_create_request TO 'scav_user'@'%';
 
 FLUSH PRIVILEGES;
 EOF

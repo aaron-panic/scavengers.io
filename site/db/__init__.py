@@ -1,4 +1,4 @@
-# user.py - Routing blueprint for /user (privileged user features)
+# db.__init__.py - For ease of importing
 # Copyright (C) 2026 Aaron Reichenbach
 #
 # This program is free software: you can redistribute it and/or modify         
@@ -14,27 +14,31 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from flask import Blueprint, render_template
-from middleware import check_access
+from .core import get_db, close_dbs, execute_query, execute_procedure
+from .announcements import (
+    fetch_announcements,
+    create_announcement,
+    update_announcement,
+    delete_announcement,
+    get_announcement,
+    list_announcements_admin
+)
+from .users import (
+    fetch_user_auth,
+    fetch_all_users,
+    approve_user,
+    deny_user,
+    fetch_user_details,
+    suspend_user,
+    ban_user,
+    reinstate_user,
+    delete_user,
+    reset_password
+)
 
-user_bp = Blueprint('user', __name__, url_prefix='/user')
-
-@user_bp.before_request
-def restrict_access():
-    return check_access(['admin','user'])
-
-@user_bp.route('/media')
-def media():
-    return render_template('media.html', title='media')
-
-@user_bp.route('/req')
-def req():
-    return render_template('req.html', title='req')
-
-@user_bp.route('/report')
-def report():
-    return render_template('report.html', title='report')
-
-@user_bp.route('/dev')
-def dev():
-    return render_template('dev.html', title='dev')
+from .requests import (
+    fetch_requests_by_status,
+    fetch_requests_by_uid,
+    create_request,
+    delete_request
+)

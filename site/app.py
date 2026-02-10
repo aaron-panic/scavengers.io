@@ -84,8 +84,8 @@ def create_app():
     app.register_blueprint(admin_bp)
 
     # User
-    from blueprints.user import user_bp
-    app.register_blueprint(user_bp)
+    from blueprints.users import users_bp
+    app.register_blueprint(users_bp)
 
     # Social
     from blueprints.social import social_bp
