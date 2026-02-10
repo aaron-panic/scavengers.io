@@ -48,6 +48,7 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_announcements TO 'scav_admin
 
 -- Admin (Reports)
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_reports TO 'scav_admin_bot'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_get_report TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_report TO 'scav_admin_bot'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_report TO 'scav_admin_bot'@'%';
 

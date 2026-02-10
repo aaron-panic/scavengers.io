@@ -36,7 +36,7 @@ def restrict_access():
 
 @admin_bp.route('/')
 def dashboard():
-    return render_redirect(url_for('admin.users'))
+    return redirect(url_for('admin.users'))
 
 # ---------------------------------------------------------
 # User Management
@@ -556,3 +556,150 @@ def delete_request(request_id):
         flash(f"Error deleting request: {e}")
     
     return redirect(url_for('admin.requests_list', **get_state()))
+
+# ---------------------------------------------------------
+# Reports Management
+# ---------------------------------------------------------
+
+@admin_bp.route('/reports', methods=['GET', 'POST'])
+def reports_list():
+    page = request.args.get('page', 1, type=int)
+    sort_col = request.args.get('sort', 'created_at')
+    sort_dir = request.args.get('dir', 'desc')
+    edit_id = request.args.get('edit_id')
+
+    # Validation
+    valid_cols = ['id', 'target', 'username', 'created_at', 'status']
+    if sort_col not in valid_cols: sort_col = 'created_at'
+    if sort_dir not in ['asc', 'desc']: sort_dir = 'desc'
+
+    # Fetch Modal Data (if editing)
+    modal_data = None
+    if edit_id:
+        rep = db.get_report(edit_id)
+        if rep:
+            modal_data = {
+                'title': f"Report #{rep['id']}",
+                'close_href': url_for('admin.reports_list', page=page, sort=sort_col, dir=sort_dir),
+                'details': [
+                    {'key': 'Target', 'value': rep['target']},
+                    {'key': 'Reporter', 'value': rep['username']},
+                    {'key': 'Created', 'value': rep['created_at']},
+                    {'key': 'Status', 'value': rep['status']},
+                    {'key': 'Status Message', 'value': rep['status_message'] if rep['status_message'] else '-'},
+                    {'key': 'Description', 'value': rep['description']}
+                ],
+                'report': rep
+            }
+        else:
+            flash(f"Error: Report ID {edit_id} not found.")
+
+    # Fetch List Data
+    per_page = 25
+    offset = (page - 1) * per_page
+    reports = db.fetch_reports(per_page, offset, sort_col, sort_dir)
+
+    # Prepare Table Rows
+    table_rows = []
+    for r in reports:
+        table_rows.append({
+            'id': r['id'],
+            'target': r['target'],
+            'username': r['username'],
+            'created_at': r['created_at'],
+            'status': r['status'],
+            'actions': [
+                {
+                    'label': 'Modify',
+                    'icon': '&#8505;', # i
+                    'href': url_for('admin.reports_list', edit_id=r['id'], page=page, sort=sort_col, dir=sort_dir),
+                    'method': 'GET',
+                    'class': ''
+                },
+                {
+                    'label': 'Delete',
+                    'icon': '&#10006;', # x
+                    'href': url_for('admin.delete_report', report_id=r['id']),
+                    'method': 'POST',
+                    'class': 'destructive',
+                    'confirm': f"Delete report #{r['id']}?"
+                }
+            ]
+        })
+
+    # Build Sortable Columns
+    base_columns = [
+        {'key': 'id', 'label': 'ID'},
+        {'key': 'target', 'label': 'Target'},
+        {'key': 'username', 'label': 'Reporter'},
+        {'key': 'created_at', 'label': 'Date'},
+        {'key': 'status', 'label': 'Status'}
+    ]
+
+    columns = []
+    for col in base_columns:
+        next_dir = 'desc'
+        label = col['label']
+        if col['key'] == sort_col:
+            next_dir = 'asc' if sort_dir == 'desc' else 'desc'
+            label += ' ▼' if sort_dir == 'desc' else ' ▲'
+        
+        columns.append({
+            'key': col['key'],
+            'label': label,
+            'sort_href': url_for('admin.reports_list', page=1, sort=col['key'], dir=next_dir)
+        })
+
+    # Pagination
+    total_records = 0
+    if reports:
+        total_records = reports[0]['total_records']
+    total_pages = math.ceil(total_records / per_page) if total_records > 0 else 1
+
+    pagination = {
+        'page': page,
+        'has_next': page < total_pages,
+        'has_prev': page > 1,
+        'next_href': url_for('admin.reports_list', page=page + 1, sort=sort_col, dir=sort_dir),
+        'prev_href': url_for('admin.reports_list', page=page - 1, sort=sort_col, dir=sort_dir),
+        'pages': total_pages,
+        'total_records': total_records,
+        'sort': sort_col,
+        'dir': sort_dir
+    }
+
+    return render_template(
+        'admin_reports.html',
+        title='reports',
+        columns=columns,
+        rows=table_rows,
+        modal_data=modal_data,
+        pagination=pagination
+    )
+
+@admin_bp.route('/reports/update/<int:report_id>', methods=['POST'])
+def update_report(report_id):
+    new_status = request.form.get('status')
+    new_message = request.form.get('status_message')
+
+    # Convert empty input to None for SQL COALESCE
+    if not new_message or new_message.strip() == "":
+        new_message = None
+    
+    try:
+        db.update_report(report_id, new_status, new_message)
+        flash(f"Report #{report_id} updated.")
+    except Exception as e:
+        flash(f"Error updating report: {e}")
+
+    return redirect(url_for('admin.reports_list', **get_state()))
+
+@admin_bp.route('/reports/delete/<int:report_id>', methods=['POST'])
+def delete_report(report_id):
+    try:
+        db.delete_report(report_id)
+        flash(f"Report #{report_id} deleted.")
+    except Exception as e:
+        flash(f"Error deleting report: {e}")
+    
+    return redirect(url_for('admin.reports_list', **get_state()))

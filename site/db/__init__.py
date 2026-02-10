@@ -39,6 +39,7 @@ from .users import (
 from .reports import (
     create_report,
     fetch_reports,
+    get_report,
     update_report,
     delete_report
 )
