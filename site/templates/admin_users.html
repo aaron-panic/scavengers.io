@@ -15,119 +15,90 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
 
 {% extends 'admin.html' %}
-
-{% macro sort_link(col_name, label) %}
-    <a href="{{ url_for('admin.users', page=pagination.current_page, sort=col_name, dir='asc' if pagination.sort_col == col_name and pagination.sort_dir == 'desc' else 'desc') }}">
-        {{ label }}
-        {% if pagination.sort_col == col_name %}
-            {{ '▲' if pagination.sort_dir == 'asc' else '▼' }}
-        {% endif %}
-    </a>
-{% endmacro %}
+{% import "components/table.html" as Table %}
+{% import "components/modal.html" as Modal %}
 
 {% block subcontent %}
-    <table id="panel-admin-users" class="table-data">
-        <thead>
-            <tr>
-                <th id="col-id">{{ sort_link('id', 'id') }}</th>
-                <th id="col-username">{{ sort_link('username', 'username') }}</th>
-                <th id="col-role">{{ sort_link('role', 'role') }}</th>
-                <th id="col-status">{{ sort_link('status', 'status') }}</th>
-                <th id="col-actions" class="text-right">actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td title="{{ user.username }}">{{ user.username }}</td>
-                <td>{{ user.role }}</td>
-                <td class="status-{{ user.status }}">{{ user.status }}</td>
-                <td class="text-right">
-                    {% if user.status == 'requested' %}
-                    <form action="{{ url_for('admin.approve', user_id=user.id) }}" method="post" class="form-inline">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="link-button">[approve]</button>
-                    </form>
-                    <form action="{{ url_for('admin.deny', user_id=user.id) }}" method="post" class="form-inline">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="link-button error-text">[deny]</button>
-                    </form>
-                    {% else %}
-                    <a href="{{ url_for('admin.users', selected_user_id=user.id)}}">edit</a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    
+    {# Render the Table #}
+    {{ Table.render(columns, rows, classes=['table-data']) }}
 
-    {% if selected_user %}
-    <div class="modal-backdrop">
-        <article class="panel theme-panel modal">
-            <header class="panel-header">
-                <h3 class="panel-title">users/{{ selected_user.username }}</h3>
-                <a href="{{ url_for('admin.users') }}">close</a>
-            </header>
+    {# Render the Modal (if active) #}
+    {% if modal_data %}
+        
+        {# Construct the Vertical Button Column for the Modal #}
+        {% set user = modal_data.user %}
+        
+        {# Define current state variables for cleaner URLs #}
+        {% set p_page = pagination.page %}
+        {% set p_sort = pagination.sort %}
+        {% set p_dir = pagination.dir %}
 
-            <div class="panel-body">
-                <div class="detail-row">
-                    <strong>id:</strong> <span>{{ selected_user.id }}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>email:</strong> <span>{{ selected_user.email }}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>role:</strong> <span>{{ selected_user.role }}</span>
-                </div>
-                <div class="detail-row">
-                    <strong>status:</strong> <span class="status-{{ selected_user.status }}">{{ selected_user.status }}</span>
-                </div>
-                {% if selected_user.suspended_until %}
-                <div class="detail-row">
-                    <strong>suspended Until:</strong> <span>{{ selected_user.suspended_until }}</span>
-                </div>
+        {% set custom_content %}
+            <div class="modal-actions-column">
+                
+                {# Password Reset #}
+                <form action="{{ url_for('admin.reset_pass', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post" class="confirm-action" data-message="Reset password for {{ user.username }}?">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn full-width">Reset Password</button>
+                </form>
+
+                <div class="separator"></div>
+
+                {# ACTIVE #}
+                {% if user.status == 'active' %}
+                    <form action="{{ url_for('admin.suspend_user', user_id=user.id, duration=24, page=p_page, sort=p_sort, dir=p_dir) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn full-width">Suspend 24h</button>
+                    </form>
+                    <form action="{{ url_for('admin.suspend_user', user_id=user.id, duration=72, page=p_page, sort=p_sort, dir=p_dir) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn full-width">Suspend 72h</button>
+                    </form>
+                    <form action="{{ url_for('admin.ban_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn full-width destructive">Ban User</button>
+                    </form>
+                    <form action="{{ url_for('admin.delete_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post" class="confirm-action" data-message="PERMANENTLY DELETE {{ user.username }}?">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn full-width destructive">Delete User</button>
+                    </form>
+                
+                {# SUSPENDED #}
+                {% elif user.status == 'suspended' %}
+                    <form action="{{ url_for('admin.reinstate_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn full-width inverted">Reinstate</button>
+                    </form>
+                    <form action="{{ url_for('admin.ban_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn full-width destructive">Ban User</button>
+                    </form>
+                    <form action="{{ url_for('admin.delete_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post" class="confirm-action" data-message="PERMANENTLY DELETE {{ user.username }}?">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn full-width destructive">Delete User</button>
+                    </form>
+
+                {# BANNED #}
+                {% elif user.status == 'banned' %}
+                    <form action="{{ url_for('admin.reinstate_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn full-width inverted">Reinstate</button>
+                    </form>
+                    <form action="{{ url_for('admin.delete_user', user_id=user.id, page=p_page, sort=p_sort, dir=p_dir) }}" method="post" class="confirm-action" data-message="PERMANENTLY DELETE {{ user.username }}?">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn full-width destructive">Delete User</button>
+                    </form>
                 {% endif %}
 
-                <div class="detail-actions">
-                    <form action="{{ url_for('admin.reset_pass', user_id=selected_user.id) }}" method="post" class="confirm-action" data-message="Reset password for {{ selected_user.username }}?">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button">pass reset</button>
-                    </form>
-
-                    {% if selected_user.status != 'suspended' and selected_user.status != 'banned' %}
-                    <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=24) }}" method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button">suspend 24h</button>
-                    </form>
-                    <form action="{{ url_for('admin.suspend_user', user_id=selected_user.id, duration=72) }}" method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button">suspend 72h</button>
-                    </form>
-                    {% endif %}
-
-                    {% if selected_user.status != 'banned' %}
-                    <form action="{{ url_for('admin.ban_user', user_id=selected_user.id) }}" method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button error-text">ban</button>
-                    </form>
-                    {% endif %}
-
-                    {% if selected_user.status == 'banned' or selected_user.status == 'suspended' %}
-                    <form action="{{ url_for('admin.reinstate_user', user_id=selected_user.id) }}" method="post">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button">reinstate</button>
-                    </form>
-                    {% endif %}
-                    
-                     <form action="{{ url_for('admin.delete_user', user_id=selected_user.id) }}" method="post" class="confirm-action" data-message="DELETE USER {{ selected_user.username }}? This cannot be undone.">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="form-button error-text">delete</button>
-                    </form>
-                </div>
             </div>
-        </article>
-    </div>
+        {% endset %}
+
+        {# Inject Content into Modal Data #}
+        {% set _ = modal_data.update({'content': custom_content}) %}
+        
+        {{ Modal.render('user-modal', modal_data, classes=['open']) }}
+
     {% endif %}
 
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
@@ -137,16 +108,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.-->
     <div class="panel-meta">
         [Records: {{ pagination.total_records }}]
         
-        {% if pagination.current_page > 1 %}
-            <a href="{{ url_for('admin.users', page=pagination.current_page - 1, sort=pagination.sort_col, dir=pagination.sort_dir) }}">[prev]</a>
+        {% if pagination.has_prev %}
+            <a href="{{ pagination.prev_href }}">[prev]</a>
         {% else %}
             <span class="text-muted">[prev]</span>
         {% endif %}
 
-        {{ pagination.current_page }} / {{ pagination.total_pages }}
+        {{ pagination.page }} / {{ pagination.pages }}
 
-        {% if pagination.current_page < pagination.total_pages %}
-            <a href="{{ url_for('admin.users', page=pagination.current_page + 1, sort=pagination.sort_col, dir=pagination.sort_dir) }}">[next]</a>
+        {% if pagination.has_next %}
+            <a href="{{ pagination.next_href }}">[next]</a>
         {% else %}
             <span class="text-muted">[next]</span>
         {% endif %}

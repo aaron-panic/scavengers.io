@@ -213,6 +213,18 @@ table tbody tr:hover {
     background-color: var(--bg-colour-secondary);
 }
 
+table th a.sort-link {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+table th a.sort-link:hover {
+    color: var(--text-colour-primary);
+    text-decoration: underline;
+}
+
 /* ========================================================================= */
 /* MODALS */
 dialog.modal {
