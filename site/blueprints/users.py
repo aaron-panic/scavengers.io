@@ -64,8 +64,16 @@ def report():
             flash('Report submitted successfully.', 'success')
             return redirect(url_for('users.report'))
         except Exception as e:
-            print(f"Error submitting report: {e}")
-            flash('An error occurred. Please try again.', 'error')
+            # DEBUG: Print to console for docker logs
+            print(f"CRITICAL DB ERROR: {e}")
+            # VISUAL: Flash the actual error to the user interface
+            flash(f'System Error: {e}', 'error')
+    
+    # Catch validation errors (just in case)
+    elif form.errors:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"Validation Error in {field}: {error}", 'error')
 
     return render_template('report.html', title='users.report', form=form)
     

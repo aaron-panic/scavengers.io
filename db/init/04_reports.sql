@@ -31,7 +31,6 @@ CREATE TABLE IF NOT EXISTS Reports (
 DELIMITER //
 
 -- Create Report (User)
-DROP PROCEDURE IF EXISTS sp_create_report //
 CREATE PROCEDURE sp_create_report(
     IN p_u_id INT,
     IN p_target VARCHAR(255),
@@ -43,7 +42,6 @@ BEGIN
 END //
 
 -- List Reports (Admin) - Sortable with Pagination
-DROP PROCEDURE IF EXISTS sp_admin_list_reports //
 CREATE PROCEDURE sp_admin_list_reports(
     IN p_limit INT,
     IN p_offset INT,
@@ -81,7 +79,6 @@ BEGIN
 END //
 
 -- Get Single Report (Admin Modal)
-DROP PROCEDURE IF EXISTS sp_admin_get_report //
 CREATE PROCEDURE sp_admin_get_report(
     IN p_id INT
 )
@@ -101,7 +98,6 @@ BEGIN
 END //
 
 -- Update Report Status/Message (Admin)
-DROP PROCEDURE IF EXISTS sp_admin_update_report //
 CREATE PROCEDURE sp_admin_update_report(
     IN p_report_id INT,
     IN p_status VARCHAR(20),
@@ -116,7 +112,6 @@ BEGIN
 END //
 
 -- Delete Report (Admin)
-DROP PROCEDURE IF EXISTS sp_admin_delete_report //
 CREATE PROCEDURE sp_admin_delete_report(
     IN p_report_id INT
 )
