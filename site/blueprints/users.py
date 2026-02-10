@@ -48,7 +48,7 @@ def restrict_access():
 
 @users_bp.route('/media')
 def media():
-    return render_template('media.html', title='media')
+    return render_template('offline.html', title='users.media')
 
 @users_bp.route('/report', methods=['GET', 'POST'])
 def report():
@@ -67,7 +67,7 @@ def report():
             print(f"Error submitting report: {e}")
             flash('An error occurred. Please try again.', 'error')
 
-    return render_template('report.html', title='report', form=form)
+    return render_template('report.html', title='users.report', form=form)
     
 @users_bp.route('/requests', methods=['GET', 'POST'])
 def requests():
@@ -168,4 +168,4 @@ def requests():
 
 @users_bp.route('/dev')
 def dev():
-    return render_template('dev.html', title='dev')
+    return render_template('offline.html', title='users.dev')
