@@ -1,4 +1,4 @@
--- 05_reports.sql - Table and retrieval stored procedure for reports
+-- 08_reports_admin.sql - Stored procedures for Reports table ('admin')
 -- Copyright (C) 2026 Aaron Reichenbach
 --
 -- This program is free software: you can redistribute it and/or modify         
@@ -14,41 +14,36 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CREATE TABLE IF NOT EXISTS Reports (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    u_id INT NOT NULL,
-    target VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-    status ENUM('open', 'resolved', 'wontfix') NOT NULL DEFAULT 'open',
-    status_message TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_rep_u_id
-        FOREIGN KEY (u_id)
-        REFERENCES Users (id)
-        ON DELETE CASCADE
-);
+
 
 DELIMITER //
 
--- Create Report (User)
-CREATE PROCEDURE sp_create_report(
-    IN p_u_id INT,
-    IN p_target VARCHAR(255),
-    IN p_description TEXT
-)
-BEGIN
-    INSERT INTO Reports (u_id, target, description)
-    VALUES (p_u_id, p_target, p_description);
-END //
+-- sp_admin_fetch_reports(p_limit, p_offset, p_sort_col, p_sort_dir)
+-- ----------------------------------------------------------------------------
+-- Desc:
+--      Fetch a paginated list of reports
+-- Params:
+--      p_limit (INT)                   Number of records to retrieve for a page view
+--      p_offset (INT)                  Where to start retrieving records for page view
+--      p_sort_col (VARCHAR 20)         Column to sort by
+--      p_sort_dir (VARCHAR 4)          Direction (ASC or DESC) to sort
 
--- List Reports (Admin) - Sortable with Pagination
-CREATE PROCEDURE sp_admin_list_reports(
+CREATE PROCEDURE sp_admin_fetch_reports(
     IN p_limit INT,
     IN p_offset INT,
     IN p_sort_col VARCHAR(20),
     IN p_sort_dir VARCHAR(4)
 )
 BEGIN
+
+    -- Hard caps to ensure that there's no nonsense from the caller
+    IF p_limit > 100 THEN
+        SET p_limit = 100;
+    END IF;
+    IF p_limit <= 0 THEN
+        SET p_limit = 25;
+    END IF;
+    
     SELECT
         r.id,
         r.target,
@@ -56,6 +51,7 @@ BEGIN
         r.status,
         r.status_message,
         r.created_at,
+        r.updated_at,
         u.username,
         COUNT(*) OVER() as total_records
     FROM Reports r
@@ -76,13 +72,23 @@ BEGIN
         CASE WHEN p_sort_col = 'created_at' AND UPPER(p_sort_dir) = 'ASC' THEN r.created_at END ASC,
         CASE WHEN p_sort_col = 'created_at' AND UPPER(p_sort_dir) = 'DESC' THEN r.created_at END DESC
     LIMIT p_limit OFFSET p_offset;
+
 END //
 
--- Get Single Report (Admin Modal)
-CREATE PROCEDURE sp_admin_get_report(
+
+
+-- sp_admin_fetch_report(p_id)
+-- ----------------------------------------------------------------------------
+-- Desc:
+--      Fetch details of a single report.
+-- Params:
+--      p_id (INT)                      Report id (matches Reports.id)
+
+CREATE PROCEDURE sp_admin_fetch_report(
     IN p_id INT
 )
 BEGIN
+
     SELECT 
         r.id,
         r.target,
@@ -90,33 +96,55 @@ BEGIN
         r.status,
         r.status_message,
         r.created_at,
+        r.updated_at,
         u.username,
         u.email
     FROM Reports r
     JOIN Users u ON r.u_id = u.id
     WHERE r.id = p_id;
+
 END //
 
+
+
 -- Update Report Status/Message (Admin)
+-- ----------------------------------------------------------------------------
+-- Desc:
+--      Update the status or message of a report.
+-- Params:
+--      p_id (INT)                      Report id (matches Reports.id)
+--      p_status (VARCHAR 20)           New status to update or NULL for no change
+--      p_status_message (TEXT)         New message to update or NULL for no change
+
 CREATE PROCEDURE sp_admin_update_report(
-    IN p_report_id INT,
+    IN p_id INT,
     IN p_status VARCHAR(20),
     IN p_status_message TEXT
 )
 BEGIN
+
     UPDATE Reports
     SET 
         status = COALESCE(p_status, status),
         status_message = COALESCE(p_status_message, status_message)
-    WHERE id = p_report_id;
+    WHERE id = p_id;
+
 END //
 
--- Delete Report (Admin)
+-- sp_admin_delete_report(p_id)
+-- ----------------------------------------------------------------------------
+-- Desc:
+--      Permanently delete a report.
+-- Params:
+--      p_id (INT)                      Report id (matches Reports.id)
+
 CREATE PROCEDURE sp_admin_delete_report(
-    IN p_report_id INT
+    IN p_id INT
 )
 BEGIN
-    DELETE FROM Reports WHERE id = p_report_id;
+
+    DELETE FROM Reports WHERE id = p_id;
+    
 END //
 
 DELIMITER ;

@@ -20,58 +20,103 @@ set -e
 # Create Database Users and Assign Permissions
 mariadb -u root -p"${MARIADB_ROOT_PASSWORD}" <<EOF
 
--- scav_login_bot
-CREATE USER IF NOT EXISTS 'scav_login_bot'@'%' IDENTIFIED BY '${DB_PASS_LOGIN_BOT}';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_get_user_auth TO 'scav_login_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_register_user TO 'scav_login_bot'@'%';
 
--- scav_admin_bot
-CREATE USER IF NOT EXISTS 'scav_admin_bot'@'%' IDENTIFIED BY '${DB_PASS_ADMIN_BOT}';
 
--- Admin (Users)
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_users TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_approve_requested TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_deny_requested TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_get_user_details TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_suspend_user TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_ban_user TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_reinstate_user TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_user TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_reset_password TO 'scav_admin_bot'@'%';
+-- ----------------------------------------------------------------------------
+-- MARIADB USER CREATION FOR RBAC                                             -
+-- ----------------------------------------------------------------------------
+-- NOTE: All access is controlled by stored procedures with no direct table access
+         for any user regardless of role.
 
--- Admin (Announcements)
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_create_announcement TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_announcement TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_announcement TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_get_announcement TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_announcements TO 'scav_admin_bot'@'%';
-
--- Admin (Reports)
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_reports TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_get_report TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_report TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_report TO 'scav_admin_bot'@'%';
-
--- Admin (Requests)
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_list_requests TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_get_request TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_request TO 'scav_admin_bot'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_request TO 'scav_admin_bot'@'%';
-
--- Social
-CREATE USER IF NOT EXISTS 'scav_social'@'%' IDENTIFIED BY '${DB_PASS_SOCIAL}';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_get_announcements TO 'scav_social'@'%';
-
--- User
+CREATE USER IF NOT EXISTS 'scav_login'@'%' IDENTIFIED BY '${DB_PASS_LOGIN}';
+CREATE USER IF NOT EXISTS 'scav_admin'@'%' IDENTIFIED BY '${DB_PASS_ADMIN}';
 CREATE USER IF NOT EXISTS 'scav_user'@'%' IDENTIFIED BY '${DB_PASS_USER}';
+CREATE USER IF NOT EXISTS 'scav_social'@'%' IDENTIFIED BY '${DB_PASS_SOCIAL}';
 
--- User (Requests)
-GRANT EXECUTE ON PROCEDURE scavengers.sp_list_requests_by_status TO 'scav_user'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_list_requests_by_user TO 'scav_user'@'%';
 
--- User (Reports)
+
+-- ----------------------------------------------------------------------------
+-- -                              USERS TABLE                                 -
+-- ----------------------------------------------------------------------------
+
+-- Users table stored procedures ('scav_login')
+-- ----------------------------------------------------------------------------
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_user_auth TO 'scav_login'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_create_user_request TO 'scav_login'@'%';
+
+
+
+-- Users table administrative stored procedures ('scav_admin')
+-- ----------------------------------------------------------------------------
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_users TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_approve_user TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_deny_user TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_user_details TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_suspend_user TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_ban_user TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_reinstate_user TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_user TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_reset_password TO 'scav_admin'@'%';
+
+
+
+-- ----------------------------------------------------------------------------
+--                           ANNOUNCEMENTS TABLE                              -
+-- ----------------------------------------------------------------------------
+
+-- Announcements table stored procedures ('scav_social')
+-- ----------------------------------------------------------------------------
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_announcements TO 'scav_social'@'%';
+
+
+
+-- Announcements table administrative stored procedures ('scav_admin')
+-- ----------------------------------------------------------------------------
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_create_announcement TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_announcement TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_announcement TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_announcement TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_announcements TO 'scav_admin'@'%';
+
+
+
+-- ----------------------------------------------------------------------------
+--                              REPORTS TABLE                                 -
+-- ----------------------------------------------------------------------------
+
+-- Reports table stored procedures ('scav_user')
+-- ----------------------------------------------------------------------------
 GRANT EXECUTE ON PROCEDURE scavengers.sp_create_report TO 'scav_user'@'%';
+
+
+-- Reports table administrative stored procedures ('scav_admin')
+-- ----------------------------------------------------------------------------
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_reports TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_report TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_report TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_report TO 'scav_admin'@'%';
+
+
+
+-- ----------------------------------------------------------------------------
+--                             REQUESTS TABLE                                 -
+-- ----------------------------------------------------------------------------
+
+-- Requests table stored procedures ('scav_user')
+-- ----------------------------------------------------------------------------
 GRANT EXECUTE ON PROCEDURE scavengers.sp_create_request TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_requests_by_user TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_requests_by_status TO 'scav_user'@'%';
+
+
+-- Requests table stored administrative procedures ('scav_admin')
+-- ----------------------------------------------------------------------------
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_requests TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_request TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_request TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_request TO 'scav_admin'@'%';
+
+
 
 FLUSH PRIVILEGES;
 EOF

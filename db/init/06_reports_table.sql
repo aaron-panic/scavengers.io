@@ -1,4 +1,4 @@
--- 00_users.sql - Generate users table for mariadb startup
+-- 06_reports_table.sql - Generate Reports table
 -- Copyright (C) 2026 Aaron Reichenbach
 --
 -- This program is free software: you can redistribute it and/or modify         
@@ -14,14 +14,22 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
--- Users Table - not to be exposed!
-CREATE TABLE IF NOT EXISTS Users (
+
+
+-- Reportss Table
+-- ----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS Reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    email VARCHAR(100),
-    role ENUM('admin', 'user', 'social') DEFAULT 'social',
-    status ENUM('active', 'requested', 'suspended', 'banned') NOT NULL DEFAULT 'requested',
-    suspended_until TIMESTAMP NULL DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    u_id INT NOT NULL,
+    target VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    status ENUM('open', 'resolved', 'wontfix') NOT NULL DEFAULT 'open',
+    status_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_report_u_id
+        FOREIGN KEY (u_id)
+        REFERENCES Users (id)
+        ON DELETE CASCADE
 );
