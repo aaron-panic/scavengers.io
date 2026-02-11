@@ -1,19 +1,61 @@
-# user.py - Routing blueprint for /user (privileged user features)
+# users.py - Routing blueprint for /users ('user'+)
 # Copyright (C) 2026 Aaron Reichenbach
+#
+# This program is free software: you can redistribute it and/or modify         
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+from flask import (
+    Blueprint, 
+    render_template, 
+    request, 
+    redirect, 
+    url_for, 
+    flash, 
+    session
+)
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional
+
+import db.reports
+import db.requests
 from middleware import check_access
-import math
-import db
+from utils import flash_form_errors, get_pagination_metadata
 
-users_bp = Blueprint('users', __name__, url_prefix='/users')
 
-# ---------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Configuration
+# -----------------------------------------------------------------------------
+
+bp = Blueprint('users', __name__, url_prefix='/users')
+
+# Tab configuration for Requests page
+REQUEST_TABS = [
+    {'slug': 'all',         'label': 'all'},
+    {'slug': 'Pending',     'label': 'pending'},
+    {'slug': 'In_Progress', 'label': 'in progress'},
+    {'slug': 'Completed',   'label': 'completed'},
+    {'slug': 'Rejected',    'label': 'rejected'},
+    {'slug': 'my_requests', 'label': 'my requests'},
+    {'slug': 'new',         'label': 'new'}
+]
+
+
+
+# -----------------------------------------------------------------------------
 # Forms
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class ReportForm(FlaskForm):
     target = StringField('Target', validators=[
@@ -24,6 +66,8 @@ class ReportForm(FlaskForm):
         DataRequired(message="Description is required.")
     ])
     submit = SubmitField('Submit Report')
+
+# -----------------------------------------------------------------------------
 
 class RequestForm(FlaskForm):
     title = StringField('Title', validators=[
@@ -38,78 +82,73 @@ class RequestForm(FlaskForm):
     ref_3 = StringField('Reference 3', validators=[Optional()])
     submit = SubmitField('Submit Request')
 
-# ---------------------------------------------------------
-# Routes
-# ---------------------------------------------------------
 
-@users_bp.before_request
+
+# -----------------------------------------------------------------------------
+# Routes
+# -----------------------------------------------------------------------------
+
+@bp.before_request
 def restrict_access():
     return check_access(['admin', 'user'])
 
-@users_bp.route('/media')
-def media():
-    return render_template('offline.html', title='users.media')
+# -----------------------------------------------------------------------------
 
-@users_bp.route('/report', methods=['GET', 'POST'])
+@bp.route('/media')
+def media():
+    return render_template('offline.html', title='media')
+
+# -----------------------------------------------------------------------------
+
+@bp.route('/report', methods=['GET', 'POST'])
 def report():
     form = ReportForm()
     
     if form.validate_on_submit():
         try:
-            db.create_report(
-                u_id=session.get('uid'),
+            db.reports.create_report(
+                u_id=session.get('user_id'),
                 target=form.target.data,
                 description=form.description.data
             )
             flash('Report submitted successfully.', 'success')
             return redirect(url_for('users.report'))
+            
         except Exception as e:
-            # DEBUG: Print to console for docker logs
-            print(f"CRITICAL DB ERROR: {e}")
-            # VISUAL: Flash the actual error to the user interface
-            flash(f'System Error: {e}', 'error')
+            print(f"Report Error: {e}")
+            flash('An error occurred while submitting report.', 'error')
     
-    # Catch validation errors (just in case)
     elif form.errors:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f"Validation Error in {field}: {error}", 'error')
+        flash_form_errors(form)
 
-    return render_template('report.html', title='users.report', form=form)
-    
-@users_bp.route('/requests', methods=['GET', 'POST'])
+    return render_template('report.html', title='report', form=form)
+
+# -----------------------------------------------------------------------------
+
+@bp.route('/requests', methods=['GET', 'POST'])
 def requests():
+    
+    # parameter extraction
     tab_sel = request.args.get('tab_sel', 'all')
     page = request.args.get('page', 1, type=int)
 
-    tabs = [
-        {'slug': 'all',         'label': 'all'},
-        {'slug': 'Pending',     'label': 'pending'},
-        {'slug': 'In_Progress', 'label': 'in progress'},
-        {'slug': 'Completed',   'label': 'completed'},
-        {'slug': 'Rejected',    'label': 'rejected'},
-        {'slug': 'my_requests', 'label': 'my requests'},
-        {'slug': 'new',         'label': 'new'}
-    ]
-
+    # navigation tabs
     filters = []
-    for tab in tabs:
+    for tab in REQUEST_TABS:
         filters.append({
             'label': tab['label'],
             'href': url_for('users.requests', tab_sel=tab['slug']),
             'active': (tab_sel == tab['slug'])
         })
     
-    # Create new
+    # new request view
     if tab_sel == 'new':
         form = RequestForm()
         
         if form.validate_on_submit():
             try:
-                u_id = session.get('uid')
-                
-                db.create_request(
-                    u_id=u_id,
+                db.requests.create_request(
+                    u_id=session.get('user_id'),
                     title=form.title.data,
                     description=form.description.data,
                     ref_1=form.ref_1.data,
@@ -118,10 +157,11 @@ def requests():
                 )
                 flash('Request submitted successfully.', 'success')
                 return redirect(url_for('users.requests', tab_sel='my_requests'))
+                
             except Exception as e:
-                print(f"Error creating request: {e}")
+                print(f"Request Creation Error: {e}")
                 flash('An error occurred. Please try again.', 'error')
-
+        
         return render_template(
             'requests.html', 
             title='requests', 
@@ -130,47 +170,40 @@ def requests():
             show_form=True
         )
 
-    # List Users
-    raw_requests = []
+    # list view
     per_page = 12
     offset = (page - 1) * per_page
-
-    # Fetch data based on filter
-    if tab_sel == 'my_requests':
-        raw_requests = db.fetch_requests_by_uid(uid=session.get('uid'), limit=per_page, offset=offset)
-    else:
-        raw_requests = db.fetch_requests_by_status(status=tab_sel, limit=per_page, offset=offset)
-
-    # Calculate pages
-    total_records = 0
-    if raw_requests:
-        # SQL gives us total records
-        total_records = raw_requests[0]['total_records']
-
-    # Avoid division by zero, default to 1 page if empty
-    total_pages = math.ceil(total_records / per_page) if total_records > 0 else 1
-
-    has_next = page < total_pages
-    has_prev = page > 1
     
-    pagination = {
-        'page': page,
-        'has_next': has_next,
-        'has_prev': has_prev,
-        'next_href': url_for('users.requests', tab_sel=tab_sel, page=page + 1) if has_next else '#',
-        'prev_href': url_for('users.requests', tab_sel=tab_sel, page=page - 1) if has_prev else '#',
-        'pages': total_pages
-    }
+    rows = []
+    
+    if tab_sel == 'my_requests':
+        rows = db.requests.fetch_requests_by_user(session.get('user_id'), per_page, offset)
+    else:
+        rows = db.requests.fetch_requests_by_status(tab_sel, per_page, offset)
+        
+    # if data exists, we grab how many records total from the first row
+    total_records = rows[0].get('total_records', 0) if rows else 0
+    
+    # build pagination
+    pagination = get_pagination_metadata(
+        page, 
+        per_page, 
+        total_records, 
+        'users.requests', 
+        tab_sel=tab_sel
+    )
 
     return render_template(
         'requests.html',
         title='requests',
         filters=filters,
-        posts=raw_requests,
+        posts=rows,
         pagination=pagination,
         show_form=False
     )
 
-@users_bp.route('/dev')
+# -----------------------------------------------------------------------------
+
+@bp.route('/dev')
 def dev():
-    return render_template('offline.html', title='users.dev')
+    return render_template('offline.html', title='dev')

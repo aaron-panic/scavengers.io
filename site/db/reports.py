@@ -14,14 +14,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import List, Dict, Any, Optional
+
 from mysql.connector import Error
 from .core import get_connection, execute_procedure
 
-# ---------------------------------------------------------
-# User Actions
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# User
+# -----------------------------------------------------------------------------
 
-def create_report(u_id, target, description):
+def create_report(u_id: int, target: str, description: str) -> None:
+    """
+    Submit a new issue or report.
+    Calls: sp_create_report
+    """
     conn = None
     try:
         conn = get_connection('user')
@@ -32,16 +38,28 @@ def create_report(u_id, target, description):
         if conn and conn.is_connected():
             conn.close()
 
-# ---------------------------------------------------------
-# Admin Management
-# ---------------------------------------------------------
 
-def fetch_reports(limit=25, offset=0, sort_col='created_at', sort_dir='desc'):
+
+# -----------------------------------------------------------------------------
+# Admin
+# -----------------------------------------------------------------------------
+
+def admin_fetch_reports(
+    limit: int = 25, 
+    offset: int = 0, 
+    sort_col: str = 'created_at', 
+    sort_dir: str = 'desc'
+) -> List[Dict[str, Any]]:
+    """
+    Fetch a paginated list of reports.
+    Calls: sp_admin_fetch_reports
+    """
+
     conn = None
     reports = []
     try:
-        conn = get_connection('admin_bot')
-        reports = execute_procedure(conn, 'sp_admin_list_reports', [limit, offset, sort_col, sort_dir])
+        conn = get_connection('admin')
+        reports = execute_procedure(conn, 'sp_admin_fetch_reports', [limit, offset, sort_col, sort_dir])
     except Error:
         pass
     finally:
@@ -49,12 +67,19 @@ def fetch_reports(limit=25, offset=0, sort_col='created_at', sort_dir='desc'):
             conn.close()
     return reports
 
-def get_report(report_id):
+# -----------------------------------------------------------------------------
+
+def admin_fetch_report(id: int) -> Optional[Dict[str, Any]]:
+    """
+    Fetch details of a single report.
+    Calls: sp_admin_fetch_report
+    """
+
     conn = None
     report = None
     try:
-        conn = get_connection('admin_bot')
-        rows = execute_procedure(conn, 'sp_admin_get_report', [report_id])
+        conn = get_connection('admin')
+        rows = execute_procedure(conn, 'sp_admin_fetch_report', [id])
         if rows:
             report = rows[0]
     except Error:
@@ -64,22 +89,40 @@ def get_report(report_id):
             conn.close()
     return report
 
-def update_report(report_id, status=None, message=None):
+# -----------------------------------------------------------------------------
+
+def admin_update_report(
+    id: int,
+    status: Optional[str] = None,
+    status_message: Optional[str] = None
+) -> None:
+    """
+    Update the status or message of a report.
+    Calls: sp_admin_update_report
+    """
+
     conn = None
     try:
-        conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_update_report', [report_id, status, message], commit=True)
+        conn = get_connection('admin')
+        execute_procedure(conn, 'sp_admin_update_report', [id, status, status_message], commit=True)
     except Error:
         raise
     finally:
         if conn and conn.is_connected():
             conn.close()
 
-def delete_report(report_id):
+# -----------------------------------------------------------------------------
+
+def admin_delete_report(id: int) -> None:
+    """
+    Permanently delete a report.
+    Calls: sp_admin_delete_report
+    """
+
     conn = None
     try:
-        conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_delete_report', [report_id], commit=True)
+        conn = get_connection('admin')
+        execute_procedure(conn, 'sp_admin_delete_report', [id], commit=True)
     except Error:
         raise
     finally:

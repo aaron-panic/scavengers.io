@@ -1,4 +1,4 @@
-# admin.py - Routing blueprint for /social (social networking features)
+# social.py - Routing blueprint for /social ('social'+)
 # Copyright (C) 2026 Aaron Reichenbach
 #
 # This program is free software: you can redistribute it and/or modify         
@@ -14,38 +14,84 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from flask import Blueprint, render_template
+from flask import (
+    Blueprint, 
+    render_template,
+    current_app
+)
+
+import db.announcements
 from middleware import check_access
-import db
 from utils import format_post
 
-social_bp = Blueprint('social', __name__, url_prefix='/social')
 
-@social_bp.app_template_filter('format_post')
+
+# -----------------------------------------------------------------------------
+# Configuration
+# -----------------------------------------------------------------------------
+
+bp = Blueprint('social', __name__, url_prefix='/social')
+
+
+@bp.app_template_filter('format_post')
 def format_post_filter(text):
     return format_post(text)
 
-@social_bp.before_request
+
+@bp.before_request
 def restrict_access():
+    """
+    Enforce login requirements for all routes in this blueprint.
+    """
     return check_access(['admin', 'user', 'social'])
 
-@social_bp.route('/announce')
-def announce():
-    posts = db.fetch_announcements()
-    return render_template('announce.html', title='social.announce', posts=posts)
 
-@social_bp.route('/feed')
+
+# -----------------------------------------------------------------------------
+# Routes
+# -----------------------------------------------------------------------------
+
+@bp.route('/announcements')
+def announcements():
+    """
+    Display the latest administrator announcements
+    """
+    
+    posts = db.announcements.fetch_announcements()
+    return render_template('announce.html', title='announcements', posts=posts)
+
+# -----------------------------------------------------------------------------
+
+@bp.route('/feed')
 def feed():
-    return render_template('offline.html', title='social.feed')
+    """
+    User's personal activity feed.
+    """
+    return render_template('offline.html', title='feed')
 
-@social_bp.route('/board')
+# -----------------------------------------------------------------------------
+
+@bp.route('/board')
 def board():
-    return render_template('offline.html', title='social.board')
+    """
+    Kanban board.
+    """
+    return render_template('offline.html', title='board')
 
-@social_bp.route('/chat')
+# -----------------------------------------------------------------------------
+
+@bp.route('/chat')
 def chat():
-    return render_template('offline.html', title='social.chat')
+    """
+    Real-time chat interface.
+    """
+    return render_template('offline.html', title='chat')
 
-@social_bp.route('/profile')
+# -----------------------------------------------------------------------------
+
+@bp.route('/profile')
 def profile():
-    return render_template('offline.html', title='social.profile')
+    """
+    User profile management.
+    """
+    return render_template('offline.html', title='profile')

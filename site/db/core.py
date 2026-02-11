@@ -15,30 +15,38 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+from typing import List, Dict, Any, Optional, Union
+
 import mysql.connector
 from mysql.connector import Error
 from flask import g
 
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Configuration
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 DB_HOST = "db"
 DB_NAME = "scavengers"
 
 ROLE_MAP = {
-    'login_bot': 'DB_PASS_LOGIN_BOT',
-    'admin_bot': 'DB_PASS_ADMIN_BOT',
+    'login': 'DB_PASS_LOGIN',
     'admin': 'DB_PASS_ADMIN',
     'social': 'DB_PASS_SOCIAL',
     'user': 'DB_PASS_USER'
 }
 
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Connection Logic
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-# Return proper connection based on role
-def get_connection(role):
+def get_connection(role: str) -> mysql.connector.connection.MySQLConnection:
+    """
+    Establish and return a database connection based on the requested role.
+
+    :param role: The role key ('login', 'admin', 'user' or 'social') mapping to credentials.
+    :return: A generic MySQLConnection object.
+    :raises ValueError: If the role is invalid or credentials are missing.
+    """
+    
     if role not in ROLE_MAP:
         raise ValueError(f"Invalid Role: {role}")
 
@@ -58,8 +66,17 @@ def get_connection(role):
         print(f"Error connecting to database as {role}: {e}")
         raise
 
-# New Database connection based on role (Flask Context Aware)
-def get_db(role='social'):
+# -----------------------------------------------------------------------------
+
+def get_db(role: str = 'UNDEFINED_ROLE') -> mysql.connector.connection.MySQLConnection:
+    """
+    Retrieve a database connection for the current Flask application context.
+    Creates a new connection if one does not exist for the specified role.
+
+    :param role: The role key to connect as.
+    :return: The active MySQLConnection for this context.
+    """
+
     if 'db_conns' not in g:
         g.db_conns = {}
 
@@ -68,46 +85,44 @@ def get_db(role='social'):
 
     return g.db_conns[role]
 
-# Close all open database connections
-def close_dbs(e=None):
+# -----------------------------------------------------------------------------
+
+def close_dbs(e: Optional[BaseException] = None) -> None:
+    """
+    Close all database connections stored in the Flask global context (g).
+
+    :param e: Optional exception that caused the teardown (unused).
+    """
+
     db_conns = g.pop('db_conns', None)
 
     if db_conns:
         for role, conn in db_conns.items():
             if conn.is_connected():
-                conn.close()
+                conn.close()    
 
-# ---------------------------------------------------------
-# Execution Wrappers
-# ---------------------------------------------------------
 
-# Generic execution for Standard SQL (INSERT, UPDATE, DELETE, simple SELECT)
-def execute_query(conn, query, params=None, commit=False):
-    cursor = conn.cursor(dictionary=True)
-    result = None
-    try:
-        cursor.execute(query, params or ())
 
-        if commit:
-            conn.commit()
-            if query.strip().upper().startswith("INSERT"):
-                result = cursor.lastrowid
-            else:
-                result = cursor.rowcount
-        else:
-            result = cursor.fetchall()
+# -----------------------------------------------------------------------------
+# Execution Wrapper
+# -----------------------------------------------------------------------------
 
-    except Error as e:
-        print(f"Query execution error: {e}")
-        raise
-    finally:
-        cursor.close()
+def execute_procedure(
+    conn: mysql.connector.connection.MySQLConnection, 
+    proc_name: str, 
+    args: tuple = (), 
+    commit: bool = False
+) -> List[Dict[str, Any]]:
+    """
+    Execute a stored procedure and return the result set.
 
-    return result
-
-# Generic execution for Stored Procedures (Handling callproc + stored_results)
-# Returns: List of dictionaries (all rows from the first result set)
-def execute_procedure(conn, proc_name, args=(), commit=False):
+    :param conn: The active database connection.
+    :param proc_name: The name of the stored procedure to call.
+    :param args: A tuple of arguments to pass to the procedure.
+    :param commit: If True, commits the transaction after execution.
+    :return: A list of dictionaries representing the rows returned by the procedure.
+    """
+    
     cursor = conn.cursor(dictionary=True)
     results = []
     try:
