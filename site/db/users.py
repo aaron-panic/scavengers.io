@@ -19,30 +19,6 @@ from typing import List, Dict, Any, Optional
 from mysql.connector import Error
 from .core import get_connection, execute_procedure
 
-# -----------------------------------------------------------------------------
-# Login
-# -----------------------------------------------------------------------------
-
-def fetch_user_auth(username: str) -> Optional[Dict[str, Any]]:
-    """
-    Retrieve password hash, role, and status for login authentication.
-    Calls: sp_fetch_user_auth
-    """
-
-    conn = None
-    auth_data = None
-    try:
-        conn = get_connection('login')
-        rows = execute_procedure(conn, 'sp_fetch_user_auth', [username])
-        if rows:
-            auth_data = rows[0]
-    except Error:
-        pass
-    finally:
-        if conn and conn.is_connected():
-            conn.close()
-    return auth_data
-
 
 
 # -----------------------------------------------------------------------------

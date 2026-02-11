@@ -130,7 +130,7 @@ def format_post(text):
     
     return Markup(final_html)
 
-    # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 def get_pagination_metadata(page: int, per_page: int, total_count: int, endpoint: str, **kwargs) -> dict:
     """

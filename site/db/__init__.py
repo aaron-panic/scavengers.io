@@ -53,7 +53,6 @@ from .requests import (
 )
 
 from .users import (
-    fetch_user_auth,
     admin_fetch_users,
     admin_approve_user,
     admin_deny_user,
