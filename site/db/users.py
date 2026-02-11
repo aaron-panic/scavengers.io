@@ -1,4 +1,4 @@
-# db.users.py - Database routines for Users Table (User Authentication + Admin)
+# db.users.py - Database routines for Users Table (Login + Admin)
 # Copyright (C) 2026 Aaron Reichenbach
 #
 # This program is free software: you can redistribute it and/or modify         
@@ -14,20 +14,26 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from typing import List, Dict, Any, Optional
+
 from mysql.connector import Error
 from .core import get_connection, execute_procedure
 
-# ---------------------------------------------------------
-# Authentication
-# ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Login
+# -----------------------------------------------------------------------------
 
-# Fetch password_hash for username (Login)
-def fetch_user_auth(username):
+def fetch_user_auth(username: str) -> Optional[Dict[str, Any]]:
+    """
+    Retrieve password hash, role, and status for login authentication.
+    Calls: sp_fetch_user_auth
+    """
+
     conn = None
     auth_data = None
     try:
-        conn = get_connection('login_bot')
-        rows = execute_procedure(conn, 'sp_get_user_auth', [username])
+        conn = get_connection('login')
+        rows = execute_procedure(conn, 'sp_fetch_user_auth', [username])
         if rows:
             auth_data = rows[0]
     except Error:
@@ -37,16 +43,28 @@ def fetch_user_auth(username):
             conn.close()
     return auth_data
 
-# ---------------------------------------------------------
-# Admin User Management
-# ---------------------------------------------------------
 
-def fetch_all_users(limit, offset, sort_col, sort_dir):
+
+# -----------------------------------------------------------------------------
+# Admin
+# -----------------------------------------------------------------------------
+
+def admin_fetch_users(
+    limit: int, 
+    offset: int, 
+    sort_col: str, 
+    sort_dir: str
+) -> List[Dict[str, Any]]:
+    """
+    Retrieve a paginated list of users.
+    Calls: sp_admin_fetch_users
+    """
+
     conn = None
     users = []
     try:
-        conn = get_connection('admin_bot')
-        users = execute_procedure(conn, 'sp_admin_list_users', [limit, offset, sort_col, sort_dir])
+        conn = get_connection('admin')
+        users = execute_procedure(conn, 'sp_admin_fetch_users', [limit, offset, sort_col, sort_dir])
     except Error:
         pass
     finally:
@@ -54,38 +72,55 @@ def fetch_all_users(limit, offset, sort_col, sort_dir):
             conn.close()
     return users
 
-# Approve user creation request
-def approve_user(user_id):
+# -----------------------------------------------------------------------------
+
+def admin_approve_user(id: int) -> None:
+    """
+    Promote a requested user to active status.
+    Calls: sp_admin_approve_user
+    """
+
     conn = None
     try:
-        conn = get_connection('admin_bot')
-        # Note: We use execute_procedure with commit=True for actions
-        execute_procedure(conn, 'sp_admin_approve_requested', [user_id], commit=True)
+        conn = get_connection('admin')
+        execute_procedure(conn, 'sp_admin_approve_user', [id], commit=True)
     except Error:
         raise
     finally:
         if conn and conn.is_connected():
             conn.close()
 
-# Deny user creation request
-def deny_user(user_id):
+# -----------------------------------------------------------------------------
+
+def admin_deny_user(id: int) -> None:
+    """
+    Delete (deny) a user request.
+    Calls: sp_admin_deny_user
+    """
+
     conn = None
     try:
-        conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_deny_requested', [user_id], commit=True)
+        conn = get_connection('admin')
+        execute_procedure(conn, 'sp_admin_deny_user', [id], commit=True)
     except Error:
         raise
     finally:
         if conn and conn.is_connected():
             conn.close()
 
-# Fetch all user details except password_hash
-def fetch_user_details(user_id):
+# -----------------------------------------------------------------------------
+
+def admin_fetch_user(id: int) -> Optional[Dict[str, Any]]:
+    """
+    Retrieve full profile details for a specific user.
+    Calls: sp_admin_fetch_user
+    """
+
     conn = None
     user_data = None
     try:
-        conn = get_connection('admin_bot')
-        rows = execute_procedure(conn, 'sp_admin_get_user_details', [user_id])
+        conn = get_connection('admin')
+        rows = execute_procedure(conn, 'sp_admin_fetch_user', [id])
         if rows:
             user_data = rows[0]
     except Error:
@@ -95,47 +130,82 @@ def fetch_user_details(user_id):
             conn.close()
     return user_data
 
-def suspend_user(user_id, hours):
+# -----------------------------------------------------------------------------
+
+def admin_suspend_user(id: int, hours: int) -> None:
+    """
+    Set user status to suspended for a specified duration.
+    Calls: sp_admin_suspend_user
+    """
+
     conn = None
     try:
-        conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_suspend_user', [user_id, hours], commit=True)
+        conn = get_connection('admin')
+        execute_procedure(conn, 'sp_admin_suspend_user', [id, hours], commit=True)
     except Error: raise
     finally:
         if conn and conn.is_connected(): conn.close()
 
-def ban_user(user_id):
+# -----------------------------------------------------------------------------
+
+def admin_ban_user(id: int) -> None:
+    """
+    Permanently ban a user.
+    Calls: sp_admin_ban_user
+    """
+
     conn = None
     try:
-        conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_ban_user', [user_id], commit=True)
+        conn = get_connection('admin')
+        execute_procedure(conn, 'sp_admin_ban_user', [id], commit=True)
     except Error: raise
     finally:
         if conn and conn.is_connected(): conn.close()
 
-def reinstate_user(user_id):
+# -----------------------------------------------------------------------------
+
+def admin_reinstate_user(id: int) -> None:
+    """
+    Restore a user to active status.
+    Calls: sp_admin_reinstate_user
+    """
+
     conn = None
     try:
-        conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_reinstate_user', [user_id], commit=True)
+        conn = get_connection('admin')
+        execute_procedure(conn, 'sp_admin_reinstate_user', [id], commit=True)
     except Error: raise
     finally:
         if conn and conn.is_connected(): conn.close()
 
-def delete_user(user_id):
+# -----------------------------------------------------------------------------
+
+def admin_delete_user(id: int) -> None:
+    """
+    Permanently delete a user record.
+    Calls: sp_admin_delete_user
+    """
+
     conn = None
     try:
-        conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_delete_user', [user_id], commit=True)
+        conn = get_connection('admin')
+        execute_procedure(conn, 'sp_admin_delete_user', [id], commit=True)
     except Error: raise
     finally:
         if conn and conn.is_connected(): conn.close()
 
-def reset_password(user_id, new_hash):
+# -----------------------------------------------------------------------------
+
+def admin_reset_password(id: int, password_hash: str) -> None:
+    """
+    Force update a user's password hash.
+    Calls: sp_admin_reset_password
+    """
+
     conn = None
     try:
-        conn = get_connection('admin_bot')
-        execute_procedure(conn, 'sp_admin_reset_password', [user_id, new_hash], commit=True)
+        conn = get_connection('admin')
+        execute_procedure(conn, 'sp_admin_reset_password', [id, password_hash], commit=True)
     except Error: raise
     finally:
         if conn and conn.is_connected(): conn.close()

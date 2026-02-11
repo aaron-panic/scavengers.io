@@ -51,7 +51,7 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_create_user_request TO 'scav_login'@'%'
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_users TO 'scav_admin'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_approve_user TO 'scav_admin'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_deny_user TO 'scav_admin'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_user_details TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_user TO 'scav_admin'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_suspend_user TO 'scav_admin'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_ban_user TO 'scav_admin'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_reinstate_user TO 'scav_admin'@'%';

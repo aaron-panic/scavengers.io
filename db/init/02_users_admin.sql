@@ -128,14 +128,14 @@ END //
 
 
 
--- sp_admin_fetch_user_details(p_id)
+-- sp_admin_fetch_user(p_id)
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Retrieve full profile details for a specific user.
 -- Params:
 --      p_id (INT)                      User id (matches Users.id)
 
-CREATE PROCEDURE sp_admin_fetch_user_details(
+CREATE PROCEDURE sp_admin_fetch_user(
     IN p_id INT
 )
 BEGIN
@@ -164,7 +164,10 @@ END //
 --      p_id (INT)                      User id (matches Users.id)
 --      p_hours (INT)                   Duration of suspension (hours)
 
-CREATE PROCEDURE sp_admin_suspend_user(IN p_id INT, IN p_hours INT)
+CREATE PROCEDURE sp_admin_suspend_user(
+    IN p_id INT,
+    IN p_hours INT
+)
 BEGIN
 
     UPDATE Users 
@@ -183,7 +186,9 @@ END //
 -- Params:
 --      p_id (INT)                      User id (matches Users.id)
 
-CREATE PROCEDURE sp_admin_ban_user(IN p_id INT)
+CREATE PROCEDURE sp_admin_ban_user(
+    IN p_id INT
+)
 BEGIN
 
     -- No need for a suspension time if banned - reinstate immediately makes
@@ -204,7 +209,9 @@ END //
 -- Params:
 --      p_id (INT)                      User id (matches Users.id)
 
-CREATE PROCEDURE sp_admin_reinstate_user(IN p_id INT)
+CREATE PROCEDURE sp_admin_reinstate_user(
+    IN p_id INT
+)
 BEGIN
 
     UPDATE Users 
@@ -223,7 +230,9 @@ END //
 -- Params:
 --      p_id (INT)                      User id (matches Users.id)
 
-CREATE PROCEDURE sp_admin_delete_user(IN p_id INT)
+CREATE PROCEDURE sp_admin_delete_user(
+    IN p_id INT
+)
 BEGIN
 
     DELETE FROM Users WHERE id = p_id;
@@ -232,19 +241,22 @@ END //
 
 
 
--- sp_admin_reset_password(p_id, p_hash)
+-- sp_admin_reset_password(p_id, p_password_hash)
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Force update a user's password hash.
 -- Params:
 --      p_id (INT)                      User id (matches Users.id)
---      p_hash (VARCHAR 255)            New password hash provided to procedure
+--      p_password_hash (VARCHAR 255)            New password hash provided to procedure
 
-CREATE PROCEDURE sp_admin_reset_password(IN p_id INT, IN p_hash VARCHAR(255))
+CREATE PROCEDURE sp_admin_reset_password(
+    IN p_id INT,
+    IN p_password_hash VARCHAR(255)
+)
 BEGIN
 
     UPDATE Users
-    SET password_hash = p_hash
+    SET password_hash = p_password_hash
     WHERE id = p_id;
 
 END //
