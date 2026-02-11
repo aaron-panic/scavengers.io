@@ -75,10 +75,6 @@ def create_app():
     from blueprints.auth import bp as auth_bp
     app.register_blueprint(auth_bp)
 
-    # Home
-    from blueprints.home import home_bp
-    app.register_blueprint(home_bp)
-
     # Admin
     from blueprints.admin import admin_bp
     app.register_blueprint(admin_bp)

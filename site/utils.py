@@ -15,7 +15,55 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import html
+import re
 from markupsafe import Markup
+
+from config import PASSWORD_POLICY, PASSWORD_ALLOWED_SYMBOLS
+
+
+
+# -----------------------------------------------------------------------------
+# Authorization Security
+# -----------------------------------------------------------------------------
+
+def validate_password(password: str) -> bool:
+    """
+    Validate password against global policy provided in config.py
+
+    :param password: plain text password to check
+    :return: True if valid, False otherwise.
+    """
+
+    # Length Maximum Check.
+    if len(password) > PASSWORD_POLICY['max-length']:
+        return False
+    
+    # Length Minimum Check.
+    if len(password) < PASSWORD_POLICY['min-length']:
+        return False
+
+    # Allow user to skip all other checks if password is long enough as entropy
+    # will be high enough to be secure. As the password is already confirmed to
+    # be < 'max-length' we only have to check it's at the 'safe-length' or more.
+    if len(password) >= PASSWORD_POLICY['safe-length']:
+        return True
+    
+    # Complexity Checks
+    if PASSWORD_POLICY['require-lower'] and not re.search(r"[a-z]", password):
+        return False
+    if PASSWORD_POLICY['require-upper'] and not re.search(r"[A-Z]", password):
+        return False
+    if PASSWORD_POLICY['require-digit'] and not re.search(r"\d", password):
+        return False
+    if PASSWORD_POLICY['require-symbol']:
+        # ensure symbols are escaped properly
+        symbols = re.escape(PASSWORD_ALLOWED_SYMBOLS)
+        if not re.search(f"[{symbols}]", password):
+            return False
+    
+    return True
+    
+# -----------------------------------------------------------------------------
 
 def format_post(text):
     if not text:
@@ -79,3 +127,45 @@ def format_post(text):
     final_html = formatted_text.replace('\n', '<br>')
     
     return Markup(final_html)
+
+    # -----------------------------------------------------------------------------
+
+def get_pagination_metadata(page: int, per_page: int, total_count: int, endpoint: str, **kwargs) -> dict:
+    """
+
+    Generate standard pagination metadata for templates.
+    
+    :param page: Current page number.
+    :param per_page: Items per page.
+    :param total_count: Total number of items.
+    :param endpoint: The flask route endpoint to generate links for.
+    :param kwargs: Additional arguments to pass to url_for (e.g. tab_sel).
+    :return: Dictionary containing pagination state and links.
+    """
+    
+    # Calculate pages
+    # NOTE - avoid division by zero, default to 1 page if empty
+    total_pages = math.ceil(total_count / per_page) if total_count > 0 else 1
+    
+    has_next = page < total_pages
+    has_prev = page > 1
+    
+    return {
+        'page': page,
+        'has_next': has_next,
+        'has_prev': has_prev,
+        'next_href': url_for(endpoint, page=page + 1, **kwargs) if has_next else '#',
+        'prev_href': url_for(endpoint, page=page - 1, **kwargs) if has_prev else '#',
+        'pages': total_pages
+    }
+
+# -----------------------------------------------------------------------------
+
+def flash_form_errors(form):
+    """
+    Iterate over a FlaskForm's errors and flash them to the user.
+    """
+
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(f"Error in {getattr(form, field).label.text}: {error}", 'error')
