@@ -1,4 +1,4 @@
-# auth.py - Routing blueprint for / (authentication)
+# auth.py - Routing blueprint for / ('login'+)
 # Copyright (C) 2026 Aaron Reichenbach
 #
 # This program is free software: you can redistribute it and/or modify         
@@ -20,8 +20,7 @@ from flask import (
     redirect, url_for,
     flash,
     session,
-    make_response,
-    current_app
+    make_response
 )
 
 from flask_wtf import FlaskForm
@@ -31,12 +30,10 @@ from wtforms.validators import DataRequired, EqualTo, Length, Email
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
-from mysql.connector import Error as DBError
-
-import db.core as db
+import db.auth
 from extensions import limiter
 from config import DUMMY_HASH, USER_DETAIL_LIMITS, PASSWORD_POLICY
-from utils import validate_password
+from utils import validate_password, flash_form_errors
 
 
 
@@ -132,47 +129,6 @@ def _check_account_status(user_data: dict) -> bool:
     
     return False
 
-# -----------------------------------------------------------------------------
-
-def _register_user_db(username: str, password_hash: str, email: str) -> bool:
-    """
-    Execute the stored procedure to create a user request.
-    
-    :return: True if successful, False if username exists/error.
-    """
-    conn = None
-    try:
-        # login role is used for both login and registration request
-        conn = db.get_connection('login')
-        
-        db.execute_procedure(
-            conn, 
-            'sp_create_user_request', 
-            (username, password_hash, email), 
-            commit=True
-        )
-
-        return True
-        
-    except DBError as e:
-
-        # on the fence if exposing that a username is already in use to user is
-        # necessary. On one hand, it confirms to an attacker that a username 
-        # exists. On the other, it creates user frustration if they can't 
-        # register and no reason is given. Leaving it as default security-first
-        # for now. Maybe I'll have a change of heart later.
-        if "Duplicate entry" in str(e):
-            return False
-        
-        # log all other errors locally.
-        print(f"Registration Error: {e}")
-        return False
-    
-    finally:
-        if conn and conn.is_connected():
-            conn.close()
-
-
 
 # -----------------------------------------------------------------------------
 # Routes
@@ -203,26 +159,15 @@ def login():
         username = form.username.data
         password = form.password.data
         
-        user_data = None
         target_hash = DUMMY_HASH
         user_found = False
 
         # fetch user
-        try:
-            conn = db.get_connection('login')
-            rows = db.execute_procedure(conn, 'sp_fetch_user_auth', (username,))
-            
-            if rows:
-                user_data = rows[0]
-                # overwrite DUMMY_HASH for verification
-                target_hash = user_data['password_hash']
-                user_found = True
-                
-        except DBError as e:
-            print(f'Database errror: {e}')
-        finally:
-            if conn and conn.is_connected():
-                conn.close()
+        user_data = db.auth.fetch_user_auth(username)
+        
+        if user_data:
+            target_hash = user_data['password_hash']
+            user_found = True
 
         # this always executes to try and mitigate timing attacks
         try:
@@ -234,7 +179,7 @@ def login():
         # actually log in and set up session here
         if user_found and password_valid:
             if _check_account_status(user_data):
-                # Set Session
+                # set session
                 session.clear()
                 session['user_id'] = user_data['id']
                 session['username'] = user_data['username']
@@ -243,6 +188,9 @@ def login():
                 return redirect(url_for('social.announcements'))
         else:
             flash('login failed.')
+            
+    elif form.errors:
+        flash_form_errors(form)
 
     # headers to prevent caching of the login page
     response = make_response(render_template('login.html', title='login', form=form))
@@ -284,7 +232,7 @@ def register():
         hashed_pw = ph.hash(form.password.data)
 
         # attempt db insertion
-        success = _register_user_db(
+        success = db.auth.create_user_request(
             form.username.data, 
             hashed_pw, 
             form.email.data
@@ -296,5 +244,8 @@ def register():
         else:
             # vague on purpose
             flash('username unavailable or registration failed.')
+            
+    elif form.errors:
+        flash_form_errors(form)
 
     return render_template('register.html', title='register', form=form)

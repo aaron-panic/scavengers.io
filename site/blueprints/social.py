@@ -19,9 +19,8 @@ from flask import (
     render_template,
     current_app
 )
-from mysql.connector import Error as DBError
 
-import db.core as db
+import db.announcements
 from middleware import check_access
 from utils import format_post
 
@@ -58,19 +57,7 @@ def announcements():
     Display the latest administrator announcements
     """
     
-    posts = []
-    conn = None
-
-    try:
-        conn = db.get_connection('social')
-        posts = db.execute_procedure(conn, 'sp_fetch_announcements')
-    except DBError as e:
-        print(f"Social DB Error: {e}")
-        # fail gracefully
-    finally:
-        if conn and conn.is_connected():
-            conn.close()
-
+    posts = db.announcements.fetch_announcements()
     return render_template('announce.html', title='announcements', posts=posts)
 
 # -----------------------------------------------------------------------------

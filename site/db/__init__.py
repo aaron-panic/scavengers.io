@@ -29,6 +29,11 @@ from .announcements import (
     admin_fetch_announcements
 )
 
+from .auth import (
+    fetch_user_auth,
+    create_user_request
+)
+
 from .reports import (
     create_report,
     admin_fetch_reports,
