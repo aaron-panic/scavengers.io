@@ -20,36 +20,31 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
     <section class="form-grid">
-        {% for field in data.fields %}
-        
-        {# Handle Hidden Fields #}
-        {% if field.type == 'hidden' %}
-            <input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
-        
-        {% else %}
-            <div class="field-group {{ field.width }}">
-                <label for="{{ field.name }}">{{ field.label }}</label>
-                
-                {% if field.type == 'textarea' %}
-                    <textarea 
-                        id="{{ field.name }}" 
-                        name="{{ field.name }}" 
-                        class="{{ field.height }}"
-                        placeholder="{{ field.placeholder if field.placeholder else '' }}"
-                    >{{ field.value if field.value else '' }}</textarea>
-                {% else %}
-                    <input 
-                        type="{{ field.type }}" 
-                        id="{{ field.name }}" 
-                        name="{{ field.name }}" 
-                        placeholder="{{ field.placeholder if field.placeholder else '' }}"
-                        value="{{ field.value if field.value else '' }}"
-                    >
-                {% endif %}
-            </div>
-        {% endif %}
-        
-        {% endfor %}
+{% for field in data.fields %}
+{% if field.type == 'hidden' %}
+        <input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
+{% else %}
+        <div class="field-group {{ field.width }}">
+            <label for="{{ field.name }}">{{ field.label }}</label>
+{% if field.type == 'textarea' %}
+            <textarea 
+                id="{{ field.name }}" 
+                name="{{ field.name }}" 
+                class="{{ field.height }}"
+                placeholder="{{ field.placeholder if field.placeholder else '' }}"
+            >{{ field.value if field.value else '' }}</textarea>
+{% else %}
+            <input 
+                type="{{ field.type }}" 
+                id="{{ field.name }}" 
+                name="{{ field.name }}" 
+                placeholder="{{ field.placeholder if field.placeholder else '' }}"
+                value="{{ field.value if field.value else '' }}"
+            >
+{% endif %}
+        </div>
+{% endif %}
+{% endfor %}
     </section>
 </form>
 {% endmacro %}

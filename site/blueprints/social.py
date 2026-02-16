@@ -71,15 +71,6 @@ def feed():
 
 # -----------------------------------------------------------------------------
 
-@bp.route('/board')
-def board():
-    """
-    Kanban board.
-    """
-    return render_template('offline.html', title='board')
-
-# -----------------------------------------------------------------------------
-
 @bp.route('/chat')
 def chat():
     """

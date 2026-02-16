@@ -52,3 +52,27 @@ USER_DETAIL_LIMITS = {
     'username-max-length': 64,
     'email-max-length': 100
 }
+
+
+
+# -----------------------------------------------------------------------------
+# CSS Defaults
+# -----------------------------------------------------------------------------
+
+CSS_DEFAULT_SHEETS = [
+    'static/css/reset.css',
+    'static/css/layout.css',
+    'static/css/theme.css',
+    'static/css/widgets.css',
+    'static/css/visuals.css'
+]
+
+
+
+# -----------------------------------------------------------------------------
+# JS Defaults
+# -----------------------------------------------------------------------------
+
+JS_DEFAULT_SCRIPTS = [
+    'static/js/flashmodal.js'
+]

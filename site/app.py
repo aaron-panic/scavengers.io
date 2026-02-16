@@ -44,6 +44,10 @@ def create_app():
     # Database Teardown
     app.teardown_appcontext(close_dbs)
 
+    # Jinja2 loves whitespace... So let's try to not.
+    app.jinja_env.trim_blocks = True
+    app.jinja_env.lstrip_blocks = True
+
     # Security stuff
     csrf.init_app(app)
 
@@ -71,20 +75,21 @@ def create_app():
         return response
 
     # Blueprint Registration
+
     # Auth
     from blueprints.auth import bp as auth_bp
     app.register_blueprint(auth_bp)
 
     # Admin
-    from blueprints.admin import admin_bp
+    from blueprints.admin import bp as admin_bp
     app.register_blueprint(admin_bp)
 
     # User
-    from blueprints.users import users_bp
+    from blueprints.users import bp as users_bp
     app.register_blueprint(users_bp)
 
     # Social
-    from blueprints.social import social_bp
+    from blueprints.social import bp as social_bp
     app.register_blueprint(social_bp)
 
     return app

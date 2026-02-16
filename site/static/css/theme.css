@@ -1,0 +1,45 @@
+/* static/css/theme.css - global theme variables */
+:root {
+    /* --- Colours: Backgrounds (Greyscale) --- */
+    --bg-colour-01: #ffffff; /* Page Base / Main Content */
+    --bg-colour-02: #f4f4f5; /* Sidebar / Secondary */
+    --bg-colour-03: #e4e4e7; /* Borders / Lines */
+    --bg-colour-04: #27272a; /* Buttons / Inverse */
+    
+    /* --- Colours: Text --- */
+    --text-colour-01: #18181b; /* Primary Text */
+    --text-colour-02: #71717a; /* Secondary Text */
+    --text-colour-inverse: #ffffff; /* Text on dark buttons */
+
+    --state-colour-hover: #3f3f46;
+    
+    --font-stack-base: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
+    
+    --font-size-base: 12pt;
+    --font-size-sm: 0.9rem;
+    --font-size-lg: 1.1rem;
+    --font-size-xl: 1.3rem;
+    --font-weight-bold: 600;
+
+    /* --- Spacing --- */
+    --gap-tiny: 0.25rem;
+    --gap-xsmall: 0.4rem;
+    --gap-small: 0.5rem;
+    --gap-medium: 1rem;
+    --gap-large: 1.3rem;
+    --gap-xl: 1.5rem;
+    
+    /* --- Borders & Effects --- */
+    --border-radius-sm: 4px;
+    --border-radius-md: 6px;
+    
+    --shadow-elevation-low: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-elevation-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+body {
+    font-family: var(--font-stack-base);
+    font-size: var(--font-size-base);
+    color: var(--text-colour-01);
+    line-height: 1.5;
+}

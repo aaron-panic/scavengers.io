@@ -207,3 +207,10 @@ def requests():
 @bp.route('/dev')
 def dev():
     return render_template('offline.html', title='dev')
+
+# -----------------------------------------------------------------------------
+
+@bp.route('/board')
+def board():
+    return render_template('offline.html', title='board')
+
