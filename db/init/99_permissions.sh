@@ -23,10 +23,10 @@ mariadb -u root -p"${MARIADB_ROOT_PASSWORD}" <<EOF
 
 
 -- ----------------------------------------------------------------------------
--- MARIADB USER CREATION FOR RBAC                                             -
+--                       MARIADB USER CREATION FOR RBAC                       -
 -- ----------------------------------------------------------------------------
 -- NOTE: All access is controlled by stored procedures with no direct table access
-         for any user regardless of role.
+--       for any user regardless of role.
 
 CREATE USER IF NOT EXISTS 'scav_login'@'%' IDENTIFIED BY '${DB_PASS_LOGIN}';
 CREATE USER IF NOT EXISTS 'scav_admin'@'%' IDENTIFIED BY '${DB_PASS_ADMIN}';

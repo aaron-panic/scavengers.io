@@ -1,0 +1,61 @@
+{# site/templates/widget_table.html - Renders a table with data
+ # Copyright (C) 2026 Aaron Reichenbach
+ #
+ # This program is free software: you can redistribute it and/or modify         
+ # it under the terms of the GNU Affero General Public License as
+ # published by the Free Software Foundation, either version 3 of the
+ # License, or (at your option) any later version.
+
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU Affero General Public License for more details.
+
+ # You should have received a copy of the GNU Affero General Public License
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.#}
+
+
+
+<div class="wid-table-wrapper">
+    <table class="wid-table">
+        <thead>
+            <tr>
+{% for col in this.columns %}
+                <th>
+{% if col.sort_href %}
+                    <a href="{{ col.sort_href }}">{{ col.label }}</a>
+{% else %}
+                        {{ col.label }}
+{% endif %}
+                </th>
+{% endfor %}
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+{% for row in this.rows %}
+            <tr>
+{% for col in this.columns %}
+                <td>{{ row[col.key] }}</td>
+{% endfor %}
+                <td class="wid-table-actions-cell">
+{% for action in row.actions %}
+{% if action.method == 'POST' %}
+                    <form action="{{ action.href }}" method="POST" class="wid-table-inline-form" 
+                            {% if action.confirm %}onsubmit="return confirm('{{ action.confirm }}')"{% endif %}>
+                        <button type="submit" class="wid-table-btn-icon {{ action.class }}" title="{{ action.label }}">
+                            {{ action.icon | safe }}
+                        </button>
+                    </form>
+{% else %}
+                    <a href="{{ action.href }}" class="wid-table-btn-icon {{ action.class }}" title="{{ action.label }}">
+                        {{ action.icon | safe }}
+                    </a>
+{% endif %}
+{% endfor %}
+                </td>
+            </tr>
+{% endfor %}
+        </tbody>
+    </table>
+</div>

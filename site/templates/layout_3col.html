@@ -1,0 +1,37 @@
+{# site/templates/layout_3col.html - basic 3 column layout_3col
+ # Copyright (C) 2026 Aaron Reichenbach
+ #
+ # This program is free software: you can redistribute it and/or modify         
+ # it under the terms of the GNU Affero General Public License as
+ # published by the Free Software Foundation, either version 3 of the
+ # License, or (at your option) any later version.
+
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU Affero General Public License for more details.
+
+ # You should have received a copy of the GNU Affero General Public License
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.#}
+
+{% from 'macros/renderer.html' import render_component %}
+<div class="layout-three">
+    <aside class="layout-three-sidebar">
+{% for component in this.sidebar %}
+{{ render_component(component) }}
+{% endfor %}
+    </aside>
+    <main class="layout-three-content">
+    <h1 class="layout-three-main-title">{{ this.content_title }}</h1>
+    <div class="layout-three-main-content-wrapper">
+{% for component in this.content %}
+{{ render_component(component) }}
+{% endfor %}
+    </div>
+    </main>
+    <aside class="layout-three-visuals">
+{% for component in this.visuals %}
+{{ render_component(component) }}
+{% endfor %}
+    </aside>
+</div>

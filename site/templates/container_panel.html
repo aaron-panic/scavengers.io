@@ -1,0 +1,33 @@
+{# site/templates/container_panel.html - elements grouped in a panel-style
+ # Copyright (C) 2026 Aaron Reichenbach
+ #
+ # This program is free software: you can redistribute it and/or modify         
+ # it under the terms of the GNU Affero General Public License as
+ # published by the Free Software Foundation, either version 3 of the
+ # License, or (at your option) any later version.
+
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU Affero General Public License for more details.
+
+ # You should have received a copy of the GNU Affero General Public License
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.#} 
+{%- from 'macros/renderer.html' import render_component %}
+    <section class="wid-panel {{ this.props.get('class', '') }}">
+{% if this.title %}
+        <header class="wid-panel-header">
+            <h3 class="wid-panel-title">{{ this.title }}</h3>
+        </header>
+{% endif %}
+        <div class="wid-panel-body">
+{% for child in this.children %}
+            {{ render_component(child) }}
+{% endfor %}
+        </div>
+{% if this.footer %}
+        <footer class="wid-panel-footer">
+            <span class="wid-panel-footer-content">{{ render_component(this.footer) }}</span>
+        </footer>
+{% endif %}
+    </section>

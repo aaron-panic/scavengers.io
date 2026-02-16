@@ -27,14 +27,14 @@ from middleware import check_access
 
 import db
 
-admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+bp = Blueprint('admin', __name__, url_prefix='/admin')
 ph = PasswordHasher()
 
-@admin_bp.before_request
+@bp.before_request
 def restrict_access():
     return check_access(['admin'])
 
-@admin_bp.route('/')
+@bp.route('/')
 def dashboard():
     return redirect(url_for('admin.users'))
 
@@ -42,8 +42,8 @@ def dashboard():
 # User Management
 # ---------------------------------------------------------
 
-@admin_bp.route('/users')
-@admin_bp.route('/users/<int:selected_user_id>')
+@bp.route('/users')
+@bp.route('/users/<int:selected_user_id>')
 def users(selected_user_id=None):
     page = request.args.get('page', 1, type=int)
     sort_col = request.args.get('sort', 'id')
@@ -188,7 +188,7 @@ def get_state():
         'dir': request.args.get('dir', 'desc')
     }
 
-@admin_bp.route('/users/approve/<int:user_id>', methods=['POST'])
+@bp.route('/users/approve/<int:user_id>', methods=['POST'])
 def approve(user_id):
     try:
         db.approve_user(user_id)
@@ -197,7 +197,7 @@ def approve(user_id):
         flash(f"Approval error: {e}")
     return redirect(url_for('admin.users', **get_state()))
 
-@admin_bp.route('/users/deny/<int:user_id>', methods=['POST'])
+@bp.route('/users/deny/<int:user_id>', methods=['POST'])
 def deny(user_id):
     try:
         db.deny_user(user_id)
@@ -206,7 +206,7 @@ def deny(user_id):
         flash(f"Denial error: {e}")
     return redirect(url_for('admin.users', **get_state()))
 
-@admin_bp.route('/users/suspend/<int:user_id>/<int:duration>', methods=['POST'])
+@bp.route('/users/suspend/<int:user_id>/<int:duration>', methods=['POST'])
 def suspend_user(user_id, duration):
     try:
         db.suspend_user(user_id, duration)
@@ -216,7 +216,7 @@ def suspend_user(user_id, duration):
     # Maintain selection on suspend
     return redirect(url_for('admin.users', selected_user_id=user_id, **get_state()))
 
-@admin_bp.route('/users/ban/<int:user_id>', methods=['POST'])
+@bp.route('/users/ban/<int:user_id>', methods=['POST'])
 def ban_user(user_id):
     try:
         db.ban_user(user_id)
@@ -225,7 +225,7 @@ def ban_user(user_id):
         flash(f"Error banning: {e}")
     return redirect(url_for('admin.users', selected_user_id=user_id, **get_state()))
 
-@admin_bp.route('/users/reinstate/<int:user_id>', methods=['POST'])
+@bp.route('/users/reinstate/<int:user_id>', methods=['POST'])
 def reinstate_user(user_id):
     try:
         db.reinstate_user(user_id)
@@ -234,7 +234,7 @@ def reinstate_user(user_id):
         flash(f"Error reinstating: {e}")
     return redirect(url_for('admin.users', selected_user_id=user_id, **get_state()))
 
-@admin_bp.route('/users/delete/<int:user_id>', methods=['POST'])
+@bp.route('/users/delete/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
     try:
         db.delete_user(user_id)
@@ -245,7 +245,7 @@ def delete_user(user_id):
         flash(f"Error deleting: {e}")
         return redirect(url_for('admin.users', selected_user_id=user_id, **get_state()))
 
-@admin_bp.route('/users/reset_pass/<int:user_id>', methods=['POST'])
+@bp.route('/users/reset_pass/<int:user_id>', methods=['POST'])
 def reset_pass(user_id):
     alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
     new_pass = ''.join(secrets.choice(alphabet) for i in range(16))
@@ -261,7 +261,7 @@ def reset_pass(user_id):
 # Announcements
 # ---------------------------------------------------------
 
-@admin_bp.route('/announce', methods=['GET', 'POST'])
+@bp.route('/announce', methods=['GET', 'POST'])
 def announce():
     # 1. Handle Form Submission (Create / Update)
     if request.method == 'POST':
@@ -391,7 +391,7 @@ def announce():
         pagination=pagination
     )
 
-@admin_bp.route('/announce/delete/<int:post_id>', methods=['POST'])
+@bp.route('/announce/delete/<int:post_id>', methods=['POST'])
 def delete_announce(post_id):
     try:
         db.delete_announcement(post_id)
@@ -404,7 +404,7 @@ def delete_announce(post_id):
 # Requests Management
 # ---------------------------------------------------------
 
-@admin_bp.route('/requests', methods=['GET', 'POST'])
+@bp.route('/requests', methods=['GET', 'POST'])
 def requests_list():
     # 1. State Management
     page = request.args.get('page', 1, type=int)
@@ -525,7 +525,7 @@ def requests_list():
         pagination=pagination
     )
 
-@admin_bp.route('/requests/update/<int:request_id>', methods=['POST'])
+@bp.route('/requests/update/<int:request_id>', methods=['POST'])
 def update_request(request_id):
     # Retrieve form data
     new_status = request.form.get('status')
@@ -547,7 +547,7 @@ def update_request(request_id):
     # Return to list with state preserved
     return redirect(url_for('admin.requests_list', **get_state()))
 
-@admin_bp.route('/requests/delete/<int:request_id>', methods=['POST'])
+@bp.route('/requests/delete/<int:request_id>', methods=['POST'])
 def delete_request(request_id):
     try:
         db.delete_request(request_id)
@@ -561,7 +561,7 @@ def delete_request(request_id):
 # Reports Management
 # ---------------------------------------------------------
 
-@admin_bp.route('/reports', methods=['GET', 'POST'])
+@bp.route('/reports', methods=['GET', 'POST'])
 def reports_list():
     page = request.args.get('page', 1, type=int)
     sort_col = request.args.get('sort', 'created_at')
@@ -677,7 +677,7 @@ def reports_list():
         pagination=pagination
     )
 
-@admin_bp.route('/reports/update/<int:report_id>', methods=['POST'])
+@bp.route('/reports/update/<int:report_id>', methods=['POST'])
 def update_report(report_id):
     new_status = request.form.get('status')
     new_message = request.form.get('status_message')
@@ -694,7 +694,7 @@ def update_report(report_id):
 
     return redirect(url_for('admin.reports_list', **get_state()))
 
-@admin_bp.route('/reports/delete/<int:report_id>', methods=['POST'])
+@bp.route('/reports/delete/<int:report_id>', methods=['POST'])
 def delete_report(report_id):
     try:
         db.delete_report(report_id)

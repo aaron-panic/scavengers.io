@@ -17,7 +17,8 @@
 from flask import (
     Blueprint,
     render_template,
-    redirect, url_for,
+    redirect,
+    url_for,
     flash,
     session,
     make_response
@@ -34,6 +35,12 @@ import db.auth
 from extensions import limiter
 from config import DUMMY_HASH, USER_DETAIL_LIMITS, PASSWORD_POLICY
 from utils import validate_password, flash_form_errors
+
+from components.page import Page
+from components.layout import LayoutThreeColumn
+from components.containers import ContainerPanel, ContainerStack
+from components.widgets import WidgetForm, WidgetButton, WidgetStatCard
+from factory import build_page
 
 
 
@@ -66,7 +73,6 @@ class RegisterForm(FlaskForm):
 
     email = StringField('email', validators=[
         Length(max = USER_DETAIL_LIMITS['email-max-length']),
-        Email()
     ])
 
     password = PasswordField('password', validators=[
@@ -130,6 +136,63 @@ def _check_account_status(user_data: dict) -> bool:
     return False
 
 
+
+# -----------------------------------------------------------------------------
+# Scene Building
+# -----------------------------------------------------------------------------
+
+def _build_login_scene(form):
+    submit_button = WidgetButton(
+        label = 'login',
+        button_type = 'submit',
+        style = 'primary'
+    )
+
+    login_widget = WidgetForm(
+        form = form,
+        buttons = [submit_button]
+    )
+
+    login_panel = ContainerPanel(
+        title = 'auth.login',
+        children = [ContainerStack(
+            gap = 'medium',
+            children = [login_widget]
+        )],
+        class_ = 'login-panel'
+    )
+
+    return build_page(
+        content = [login_panel],
+        title = 'login'
+    )
+
+def _build_register_scene(form):
+    submit_button = WidgetButton(
+        label = 'request account',
+        button_type = 'submit',
+        style = 'primary'
+    )
+
+    register_widget = WidgetForm(
+        form = form,
+        buttons = [submit_button]
+    )
+
+    register_panel = ContainerPanel(
+        title = 'auth.register',
+        children = [ContainerStack(
+            gap = 'medium',
+            children = [register_widget]
+        )],
+        class_ = 'register-panel'
+    )
+
+    return build_page(
+        content = [register_panel],
+        title = 'register'
+    )
+
 # -----------------------------------------------------------------------------
 # Routes
 # -----------------------------------------------------------------------------
@@ -192,8 +255,11 @@ def login():
     elif form.errors:
         flash_form_errors(form)
 
+    page = _build_login_scene(form)
+
     # headers to prevent caching of the login page
-    response = make_response(render_template('login.html', title='login', form=form))
+    response = make_response(render_template(page.template, this = page))
+
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
@@ -248,4 +314,7 @@ def register():
     elif form.errors:
         flash_form_errors(form)
 
-    return render_template('register.html', title='register', form=form)
+    page = _build_register_scene(form)
+
+    response = make_response(render_template(page.template, this = page))
+    return response

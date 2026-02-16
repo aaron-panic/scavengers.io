@@ -1,0 +1,1 @@
+document.getElementById('sys-flash-modal').showModal();
