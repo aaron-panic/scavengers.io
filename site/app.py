@@ -46,7 +46,7 @@ def create_app():
 
     # Jinja2 loves whitespace... So let's try to not.
     app.jinja_env.trim_blocks = True
-    app.jinja_env.lstrip_blocks = True
+    #app.jinja_env.lstrip_blocks = True
 
     # Security stuff
     csrf.init_app(app)

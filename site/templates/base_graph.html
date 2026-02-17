@@ -20,9 +20,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ this.title }} - Scavengers.io</title>
-    {% for href in this.stylesheets %}
+{% for href in this.stylesheets %}
     <link rel="stylesheet" href="{{ href }}">
-    {% endfor %}
+{% endfor %}
 </head>
 <body>
     {{ render_component(this.layout) }}

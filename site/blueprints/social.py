@@ -15,16 +15,22 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from flask import (
-    Blueprint, 
+    Blueprint,
     render_template,
-    current_app
+    redirect,
+    url_for,
+    flash,
+    session,
+    make_response
 )
 
 import db.announcements
 from middleware import check_access
 from utils import format_post
 
-
+from components.widgets import WidgetText
+from components.containers import ContainerPanel, ContainerStack
+from factory import build_page
 
 # -----------------------------------------------------------------------------
 # Configuration
@@ -32,6 +38,55 @@ from utils import format_post
 
 bp = Blueprint('social', __name__, url_prefix='/social')
 
+
+
+# -----------------------------------------------------------------------------
+# Scene Building
+# -----------------------------------------------------------------------------
+
+def _build_announcement_scene(posts):
+    content = []
+
+    if not posts:
+        msg = WidgetText('currently no announcements.')
+
+        panel = ContainerPanel(
+            title = 'no announcements',
+            children = [msg]
+        )
+
+        content.append(panel)
+    
+    else:
+        for i, post in enumerate(posts):
+            start_collapsed = (i > 0)
+            
+            body = WidgetText(content=post.get('content', ''))
+            
+            panel = ContainerPanel(
+                title=post.get('title', 'Untitled'),
+                subtitle=post.get('subtitle'),
+                author=post.get('username', 'Unknown'),
+                timestamp=post.get('created_at'),
+                footnote=post.get('footnote'),
+                collapsible=True,
+                start_collapsed=start_collapsed,
+                children=[body]
+            )
+            
+            content.append(panel)
+    
+    stack = ContainerStack(
+        gap="medium",
+        children=content
+    )
+
+    return build_page(content=[stack], title="announcements")
+
+
+# -----------------------------------------------------------------------------
+# Routes
+# -----------------------------------------------------------------------------
 
 @bp.app_template_filter('format_post')
 def format_post_filter(text):
@@ -45,20 +100,15 @@ def restrict_access():
     """
     return check_access(['admin', 'user', 'social'])
 
-
-
-# -----------------------------------------------------------------------------
-# Routes
-# -----------------------------------------------------------------------------
-
 @bp.route('/announcements')
 def announcements():
     """
     Display the latest administrator announcements
     """
-    
     posts = db.announcements.fetch_announcements()
-    return render_template('announce.html', title='announcements', posts=posts)
+    page = _build_announcement_scene(posts)
+
+    return make_response(render_template(page.template, this = page))
 
 # -----------------------------------------------------------------------------
 

@@ -14,26 +14,26 @@
  # You should have received a copy of the GNU Affero General Public License
  # along with this program.  If not, see <https://www.gnu.org/licenses/>.#}
 {% from 'macros/renderer.html' import render_component %}
-            <form action="{{ this.action }}" method="{{ this.method }}" class="wid-form">
-                {{ this.form.hidden_tag() }}
+<form action="{{ this.action }}" method="{{ this.method }}" class="wid-form">
+    {{ this.form.hidden_tag() }}
 {% for field in this.form %}
 {% if field.type not in ['CSRFTokenField', 'HiddenField', 'SubmitField'] %}
-                <div class="wid-form-group">
-                    {{ field.label }}
-                    {{ field(class="wid-form-control") }}
+    <div class="wid-form-group">
+        {{ field.label }}
+        {{ field(class="wid-form-control") }}
 {% if field.errors %}
-                    <ul class="wid-form-errors">
+        <ul class="wid-form-errors">
 {% for error in field.errors %}
-                        <li>{{ error }}</li>
+            <li>{{ error }}</li>
 {% endfor %}
-                    </ul>
+        </ul>
 {% endif %}
-                </div>
+    </div>
 {% endif %}
 {% endfor %}
-                <div class="wid-form-actions">
+    <div class="wid-form-actions">
 {% for button in this.buttons %}
-                    {{ render_component(button) }}
+        {{ render_component(button) }}
 {% endfor %}
-                </div>
-            </form>
+    </div>
+</form>

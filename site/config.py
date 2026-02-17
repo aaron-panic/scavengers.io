@@ -60,11 +60,11 @@ USER_DETAIL_LIMITS = {
 # -----------------------------------------------------------------------------
 
 CSS_DEFAULT_SHEETS = [
-    'static/css/reset.css',
-    'static/css/layout.css',
-    'static/css/theme.css',
-    'static/css/widgets.css',
-    'static/css/visuals.css'
+    '/static/css/reset.css',
+    '/static/css/layout.css',
+    '/static/css/theme.css',
+    '/static/css/widgets.css',
+    '/static/css/visuals.css'
 ]
 
 
@@ -74,5 +74,6 @@ CSS_DEFAULT_SHEETS = [
 # -----------------------------------------------------------------------------
 
 JS_DEFAULT_SCRIPTS = [
-    'static/js/flashmodal.js'
+    '/static/js/flashmodal.js',
+    '/static/js/togglepanel.js'
 ]

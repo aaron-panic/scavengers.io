@@ -1,24 +1,21 @@
-{# site/templates/widget_flash_modal.html #}
 {% if this.messages %}
-    <dialog id="sys-flash-modal" class="wid-modal">
-        <div class="wid-modal-content">
-            <header class="wid-modal-header">
-                <h3>System Message</h3>
-            </header>
-            
-            <div class="wid-modal-body">
+<dialog id="sys-flash-modal" class="wid-modal">
+    <div class="wid-modal-content">
+        <header class="wid-modal-header">
+            <h3>System Message</h3>
+        </header>    
+        <div class="wid-modal-body">
 {% for category, message in this.messages %}
-                <div class="wid-flash-message wid-flash-{{ category }}">
-                    {{ message }}
-                </div>
-{% endfor %}
+            <div class="wid-flash-message wid-flash-{{ category }}">
+                {{ message }}
             </div>
-
-            <footer class="wid-modal-footer">
-                <form method="dialog">
-                    <button class="wid-button wid-button-primary">OK</button>
-                </form>
-            </footer>
+{% endfor %}
         </div>
-    </dialog>
+        <footer class="wid-modal-footer">
+            <form method="dialog">
+                <button class="wid-button wid-button-primary">OK</button>
+            </form>
+        </footer>
+    </div>
+</dialog>
 {% endif %}
