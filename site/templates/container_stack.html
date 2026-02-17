@@ -14,8 +14,8 @@
  # You should have received a copy of the GNU Affero General Public License
  # along with this program.  If not, see <https://www.gnu.org/licenses/>.#}
 {% from 'macros/renderer.html' import render_component %}
-<div class="wid-con-stack gap-{{ this.gap }} {{ this.props.get('class', '') }}">
+<div class="wid-con-stack gap-{{ this.gap }}{{ this.props.get('class', '') }}">
 {% for child in this.children %}
-{{ render_component(child) }}
+    {{ render_component(child) }}
 {% endfor %}
-            </div>
+</div>

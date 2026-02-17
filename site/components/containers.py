@@ -16,7 +16,7 @@
 
 
 
-from typing import Optional, List
+from typing import Optional, List, Any
 from .base import Component, Container
 
 
@@ -62,13 +62,23 @@ class ContainerPanel(Container):
         self,
         title: Optional[str] = None,
         subtitle: Optional[str] = None,
+        author: Optional[str] = None,
+        timestamp: Optional[str] = None,
+        footnote: Optional[str] = None,
         footer: Optional[Component] = None,
+        collapsible: bool = False,
+        start_collapsed: bool = False,
         **kwargs
     ):
         super().__init__(**kwargs)
         self.title = title
         self.subtitle = subtitle
+        self.author = author
+        self.timestamp = timestamp
+        self.footnote = footnote
         self.footer = footer
+        self.collapsible = collapsible
+        self.start_collapsed = start_collapsed
 
     @property
     def template(self) -> str:

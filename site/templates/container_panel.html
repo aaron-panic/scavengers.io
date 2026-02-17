@@ -13,21 +13,50 @@
 
  # You should have received a copy of the GNU Affero General Public License
  # along with this program.  If not, see <https://www.gnu.org/licenses/>.#} 
-{%- from 'macros/renderer.html' import render_component %}
-    <section class="wid-panel {{ this.props.get('class', '') }}">
+{%- from 'macros/renderer.html' import render_component -%}
+<section class="wid-panel{{ ' wid-panel-collapsible' if this.collapsible else '' }}{{ ' wid-panel-start-collapsed' if this.start_collapsed else '' }}{{ this.props.get('class', '') }}">
+{% if this.title or this.author or this.timestamp %}
+    <header class="wid-panel-header">
+        <div class="wid-panel-header-content">
 {% if this.title %}
-        <header class="wid-panel-header">
             <h3 class="wid-panel-title">{{ this.title }}</h3>
-        </header>
+{%- endif %}            
+{% if this.subtitle %}
+            <span class="wid-panel-subtitle">{{ this.subtitle }}</span>
 {% endif %}
-        <div class="wid-panel-body">
-{% for child in this.children %}
-            {{ render_component(child) }}
-{% endfor %}
+{% if this.author or this.timestamp %}
+            <div class="wid-panel-meta">
+{% if this.author %}
+                <span class="wid-panel-author">// {{ this.author }}</span>
+{% endif %}
+{% if this.timestamp %}
+                <span class="wid-panel-time">{{ this.timestamp }}</span>
+{% endif %}
+            </div>
+{% endif %}
         </div>
-{% if this.footer %}
-        <footer class="wid-panel-footer">
-            <span class="wid-panel-footer-content">{{ render_component(this.footer) }}</span>
-        </footer>
+{% if this.collapsible %}
+        <button class="wid-panel-toggle" type="button">
+            {{ '▼' if this.start_collapsed else '▲' }}
+        </button>
 {% endif %}
-    </section>
+    </header>
+{% endif %}
+    <div class="wid-panel-body">
+{% for child in this.children %}
+        {{ render_component(child) }}
+{% endfor %}
+    </div>
+{% if this.footer or this.footnote %}
+    <footer class="wid-panel-footer">
+{% if this.footnote %}
+        <p class="wid-panel-footnote">{{ this.footnote }}</p>
+{% endif %}
+{% if this.footer %}
+        <div class="wid-panel-footer-content">
+            {{ render_component(this.footer) }}
+        </div>
+{% endif %}
+    </footer>
+{% endif %}
+</section>

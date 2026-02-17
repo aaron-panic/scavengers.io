@@ -129,3 +129,16 @@ class WidgetFlashModal(Component):
     @property
     def template(self) -> str:
         return 'widget_flash_modal.html'
+
+class WidgetText(Component):
+    """
+    Renders a text block.
+    """
+    def __init__(self, content: str, style: str = 'body', **kwargs):
+        super().__init__(**kwargs)
+        self.content = content
+        self.style = style
+
+    @property
+    def template(self) -> str:
+        return 'widget_text.html'

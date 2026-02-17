@@ -13,6 +13,6 @@
 
  # You should have received a copy of the GNU Affero General Public License
  # along with this program.  If not, see <https://www.gnu.org/licenses/>.#}
-<button type="{{ this.button_type }}" class="wid-button wid-button-{{ this.style }} {{ this.props.get('class', '') }}" {{ this.props.get('attrs', '') | safe }}>
-                        <span class="wid-button-label">{{ this.label }}</span>
-                    </button>
+<button type="{{ this.button_type }}" class="wid-button wid-button-{{ this.style }}{{ this.props.get('class', '') }}"{{ this.props.get('attrs', '') | safe }}>
+    <span class="wid-button-label">{{ this.label }}</span>
+</button>

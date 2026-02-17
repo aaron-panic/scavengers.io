@@ -126,7 +126,6 @@
     border-left: 4px solid var(--bg-colour-04);
 }
 
-/* Category specifics (Optional) */
 .wid-flash-error { border-color: #ef4444; }
 .wid-flash-success { border-color: #22c55e; }
 
@@ -201,16 +200,24 @@
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-elevation-md);
     
-    padding: var(--gap-xl);
     display: flex;
     flex-direction: column;
-    gap: var(--gap-medium);
 } 
 
 .wid-panel-header {
     border-bottom: 1px solid var(--bg-colour-03);
-    padding-bottom: var(--gap-small);
-    margin-bottom: var(--gap-small);
+    padding: var(--gap-large);
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--gap-medium);
+}
+
+.wid-panel-header-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-tiny);
 }
 
 .wid-panel-title {
@@ -219,8 +226,60 @@
     color: var(--text-colour-01);
 }
 
-/* .wid-panel-body {} */
-/* .wid-panel-footer {} */
+.wid-panel-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--text-colour-02);
+    font-weight: var(--font-weight-bold);
+}
+
+.wid-panel-meta {
+    margin-top: var(--gap-xsmall);
+    font-size: var(--font-size-sm);
+    color: var(--text-colour-02);
+    display: flex;
+    gap: var(--gap-small);
+}
+
+.wid-panel-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    color: var(--text-colour-02);
+    padding: var(--gap-xsmall);
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.wid-panel-toggle:hover {
+    color: var(--text-colour-01);
+}
+
+.wid-panel-body {
+    padding: var(--gap-large);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-medium);
+}
+
+.wid-panel-footer {
+    border-top: 1px solid var(--bg-colour-03);
+    padding: var(--gap-medium) var(--gap-large);
+    background-color: var(--bg-colour-02);
+    border-bottom-left-radius: var(--border-radius-md);
+    border-bottom-right-radius: var(--border-radius-md);
+    
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-small);
+}
+
+.wid-panel-footnote {
+    font-size: 0.8rem;
+    color: var(--text-colour-02);
+    font-style: italic;
+}
+
 /* .wid-panel-footer-content {} */
 
 
@@ -235,4 +294,15 @@
 
 .gap-medium {
     gap: var(--gap-medium);
+}
+
+
+
+/* ----------------------------------------------------------------------------
+ * Text
+ * ---------------------------------------------------------------------------*/
+
+.wid-text {
+    font-size: var(--font-size-sm);
+    color: var(--text-colour-01);
 }

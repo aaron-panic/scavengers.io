@@ -13,25 +13,25 @@
 
  # You should have received a copy of the GNU Affero General Public License
  # along with this program.  If not, see <https://www.gnu.org/licenses/>.#}
-
 {% from 'macros/renderer.html' import render_component %}
 <div class="layout-three">
     <aside class="layout-three-sidebar">
 {% for component in this.sidebar %}
-{{ render_component(component) }}
+        {{ render_component(component) }}
 {% endfor %}
     </aside>
     <main class="layout-three-content">
-    <h1 class="layout-three-main-title">{{ this.content_title }}</h1>
-    <div class="layout-three-main-content-wrapper">
+        <h1 class="layout-three-main-title">{{ this.content_title }}</h1>
+        <div class="layout-three-main-content-wrapper">
 {% for component in this.content %}
-{{ render_component(component) }}
+            {{ render_component(component) -}}
 {% endfor %}
-    </div>
+
+        </div>
     </main>
     <aside class="layout-three-visuals">
 {% for component in this.visuals %}
-{{ render_component(component) }}
+        {{ render_component(component) }}
 {% endfor %}
     </aside>
 </div>
