@@ -1,3 +1,4 @@
+#!/bin/bash
 # 99_permission.sh - Create user accounts for RBAC and grant permissions
 # Copyright (C) 2026 Aaron Reichenbach
 #
@@ -14,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#!/bin/bash
 set -e
 
 # Create Database Users and Assign Permissions
