@@ -144,7 +144,6 @@ class WidgetText(Component):
         super().__init__(**kwargs)
         self.content = content
         self.style = style
-        self.attrs = attrs
 
     @property
     def template(self) -> str:
