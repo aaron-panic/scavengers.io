@@ -369,6 +369,7 @@
 .wid-text {
     font-size: var(--font-size-sm);
     color: var(--text-colour-01);
+    padding-top: 0;
 }
 .wid-text-subtitle {
     color: var(--text-colour-02);
@@ -378,8 +379,4 @@
 .wid-text-meta {
     color: var(--text-colour-02);
     font-size: var(--font-size-sm);
-}
-
-.wid-text {
-    white-space: pre-wrap;
 }

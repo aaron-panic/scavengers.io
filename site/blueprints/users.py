@@ -156,7 +156,7 @@ def _build_requests_scene(request_form, filter_form, tickets, pagination, tag_ro
         for i, ticket in enumerate(tickets):
             status_messages = db.tickets.fetch_ticket_status_messages(ticket['id'])
             panel = _build_ticket_panel(ticket, status_messages, fallback_author=session.get('username'))
-            panel.start_collapsed = (i > 0)
+            panel.start_collapsed = True
             ticket_panels.append(panel)
     else:
         ticket_panels.append(
@@ -258,7 +258,6 @@ def _build_requests_scene(request_form, filter_form, tickets, pagination, tag_ro
     ]
 
     filter_panel = ContainerPanel(
-        title='filters & pagination',
         collapsible=False,
         children=filter_content,
         footer=ContainerStack(
