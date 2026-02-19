@@ -245,4 +245,22 @@ BEGIN
 
 END //
 
+
+-- sp_fetch_ticket_tag_list()
+-- ----------------------------------------------------------------------------
+-- Desc:
+--      Fetch all active ticket tags.
+
+CREATE PROCEDURE sp_fetch_ticket_tag_list()
+BEGIN
+
+    SELECT
+        tt.id,
+        tt.name
+    FROM TicketTags tt
+    WHERE tt.is_deleted = FALSE
+    ORDER BY tt.name ASC;
+
+END //
+
 DELIMITER ;

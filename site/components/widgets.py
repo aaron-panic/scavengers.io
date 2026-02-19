@@ -66,6 +66,8 @@ class WidgetForm(Component):
         buttons: List[Component],
         action: str = '',
         method: str = 'POST',
+        form_id: str = '',
+        render_actions: bool = True,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -73,6 +75,8 @@ class WidgetForm(Component):
         self.buttons = buttons
         self.action = action
         self.method = method
+        self.form_id = form_id
+        self.render_actions = render_actions
 
     @property
     def template(self) -> str:
@@ -88,6 +92,7 @@ class WidgetButton(Component):
         href: Optional[str] = None,
         button_type: str = 'button',
         style: str = 'primary',
+        attrs: str = '',
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -95,6 +100,7 @@ class WidgetButton(Component):
         self.href = href
         self.button_type = button_type
         self.style = style
+        self.attrs = attrs
 
     @property
     def template(self) -> str:
@@ -138,6 +144,7 @@ class WidgetText(Component):
         super().__init__(**kwargs)
         self.content = content
         self.style = style
+        self.attrs = attrs
 
     @property
     def template(self) -> str:

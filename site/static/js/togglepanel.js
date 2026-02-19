@@ -1,35 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
     const panels = document.querySelectorAll('.wid-panel');
 
-    panels.forEach(panel => {
+    panels.forEach((panel) => {
         const toggleBtn = panel.querySelector('.wid-panel-toggle');
-        const body = panel.querySelector('.wid-panel-body');
-        const footer = panel.querySelector('.wid-panel-footer');
+        if (!toggleBtn) return;
 
-        if (!toggleBtn || !body) return;
+        const collapseFooter = panel.dataset.collapseFooter !== 'false';
 
-        if (panel.classList.contains('wid-panel-start-collapsed')) {
-            body.style.display = 'none';
-            if (footer) footer.style.display = 'none';
-        } else {
-            body.style.display = ''; 
-            if (footer) footer.style.display = '';
-        }
+        const setCollapsed = (collapsed) => {
+            panel.classList.toggle('wid-panel-collapsed', collapsed);
+            panel.classList.toggle('wid-panel-expanded', !collapsed);
+
+            if (collapsed && collapseFooter) {
+                panel.classList.add('wid-panel-hide-footer');
+            } else {
+                panel.classList.remove('wid-panel-hide-footer');
+            }
+
+            toggleBtn.textContent = collapsed ? '▼' : '▲';
+            toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        };
+
+        const startsCollapsed = panel.classList.contains('wid-panel-start-collapsed');
+        setCollapsed(startsCollapsed);
 
         toggleBtn.addEventListener('click', () => {
-            const isHidden = (body.style.display === 'none');
-
-            if (isHidden) {
-                // expand
-                body.style.display = '';
-                if (footer) footer.style.display = '';
-                toggleBtn.textContent = '▲'; 
-            } else {
-                // collapse
-                body.style.display = 'none';
-                if (footer) footer.style.display = 'none';
-                toggleBtn.textContent = '▼';
-            }
+            const isCollapsed = panel.classList.contains('wid-panel-collapsed');
+            setCollapsed(!isCollapsed);
         });
     });
 });
