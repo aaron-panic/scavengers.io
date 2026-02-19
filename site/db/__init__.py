@@ -1,7 +1,7 @@
 # db.__init__.py - For importing module
 # Copyright (C) 2026 Aaron Reichenbach
 #
-# This program is free software: you can redistribute it and/or modify         
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
@@ -16,7 +16,7 @@
 
 from .core import (
     get_db,
-    close_dbs, 
+    close_dbs,
     execute_procedure
 )
 
@@ -34,24 +34,6 @@ from .auth import (
     create_user_request
 )
 
-from .reports import (
-    create_report,
-    admin_fetch_reports,
-    admin_fetch_report,
-    admin_update_report,
-    admin_delete_report
-)
-
-from .requests import (
-    fetch_requests_by_status,
-    fetch_requests_by_user,
-    create_request,
-    admin_fetch_requests,
-    admin_fetch_request,
-    admin_update_request,
-    admin_delete_request
-)
-
 from .users import (
     admin_fetch_users,
     admin_approve_user,
@@ -62,4 +44,27 @@ from .users import (
     admin_reinstate_user,
     admin_delete_user,
     admin_reset_password
+)
+
+from .tickets import (
+    create_ticket,
+    fetch_tickets,
+    fetch_tickets_by_user,
+    fetch_ticket,
+    fetch_ticket_status_messages,
+    fetch_ticket_tags,
+    fetch_ticket_tag_list,
+    admin_fetch_tickets,
+    admin_fetch_ticket,
+    admin_update_ticket,
+    admin_create_ticket_status_message,
+    admin_update_ticket_status_message,
+    admin_delete_ticket_status_message,
+    admin_create_ticket_tag,
+    admin_link_ticket_tag,
+    admin_unlink_ticket_tag,
+    admin_assign_ticket,
+    admin_unassign_ticket,
+    admin_fetch_ticket_assignments,
+    admin_delete_ticket
 )

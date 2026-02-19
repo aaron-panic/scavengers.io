@@ -1,7 +1,7 @@
 {# site/templates/container_panel.html - elements grouped in a panel-style
  # Copyright (C) 2026 Aaron Reichenbach
  #
- # This program is free software: you can redistribute it and/or modify         
+ # This program is free software: you can redistribute it and/or modify
  # it under the terms of the GNU Affero General Public License as
  # published by the Free Software Foundation, either version 3 of the
  # License, or (at your option) any later version.
@@ -12,15 +12,15 @@
  # GNU Affero General Public License for more details.
 
  # You should have received a copy of the GNU Affero General Public License
- # along with this program.  If not, see <https://www.gnu.org/licenses/>.#} 
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.#}
 {%- from 'macros/renderer.html' import render_component -%}
-<section class="wid-panel{{ ' wid-panel-collapsible' if this.collapsible else '' }}{{ ' wid-panel-start-collapsed' if this.start_collapsed else '' }}{{ this.props.get('class', '') }}">
+<section class="wid-panel{{ ' wid-panel-collapsible' if this.collapsible else '' }}{{ ' wid-panel-start-collapsed' if this.start_collapsed else '' }}{{ this.props.get('class', '') }}" data-collapse-footer="{{ 'true' if this.collapse_footer else 'false' }}"{{ this.props.get('attrs', '') | safe }}>
 {% if this.title or this.author or this.timestamp %}
     <header class="wid-panel-header">
         <div class="wid-panel-header-content">
 {% if this.title %}
             <h3 class="wid-panel-title">{{ this.title }}</h3>
-{%- endif %}            
+{%- endif %}
 {% if this.subtitle %}
             <span class="wid-panel-subtitle">{{ this.subtitle }}</span>
 {% endif %}
@@ -36,7 +36,7 @@
 {% endif %}
         </div>
 {% if this.collapsible %}
-        <button class="wid-panel-toggle" type="button">
+        <button class="wid-panel-toggle" type="button" aria-expanded="{{ 'false' if this.start_collapsed else 'true' }}">
             {{ '▼' if this.start_collapsed else '▲' }}
         </button>
 {% endif %}
