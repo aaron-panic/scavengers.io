@@ -22,11 +22,6 @@ DELIMITER //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Retrieve a paginated list of users.
--- Params:
---      p_limit (INT)                   Number of records to retrieve for a page view
---      p_offset (INT)                  Where to start retrieving records for page view
---      p_sort_col (VARCHAR 20)         Column to sort by
---      p_sort_dir (VARCHAR 4)          Direction (ASC or DESC) to sort
 -- Notes:
 --      This function updates status for all users to remove suspended status
 --      if past the suspension_until timestamp.
@@ -91,8 +86,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Promote a requested user to active status.
--- Params:
---      p_id (INT)                      User id (matches Users.id)
 
 CREATE PROCEDURE sp_admin_approve_user(
     IN p_id INT
@@ -112,8 +105,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Delete (deny) a user request.
--- Params:
---      p_id (INT)                      User id (matches Users.id)
 
 CREATE PROCEDURE sp_admin_deny_user(
     IN p_id INT
@@ -132,8 +123,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Retrieve full profile details for a specific user.
--- Params:
---      p_id (INT)                      User id (matches Users.id)
 
 CREATE PROCEDURE sp_admin_fetch_user(
     IN p_id INT
@@ -160,9 +149,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Set user status to suspended for a specified duration.
--- Params:
---      p_id (INT)                      User id (matches Users.id)
---      p_hours (INT)                   Duration of suspension (hours)
 
 CREATE PROCEDURE sp_admin_suspend_user(
     IN p_id INT,
@@ -183,8 +169,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Permanently ban a user.
--- Params:
---      p_id (INT)                      User id (matches Users.id)
 
 CREATE PROCEDURE sp_admin_ban_user(
     IN p_id INT
@@ -206,8 +190,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Restore a user to active status.
--- Params:
---      p_id (INT)                      User id (matches Users.id)
 
 CREATE PROCEDURE sp_admin_reinstate_user(
     IN p_id INT
@@ -227,8 +209,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Permanently delete a user record.
--- Params:
---      p_id (INT)                      User id (matches Users.id)
 
 CREATE PROCEDURE sp_admin_delete_user(
     IN p_id INT
@@ -245,9 +225,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Force update a user's password hash.
--- Params:
---      p_id (INT)                      User id (matches Users.id)
---      p_password_hash (VARCHAR 255)            New password hash provided to procedure
 
 CREATE PROCEDURE sp_admin_reset_password(
     IN p_id INT,

@@ -81,41 +81,34 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_announcements TO 'scav_admi
 
 
 -- ----------------------------------------------------------------------------
---                              REPORTS TABLE                                 -
+--                              TICKETS TABLE                                 -
 -- ----------------------------------------------------------------------------
 
--- Reports table stored procedures ('scav_user')
+-- Tickets table stored procedures ('scav_user')
 -- ----------------------------------------------------------------------------
-GRANT EXECUTE ON PROCEDURE scavengers.sp_create_report TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_create_ticket TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_tickets TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_tickets_by_user TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_ticket TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_ticket_status_messages TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_ticket_tags TO 'scav_user'@'%';
 
 
--- Reports table administrative stored procedures ('scav_admin')
+-- Tickets table administrative stored procedures ('scav_admin')
 -- ----------------------------------------------------------------------------
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_reports TO 'scav_admin'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_report TO 'scav_admin'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_report TO 'scav_admin'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_report TO 'scav_admin'@'%';
-
-
-
--- ----------------------------------------------------------------------------
---                             REQUESTS TABLE                                 -
--- ----------------------------------------------------------------------------
-
--- Requests table stored procedures ('scav_user')
--- ----------------------------------------------------------------------------
-GRANT EXECUTE ON PROCEDURE scavengers.sp_create_request TO 'scav_user'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_requests_by_user TO 'scav_user'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_requests_by_status TO 'scav_user'@'%';
-
-
--- Requests table stored administrative procedures ('scav_admin')
--- ----------------------------------------------------------------------------
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_requests TO 'scav_admin'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_request TO 'scav_admin'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_request TO 'scav_admin'@'%';
-GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_request TO 'scav_admin'@'%';
-
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_tickets TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_ticket TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_ticket TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_create_ticket_status_message TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_update_ticket_status_message TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_ticket_status_message TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_create_ticket_tag TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_link_ticket_tag TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_unlink_ticket_tag TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_assign_ticket TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_unassign_ticket TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_fetch_ticket_assignments TO 'scav_admin'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_admin_delete_ticket TO 'scav_admin'@'%';
 
 
 FLUSH PRIVILEGES;

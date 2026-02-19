@@ -22,13 +22,6 @@ DELIMITER //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Create a new announcement.
--- Params:
---      p_u_id (INT)                    User id (matches Users.id)
---      p_title (VARCHAR 255)           Title of the announcement
---      p_subtitle (VARCHAR 255)        Subtitle line (optional)
---      p_content (TEXT)                Content of the announcement
---      p_footnote (TEXT)               Footnote line (optional)
---      p_is_visible (BOOLEAN)          Toggle visibility
 
 CREATE PROCEDURE sp_admin_create_announcement(
     IN p_u_id INT,
@@ -65,13 +58,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Update an existing announcement.
--- Params:
---      p_id (INT)                      Announcement id (matches Announcements.id)
---      p_title (VARCHAR 255)           Title of the Announcement
---      p_subtitle (VARCHAR 255)        Subtitle line (optional)
---      p_content (TEXT)                Content of the announcement
---      p_footnote (TEXT)               Footnote line (optional)
---      p_is_visible (BOOLEAN)          Toggle visibility
 
 CREATE PROCEDURE sp_admin_update_announcement(
     IN p_id INT,
@@ -99,8 +85,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Permanently delete an announcement.
--- Params:
---      p_id (INT)                      Announcement id (matches Announcements.id)
 
 CREATE PROCEDURE sp_admin_delete_announcement(
     IN p_id INT
@@ -117,8 +101,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Fetch a single announcement by ID for editing.
--- Params:
---      p_id (INT)                      Announcement id (matches Announcements.id)
 
 CREATE PROCEDURE sp_admin_fetch_announcement(
     IN p_id INT
@@ -143,11 +125,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Fetch a paginated list of all announcements (including hidden).
--- Params:
---      p_limit (INT)                   Number of records to retrieve for a page view
---      p_offset (INT)                  Where to start retrieving records for page view
---      p_sort_col (VARCHAR 20)         Column to sort by
---      p_sort_dir (VARCHAR 4)          Direction (ASC or DESC) to sort
 
 CREATE PROCEDURE sp_admin_fetch_announcements(
     IN p_limit INT,

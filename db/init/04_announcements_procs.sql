@@ -22,8 +22,6 @@ DELIMITER //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Fetch the public feed of visible announcements.
--- Notes:
---      Hardcoded limit of 25 records.
 
 CREATE PROCEDURE sp_fetch_announcements()
 BEGIN

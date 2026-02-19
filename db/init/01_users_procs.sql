@@ -22,8 +22,6 @@ DELIMITER //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Retrieve password hash, role, and status for login authentication.
--- Params:
---      p_username (VARCHAR 50)         Username to fetch credentials for
 -- Notes:
 --      this runs status update for suspended users and updates record if the
 --      suspension is expired. This is to allow users to login if the admin 
@@ -53,10 +51,6 @@ END //
 -- ----------------------------------------------------------------------------
 -- Desc:
 --      Submit a new user registration request.
--- Params:
---      p_username (VARCHAR 50)         Username requested to register
---      p_password_hash (VARCHAR 255)   Hashed password provided
---      p_email (VARCHAR 100)           Email to associate with the account
 -- Notes:
 --      This may fail if the username already exists in the database. Failure
 --      logic is handled in the python script calling.
