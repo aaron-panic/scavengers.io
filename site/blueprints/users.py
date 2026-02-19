@@ -45,10 +45,10 @@ bp = Blueprint('users', __name__, url_prefix='/users')
 
 REQUEST_STATUS_CHOICES = [
     ('', 'all statuses'),
-    ('Pending', 'pending'),
-    ('In_Progress', 'in progress'),
-    ('Completed', 'completed'),
-    ('Rejected', 'rejected')
+    ('pending', 'pending'),
+    ('in progress', 'in progress'),
+    ('completed', 'completed'),
+    ('rejected', 'rejected')
 ]
 
 PER_PAGE = 10
@@ -88,7 +88,7 @@ class RequestFilterForm(FlaskForm):
 # Scene Building
 # -----------------------------------------------------------------------------
 
-def _build_ticket_panel(ticket, status_messages):
+def _build_ticket_panel(ticket, status_messages, fallback_author=None):
     content = [
         WidgetText(content=ticket.get('description', ''), style='body')
     ]
@@ -105,9 +105,11 @@ def _build_ticket_panel(ticket, status_messages):
     else:
         content.append(WidgetText(content='No status messages yet.', style='meta'))
 
+    author = ticket.get('username') or fallback_author or 'unknown'
+
     return ContainerPanel(
         title=ticket.get('title', 'untitled request'),
-        author=ticket.get('username', 'unknown'),
+        author=author,
         timestamp=ticket.get('created_at'),
         footnote=ticket.get('status', 'pending'),
         collapsible=True,
@@ -153,7 +155,7 @@ def _build_requests_scene(request_form, filter_form, tickets, pagination, tag_ro
     if tickets:
         for i, ticket in enumerate(tickets):
             status_messages = db.tickets.fetch_ticket_status_messages(ticket['id'])
-            panel = _build_ticket_panel(ticket, status_messages)
+            panel = _build_ticket_panel(ticket, status_messages, fallback_author=session.get('username'))
             panel.start_collapsed = (i > 0)
             ticket_panels.append(panel)
     else:
