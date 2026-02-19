@@ -68,6 +68,7 @@ class ContainerPanel(Container):
         footer: Optional[Component] = None,
         collapsible: bool = False,
         start_collapsed: bool = False,
+        collapse_footer: bool = True,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -79,6 +80,7 @@ class ContainerPanel(Container):
         self.footer = footer
         self.collapsible = collapsible
         self.start_collapsed = start_collapsed
+        self.collapse_footer = collapse_footer
 
     @property
     def template(self) -> str:

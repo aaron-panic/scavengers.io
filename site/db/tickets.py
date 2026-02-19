@@ -133,6 +133,27 @@ def fetch_ticket_status_messages(ticket_id: int) -> List[Dict[str, Any]]:
 
 # -----------------------------------------------------------------------------
 
+
+
+def fetch_ticket_tag_list() -> List[Dict[str, Any]]:
+    """
+    Fetch all active tags ordered by name.
+    Calls: sp_fetch_ticket_tag_list
+    """
+
+    conn = None
+    tags = []
+    try:
+        conn = get_connection('user')
+        tags = execute_procedure(conn, 'sp_fetch_ticket_tag_list')
+    except Error:
+        pass
+    finally:
+        if conn and conn.is_connected():
+            conn.close()
+    return tags
+
+# -----------------------------------------------------------------------------
 def fetch_ticket_tags(ticket_id: int) -> List[Dict[str, Any]]:
     """
     Fetch tags linked to a ticket.

@@ -1,7 +1,7 @@
 {# site/templates/widget_form.html - Renders a wtform
  # Copyright (C) 2026 Aaron Reichenbach
  #
- # This program is free software: you can redistribute it and/or modify         
+ # This program is free software: you can redistribute it and/or modify
  # it under the terms of the GNU Affero General Public License as
  # published by the Free Software Foundation, either version 3 of the
  # License, or (at your option) any later version.
@@ -14,7 +14,7 @@
  # You should have received a copy of the GNU Affero General Public License
  # along with this program.  If not, see <https://www.gnu.org/licenses/>.#}
 {% from 'macros/renderer.html' import render_component %}
-<form action="{{ this.action }}" method="{{ this.method }}" class="wid-form">
+<form action="{{ this.action }}" method="{{ this.method }}" class="wid-form"{% if this.form_id %} id="{{ this.form_id }}"{% endif %}>
     {{ this.form.hidden_tag() }}
 {% for field in this.form %}
 {% if field.type not in ['CSRFTokenField', 'HiddenField', 'SubmitField'] %}
@@ -31,9 +31,11 @@
     </div>
 {% endif %}
 {% endfor %}
+{% if this.render_actions %}
     <div class="wid-form-actions">
 {% for button in this.buttons %}
         {{ render_component(button) }}
 {% endfor %}
     </div>
+{% endif %}
 </form>

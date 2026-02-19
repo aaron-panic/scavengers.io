@@ -1,7 +1,7 @@
 # db.__init__.py - For importing module
 # Copyright (C) 2026 Aaron Reichenbach
 #
-# This program is free software: you can redistribute it and/or modify         
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
@@ -16,7 +16,7 @@
 
 from .core import (
     get_db,
-    close_dbs, 
+    close_dbs,
     execute_procedure
 )
 
@@ -32,24 +32,6 @@ from .announcements import (
 from .auth import (
     fetch_user_auth,
     create_user_request
-)
-
-from .reports import (
-    create_report,
-    admin_fetch_reports,
-    admin_fetch_report,
-    admin_update_report,
-    admin_delete_report
-)
-
-from .requests import (
-    fetch_requests_by_status,
-    fetch_requests_by_user,
-    create_request,
-    admin_fetch_requests,
-    admin_fetch_request,
-    admin_update_request,
-    admin_delete_request
 )
 
 from .users import (
@@ -71,6 +53,7 @@ from .tickets import (
     fetch_ticket,
     fetch_ticket_status_messages,
     fetch_ticket_tags,
+    fetch_ticket_tag_list,
     admin_fetch_tickets,
     admin_fetch_ticket,
     admin_update_ticket,

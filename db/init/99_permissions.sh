@@ -92,6 +92,7 @@ GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_tickets_by_user TO 'scav_user'@'%
 GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_ticket TO 'scav_user'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_ticket_status_messages TO 'scav_user'@'%';
 GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_ticket_tags TO 'scav_user'@'%';
+GRANT EXECUTE ON PROCEDURE scavengers.sp_fetch_ticket_tag_list TO 'scav_user'@'%';
 
 
 -- Tickets table administrative stored procedures ('scav_admin')
