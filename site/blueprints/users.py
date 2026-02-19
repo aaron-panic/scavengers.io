@@ -1,7 +1,7 @@
 # users.py - Routing blueprint for /users ('user'+)
 # Copyright (C) 2026 Aaron Reichenbach
 #
-# This program is free software: you can redistribute it and/or modify         
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
@@ -15,23 +15,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from flask import (
-    Blueprint, 
-    render_template, 
-    request, 
-    redirect, 
-    url_for, 
-    flash, 
-    session
+    Blueprint,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+    session,
+    make_response
 )
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField
+from wtforms import StringField, TextAreaField, SelectField, BooleanField
 from wtforms.validators import DataRequired, Length, Optional
 
-import db.reports
-import db.requests
+import db.tickets
 from middleware import check_access
 from utils import flash_form_errors, get_pagination_metadata
 
+from components.widgets import WidgetText, WidgetForm, WidgetButton
+from components.containers import ContainerPanel, ContainerStack
+from factory import build_page
 
 
 # -----------------------------------------------------------------------------
@@ -40,17 +43,15 @@ from utils import flash_form_errors, get_pagination_metadata
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
-# Tab configuration for Requests page
-REQUEST_TABS = [
-    {'slug': 'all',         'label': 'all'},
-    {'slug': 'Pending',     'label': 'pending'},
-    {'slug': 'In_Progress', 'label': 'in progress'},
-    {'slug': 'Completed',   'label': 'completed'},
-    {'slug': 'Rejected',    'label': 'rejected'},
-    {'slug': 'my_requests', 'label': 'my requests'},
-    {'slug': 'new',         'label': 'new'}
+REQUEST_STATUS_CHOICES = [
+    ('', 'all statuses'),
+    ('pending', 'pending'),
+    ('in_progress', 'in progress'),
+    ('completed', 'completed'),
+    ('rejected', 'rejected')
 ]
 
+PER_PAGE = 10
 
 
 # -----------------------------------------------------------------------------
@@ -59,29 +60,216 @@ REQUEST_TABS = [
 
 class ReportForm(FlaskForm):
     target = StringField('Target', validators=[
-        DataRequired(message="Target is required (e.g., User Name, Post Title)."),
-        Length(max=255, message="Target must be less than 255 characters.")
+        DataRequired(message='Target is required (e.g., User Name, Post Title).'),
+        Length(max=255, message='Target must be less than 255 characters.')
     ])
     description = TextAreaField('Description', validators=[
-        DataRequired(message="Description is required.")
+        DataRequired(message='Description is required.')
     ])
-    submit = SubmitField('Submit Report')
 
-# -----------------------------------------------------------------------------
 
 class RequestForm(FlaskForm):
     title = StringField('Title', validators=[
-        DataRequired(message="Title is required."),
-        Length(max=255, message="Title must be less than 255 characters.")
+        DataRequired(message='Title is required.'),
+        Length(max=255, message='Title must be less than 255 characters.')
     ])
     description = TextAreaField('Description', validators=[
-        DataRequired(message="Description is required.")
+        DataRequired(message='Description is required.')
     ])
-    ref_1 = StringField('Reference 1', validators=[Optional()])
-    ref_2 = StringField('Reference 2', validators=[Optional()])
-    ref_3 = StringField('Reference 3', validators=[Optional()])
-    submit = SubmitField('Submit Request')
 
+
+class RequestFilterForm(FlaskForm):
+    tag = SelectField('tag', choices=[('', 'all tags')], validators=[Optional()])
+    status = SelectField('status', choices=REQUEST_STATUS_CHOICES, validators=[Optional()])
+    my_requests = BooleanField('my requests only')
+
+
+# -----------------------------------------------------------------------------
+# Scene Building
+# -----------------------------------------------------------------------------
+
+def _build_ticket_panel(ticket, status_messages):
+    content = [
+        WidgetText(content=ticket.get('description', ''), style='body')
+    ]
+
+    if status_messages:
+        content.append(WidgetText(content='status history:', style='subtitle'))
+        for msg in status_messages:
+            status_line = (
+                f"[{msg.get('created_at', '')}] "
+                f"{msg.get('old_status', '')} -> {msg.get('new_status', '')}: "
+                f"{msg.get('status_message', '')}"
+            )
+            content.append(WidgetText(content=status_line, style='meta'))
+    else:
+        content.append(WidgetText(content='No status messages yet.', style='meta'))
+
+    return ContainerPanel(
+        title=ticket.get('title', 'untitled request'),
+        author=ticket.get('username', 'unknown'),
+        timestamp=ticket.get('created_at'),
+        footnote=ticket.get('status', 'pending'),
+        collapsible=True,
+        collapse_footer=False,
+        children=content
+    )
+
+
+def _build_requests_scene(request_form, filter_form, tickets, pagination, tag_rows):
+    form_widget = WidgetForm(
+        form=request_form,
+        buttons=[],
+        action=url_for('users.requests'),
+        method='POST',
+        render_actions=False,
+        form_id='new-request-form'
+    )
+
+    submit_button = WidgetButton(
+        label='submit request',
+        button_type='submit',
+        style='primary',
+        attrs=' form="new-request-form"'
+    )
+    clear_button = WidgetButton(
+        label='clear',
+        button_type='reset',
+        style='secondary',
+        attrs=' form="new-request-form"'
+    )
+
+    top_panel = ContainerPanel(
+        title='new request',
+        children=[form_widget],
+        footer=ContainerStack(
+            gap='small',
+            **{'class': ' wid-con-stack-row'},
+            children=[submit_button, clear_button]
+        )
+    )
+
+    ticket_panels = []
+    if tickets:
+        for i, ticket in enumerate(tickets):
+            status_messages = db.tickets.fetch_ticket_status_messages(ticket['id'])
+            panel = _build_ticket_panel(ticket, status_messages)
+            panel.start_collapsed = (i > 0)
+            ticket_panels.append(panel)
+    else:
+        ticket_panels.append(
+            ContainerPanel(
+                title='no requests',
+                children=[WidgetText(content='No requests match the current filters.')]
+            )
+        )
+
+    tag_buttons = []
+    for tag in tag_rows:
+        tag_name = tag.get('name', '')
+        if not tag_name:
+            continue
+
+        href = url_for(
+            'users.requests',
+            page=1,
+            status=filter_form.status.data or '',
+            tag=tag_name,
+            my_requests='1' if filter_form.my_requests.data else ''
+        )
+        style = 'primary' if (filter_form.tag.data == tag_name) else 'secondary'
+        tag_buttons.append(WidgetButton(label=tag_name, href=href, style=style))
+
+    all_tags_href = url_for(
+        'users.requests',
+        page=1,
+        status=filter_form.status.data or '',
+        tag='',
+        my_requests='1' if filter_form.my_requests.data else ''
+    )
+    tag_buttons.insert(
+        0,
+        WidgetButton(
+            label='all tags',
+            href=all_tags_href,
+            style='primary' if not filter_form.tag.data else 'secondary'
+        )
+    )
+
+    status_buttons = []
+    for status_value, status_label in REQUEST_STATUS_CHOICES:
+        href = url_for(
+            'users.requests',
+            page=1,
+            status=status_value,
+            tag=filter_form.tag.data or '',
+            my_requests='1' if filter_form.my_requests.data else ''
+        )
+        style = 'primary' if (filter_form.status.data == status_value) else 'secondary'
+        status_buttons.append(WidgetButton(label=status_label, href=href, style=style))
+
+    my_requests_href = url_for(
+        'users.requests',
+        page=1,
+        status=filter_form.status.data or '',
+        tag=filter_form.tag.data or '',
+        my_requests='' if filter_form.my_requests.data else '1'
+    )
+
+    filter_content = [
+        WidgetText(content='filter by status:', style='subtitle'),
+        ContainerStack(
+            gap='small',
+            **{'class': ' wid-con-stack-row wid-con-stack-wrap'},
+            children=status_buttons
+        ),
+        WidgetText(content='scope:', style='subtitle'),
+        WidgetButton(
+            label='my requests only' if filter_form.my_requests.data else 'all requests',
+            href=my_requests_href,
+            style='primary' if filter_form.my_requests.data else 'secondary'
+        ),
+        WidgetText(content='filter by tag:', style='subtitle'),
+        ContainerStack(
+            gap='small',
+            **{'class': ' wid-con-stack-row wid-con-stack-wrap'},
+            children=tag_buttons
+        )
+    ]
+
+    nav_buttons = [
+        WidgetButton(
+            label='previous',
+            href=pagination['prev_href'] if pagination['has_prev'] else None,
+            style='secondary',
+            attrs='' if pagination['has_prev'] else ' disabled'
+        ),
+        WidgetText(content=f"page {pagination['page']} of {pagination['pages']}", style='meta'),
+        WidgetButton(
+            label='next',
+            href=pagination['next_href'] if pagination['has_next'] else None,
+            style='secondary',
+            attrs='' if pagination['has_next'] else ' disabled'
+        )
+    ]
+
+    filter_panel = ContainerPanel(
+        title='filters & pagination',
+        collapsible=False,
+        children=filter_content,
+        footer=ContainerStack(
+            gap='small',
+            **{'class': ' wid-con-stack-row'},
+            children=nav_buttons
+        )
+    )
+
+    stack = ContainerStack(
+        gap='medium',
+        children=[top_panel, *ticket_panels, filter_panel]
+    )
+
+    return build_page(content=[stack], title='requests')
 
 
 # -----------------------------------------------------------------------------
@@ -92,125 +280,104 @@ class RequestForm(FlaskForm):
 def restrict_access():
     return check_access(['admin', 'user'])
 
-# -----------------------------------------------------------------------------
 
 @bp.route('/media')
 def media():
     return render_template('offline.html', title='media')
 
-# -----------------------------------------------------------------------------
 
 @bp.route('/report', methods=['GET', 'POST'])
 def report():
-    form = ReportForm()
-    
-    if form.validate_on_submit():
-        try:
-            db.reports.create_report(
-                u_id=session.get('user_id'),
-                target=form.target.data,
-                description=form.description.data
-            )
-            flash('Report submitted successfully.', 'success')
-            return redirect(url_for('users.report'))
-            
-        except Exception as e:
-            print(f"Report Error: {e}")
-            flash('An error occurred while submitting report.', 'error')
-    
-    elif form.errors:
-        flash_form_errors(form)
+    return redirect(url_for('users.requests'))
 
-    return render_template('report.html', title='report', form=form)
-
-# -----------------------------------------------------------------------------
 
 @bp.route('/requests', methods=['GET', 'POST'])
 def requests():
-    
-    # parameter extraction
-    tab_sel = request.args.get('tab_sel', 'all')
-    page = request.args.get('page', 1, type=int)
+    request_form = RequestForm()
 
-    # navigation tabs
-    filters = []
-    for tab in REQUEST_TABS:
-        filters.append({
-            'label': tab['label'],
-            'href': url_for('users.requests', tab_sel=tab['slug']),
-            'active': (tab_sel == tab['slug'])
-        })
-    
-    # new request view
-    if tab_sel == 'new':
-        form = RequestForm()
-        
-        if form.validate_on_submit():
-            try:
-                db.requests.create_request(
-                    u_id=session.get('user_id'),
-                    title=form.title.data,
-                    description=form.description.data,
-                    ref_1=form.ref_1.data,
-                    ref_2=form.ref_2.data,
-                    ref_3=form.ref_3.data
-                )
-                flash('Request submitted successfully.', 'success')
-                return redirect(url_for('users.requests', tab_sel='my_requests'))
-                
-            except Exception as e:
-                print(f"Request Creation Error: {e}")
-                flash('An error occurred. Please try again.', 'error')
-        
-        return render_template(
-            'requests.html', 
-            title='requests', 
-            filters=filters, 
-            form=form,
-            show_form=True
+    if request_form.validate_on_submit():
+        try:
+            db.tickets.create_ticket(
+                u_id=session.get('user_id'),
+                ticket_type='request',
+                title=request_form.title.data,
+                description=request_form.description.data,
+                priority=None
+            )
+            flash('Request submitted successfully.', 'success')
+            return redirect(url_for('users.requests'))
+        except Exception as e:
+            print(f'Request creation error: {e}')
+            flash('An error occurred while submitting your request.', 'error')
+    elif request.method == 'POST' and request_form.errors:
+        flash_form_errors(request_form)
+
+    page = request.args.get('page', 1, type=int)
+    page = page if page > 0 else 1
+    offset = (page - 1) * PER_PAGE
+
+    filter_form = RequestFilterForm(request.args, meta={'csrf': False})
+
+    tag_rows = db.tickets.fetch_ticket_tag_list()
+    filter_form.tag.choices = [('', 'all tags')] + [
+        (tag.get('name', ''), tag.get('name', ''))
+        for tag in tag_rows if tag.get('name')
+    ]
+
+    selected_tag = request.args.get('tag', '')
+    selected_status = request.args.get('status', '')
+    my_requests = request.args.get('my_requests', '') in ['1', 'true', 'on', 'yes']
+
+    filter_form.tag.data = selected_tag if selected_tag in dict(filter_form.tag.choices) else ''
+    filter_form.status.data = selected_status if selected_status in dict(filter_form.status.choices) else ''
+    filter_form.my_requests.data = my_requests
+
+    if my_requests:
+        rows = db.tickets.fetch_tickets_by_user(
+            u_id=session.get('user_id'),
+            ticket_type='request',
+            status=filter_form.status.data or None,
+            tag_name=filter_form.tag.data or None,
+            limit=PER_PAGE,
+            offset=offset
+        )
+    else:
+        rows = db.tickets.fetch_tickets(
+            ticket_type='request',
+            status=filter_form.status.data or None,
+            tag_name=filter_form.tag.data or None,
+            limit=PER_PAGE,
+            offset=offset
         )
 
-    # list view
-    per_page = 12
-    offset = (page - 1) * per_page
-    
-    rows = []
-    
-    if tab_sel == 'my_requests':
-        rows = db.requests.fetch_requests_by_user(session.get('user_id'), per_page, offset)
-    else:
-        rows = db.requests.fetch_requests_by_status(tab_sel, per_page, offset)
-        
-    # if data exists, we grab how many records total from the first row
     total_records = rows[0].get('total_records', 0) if rows else 0
-    
-    # build pagination
+
     pagination = get_pagination_metadata(
-        page, 
-        per_page, 
-        total_records, 
-        'users.requests', 
-        tab_sel=tab_sel
+        page,
+        PER_PAGE,
+        total_records,
+        'users.requests',
+        status=filter_form.status.data or '',
+        tag=filter_form.tag.data or '',
+        my_requests='1' if filter_form.my_requests.data else ''
     )
 
-    return render_template(
-        'requests.html',
-        title='requests',
-        filters=filters,
-        posts=rows,
+    page_obj = _build_requests_scene(
+        request_form=request_form,
+        filter_form=filter_form,
+        tickets=rows,
         pagination=pagination,
-        show_form=False
+        tag_rows=tag_rows
     )
 
-# -----------------------------------------------------------------------------
+    return make_response(render_template(page_obj.template, this=page_obj))
+
 
 @bp.route('/dev')
 def dev():
-    return render_template('offline.html', title='dev')
+    return redirect(url_for('users.requests'))
 
-# -----------------------------------------------------------------------------
 
 @bp.route('/board')
 def board():
-    return render_template('offline.html', title='board')
-
+    return redirect(url_for('users.requests'))

@@ -1,7 +1,7 @@
 {# site/templates/widget_button.html - Renders a single button/link
  # Copyright (C) 2026 Aaron Reichenbach
  #
- # This program is free software: you can redistribute it and/or modify         
+ # This program is free software: you can redistribute it and/or modify
  # it under the terms of the GNU Affero General Public License as
  # published by the Free Software Foundation, either version 3 of the
  # License, or (at your option) any later version.
@@ -13,6 +13,12 @@
 
  # You should have received a copy of the GNU Affero General Public License
  # along with this program.  If not, see <https://www.gnu.org/licenses/>.#}
-<button type="{{ this.button_type }}" class="wid-button wid-button-{{ this.style }}{{ this.props.get('class', '') }}"{{ this.props.get('attrs', '') | safe }}>
+{% if this.href %}
+<a href="{{ this.href }}" class="wid-button wid-button-{{ this.style }}{{ ' ' + this.props.get('class') if this.props.get('class') else '' }}"{{ this.attrs | safe }}>
+    <span class="wid-button-label">{{ this.label }}</span>
+</a>
+{% else %}
+<button type="{{ this.button_type }}" class="wid-button wid-button-{{ this.style }}{{ ' ' + this.props.get('class') if this.props.get('class') else '' }}"{{ this.attrs | safe }}>
     <span class="wid-button-label">{{ this.label }}</span>
 </button>
+{% endif %}
