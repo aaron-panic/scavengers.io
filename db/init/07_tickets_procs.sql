@@ -185,8 +185,7 @@ BEGIN
         t.priority,
         t.created_at,
         t.updated_at,
-        u.username,
-        u.email
+        u.username
     FROM Tickets t
     JOIN Users u ON t.u_id = u.id
     WHERE t.id = p_id
