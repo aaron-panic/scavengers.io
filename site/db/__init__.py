@@ -63,3 +63,25 @@ from .users import (
     admin_delete_user,
     admin_reset_password
 )
+
+from .tickets import (
+    create_ticket,
+    fetch_tickets,
+    fetch_tickets_by_user,
+    fetch_ticket,
+    fetch_ticket_status_messages,
+    fetch_ticket_tags,
+    admin_fetch_tickets,
+    admin_fetch_ticket,
+    admin_update_ticket,
+    admin_create_ticket_status_message,
+    admin_update_ticket_status_message,
+    admin_delete_ticket_status_message,
+    admin_create_ticket_tag,
+    admin_link_ticket_tag,
+    admin_unlink_ticket_tag,
+    admin_assign_ticket,
+    admin_unassign_ticket,
+    admin_fetch_ticket_assignments,
+    admin_delete_ticket
+)
